@@ -10,10 +10,14 @@ Public License Version 2.1 (LGPL).  See LICENSE.txt for details.
 
 from zope.i18nmessageid import MessageFactory
 from Products.CMFCore import utils
+from Products.CMFCore.DirectoryView import registerDirectory
+from Globals import package_home
 
-from config import GLOBALS, PROJECTNAME
+from config import GLOBALS, PROJECTNAME, SKINS_DIR
 
 messageFactory = MessageFactory('rhaptossword')
+
+registerDirectory(config.SKINS_DIR, config.GLOBALS)
 
 import SwordTool
 tools = (SwordTool.SwordTool,)

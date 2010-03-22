@@ -44,7 +44,7 @@ def install(self):
     setup_tool.setImportContext('profile-Products.%s:default' % PROJECTNAME)  # our profile and steps
 
     # run all import steps
-    steps = ('toolset',)
+    steps = ('toolset','skins',)
     for step in steps:
         log(" - applying step: %s" % step, out)
         status = setup_tool.runImportStep(step)
