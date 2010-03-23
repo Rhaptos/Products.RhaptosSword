@@ -1,0 +1,7 @@
+[default]
+title=Sword Service Request
+
+[actions]
+action.ServiceDescription=traverse_to:string:service_description
+action.ContentCreation=traverse_to:string:add_content
+

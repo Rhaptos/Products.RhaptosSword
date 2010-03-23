@@ -1,0 +1,41 @@
+<tal:container xmlns:tal="http://xml.zope.org/namespaces/tal"
+                tal:define="serviceDescription string:Description of service operation goes here.;
+                            providerDescritpion string:Some description of Connexions goes here.;
+                            isAnon context/portal_membership/isAnonymousUser;"
+><?xml version="1.0" encoding='utf-8'?>
+<service xmlns="http://www.w3.org/2007/app"
+         xmlns:atom="http://www.w3.org/2005/Atom"
+         xmlns:sword="http://purl.org/net/sword/"
+         xmlns:dcterms="http://purl.org/dc/terms/">
+
+ <sword:version>1.3</sword:version>
+ <sword:verbose>false</sword:verbose>
+ <sword:noOp>true</sword:noOp>
+ <sword:maxUploadSize>60000</sword:maxUploadSize>
+ <workspace>
+   <atom:title>Connexions</atom:title>
+   <tal:collection tal:condition="isAnon">
+     <collection href="http://cnx.org/sword/atom" >
+       <atom:title>Connexions Module Generation</atom:title>
+       <accept>application/msword</accept>
+       <sword:mediation>false</sword:mediation>
+       <sword:treatment tal:content="serviceDescription"/>
+       <dcterms:abstract tal:content="providerDescritpion"/>
+     </collection>
+   </tal:collection>
+   <tal:collection tal:condition="not:isAnon"
+                   tal:define="member python:here.portal_membership.getAuthenticatedMember();
+                               member_id python:member.getId();
+                               fullname python:member.getProperty('fullname');">
+     <collection href="http://cnx.org/Members/userid/sword" 
+                 tal:attributes="href python:'http://cnx.org/Members/%s/sword' % member_id;">
+       <atom:title><tal:fullname tal:content="fullname">User</tal:fullname>'s workspace</atom:title>
+       <accept>application/zip</accept>
+       <sword:mediation>false</sword:mediation>
+       <sword:treatment tal:content="serviceDescription"/>
+       <dcterms:abstract tal:content="providerDescritpion"/>
+     </collection>
+   </tal:collection>
+ </workspace>
+</service>
+</tal:container>
