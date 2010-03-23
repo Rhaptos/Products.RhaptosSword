@@ -55,12 +55,30 @@ class SwordTool(UniqueObject, SimpleItem):
         # unknown to the user
         log('__init__ completed.') # this no workeee
 
+
     security.declareProtected(ManagePermission, 'manage_sword_tool')
-    def manage_sword_tool(self, acceptingSwordRequests=True):
+    def manage_sword_tool(self, acceptingSwordRequests=None):
         """
         Post creation configuration.  See manage_configure_sword_tool.zpt
         """
-        self.acceptingSwordRequests  = eval(acceptingSwordRequests) # string not boolean returned
+        # acceptingSwordRequests will either be the empty string or None
+        # the empty string => the checkbox was checked
+        # None => the checkbox was not checked
+        acceptingSwordRequests = acceptingSwordRequests is not None
+        self.acceptingSwordRequests = acceptingSwordRequests
+
+
+    security.declareProtected(ManagePermission, 'getAcceptingRequests')
+    def getAcceptingRequests(self):
+        """Get process requests."""
+        return self.acceptingSwordRequests
+
+
+    security.declareProtected(ManagePermission, 'setAcceptingRequests')
+    def setAcceptingRequests(self, acceptingSwordRequests):
+        """Turn sword processing on and off."""
+        self.acceptingSwordRequests = acceptingSwordRequests
+
 
 
 

@@ -10,5 +10,13 @@
       This template is used to display information about the RhaptosSword tool in ZMI.
   </tal:comment>
 
-  <h3> <code>sword_tool</code> </h3>
+  <h3> <code>Sword Tool</code> </h3>
+
+  <p>The Sword Tool allows Word documents to be imported into work areas via the Sword Protocol.</p>
+
+  <tal:block tal:define="sword_tool        python:modules['Products.CMFCore.utils'].getToolByName(here, 'sword_tool');
+                           acceptingRequests python:sword_tool is not None and sword_tool.getAcceptingRequests();">
+    <p tal:condition="acceptingRequests"    >The Sword Tool is currently accepting requests.</p>
+    <p tal:condition="not:acceptingRequests">The Sword Tool is not currently accepting requests.</p>
+  </tal:block>
 </html>
