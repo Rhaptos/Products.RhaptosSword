@@ -16,7 +16,7 @@ context.plone_log("method is %s." % method)
 
 if method == "GET":
     # service request
-    state.setStatus('ServiceDescription')
+    state.setStatus('ServiceDiscovery')
     return state.set(context=context)
 elif method == "POST":
     # content post

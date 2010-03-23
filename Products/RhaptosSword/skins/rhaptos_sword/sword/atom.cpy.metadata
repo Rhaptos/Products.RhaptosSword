@@ -2,6 +2,6 @@
 title=Sword Service Request
 
 [actions]
-action.ServiceDescription=traverse_to:string:service_description
+action.ServiceDiscovery=traverse_to:string:service_discovery
 action.ContentCreation=traverse_to:string:add_content
 
