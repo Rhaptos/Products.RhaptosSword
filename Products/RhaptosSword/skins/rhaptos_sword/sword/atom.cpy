@@ -36,8 +36,18 @@ elif method == "POST":
     else:
         # zipped word doc is part of the request
         # state.setStatus('ContentCreation')
-        pass
-
-
-
-
+		type_name = 'module'
+		id=context.generateUniqueId(type_name)
+		if context.portal_factory.getFactoryTypes().has_key(type_name):
+		    o = context.restrictedTraverse('portal_factory/' + type_name + '/' + id)
+		    message = None
+		    transaction_note('Initiated creation of %s with id %s in %s' % (o.getTypeInfo().getId(), id, context.absolute_url()))
+		else:
+		    new_id = context.invokeFactory(id=id, type_name=type_name)
+		    if new_id is None or new_id == '':
+		       new_id = id
+		    o=getattr(context, new_id, None)
+		    tname = o.getTypeInfo().Title()
+		    message = _(u'${tname} has been created.', mapping={u'tname' : tname})
+		    transaction_note('Created %s with id %s in %s' % (o.getTypeInfo().getId(), new_id, context.absolute_url()))
+		
