@@ -18,7 +18,7 @@
  <workspace>
    <atom:title>Connexions</atom:title>
    <tal:collection tal:condition="isAnon">
-     <collection href="http://cnx.org/sword/atom" >
+     <collection href="http://cnx.org/sword/atom" tal:attributes="href string:${here/absolute_url}/atom">
        <atom:title>Connexions Module Generation</atom:title>
        <accept>application/zip</accept>
        <sword:mediation>false</sword:mediation>
@@ -31,7 +31,7 @@
                  tal:define="member context/portal_membership/getAuthenticatedMember;
                  member_id member/getId;
                  workspace python:here.portal_membership.getHomeFolder(member_id).absolute_url(); "
-           tal:attributes="href workspace">
+           tal:attributes="href string:${workspace}/sword/atom">
        <atom:title><tal:fullname tal:content="member/fullname">User</tal:fullname>'s workspace</atom:title>
        <accept>application/zip</accept>
        <sword:mediation>false</sword:mediation>
