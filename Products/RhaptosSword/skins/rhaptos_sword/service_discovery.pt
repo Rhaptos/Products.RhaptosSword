@@ -29,9 +29,10 @@
    <tal:collection tal:condition="not:isAnon"
                    tal:define="member python:here.portal_membership.getAuthenticatedMember();
                                member_id python:member.getId();
+                               workspace python:here.portal_membership.getHomeFolder(member_id).absolute_url();
                                fullname python:member.getProperty('fullname');">
      <collection href="http://cnx.org/Members/userid/sword/atom" 
-                 tal:attributes="href python:'http://cnx.org/Members/%s/sword/atom' % member_id;">
+                 tal:attributes="href workspace">
        <atom:title><tal:fullname tal:content="fullname">User</tal:fullname>'s workspace</atom:title>
        <accept>application/zip</accept>
        <sword:mediation>false</sword:mediation>
