@@ -4,6 +4,8 @@ from Products.CNXMLTransforms.helpers import OOoImportError, doTransform, makeCo
 import transaction
 from AccessControl import getSecurityManager
 
+context = context.getParentNode() # since we use the URL scheme [folder]/sword/atom context is a DirectoryViewSurrogate (sword) instead of [folder]
+
 request = context.REQUEST
 response = context.REQUEST.RESPONSE 
 sword_tool = context.sword_tool
@@ -41,18 +43,11 @@ elif method == "POST":
         # state.setStatus('ContentCreation')
         type_name = 'Module'
         id=context.generateUniqueId(type_name)
-        if context.portal_factory.getFactoryTypes().has_key(type_name):
-            rme = context.restrictedTraverse('portal_factory/' + type_name + '/' + id)
-            message = None
-            #transaction_note('Initiated creation of %s with id %s in %s' % (rme.getTypeInfo().getId(), id, context.absolute_url()))
-        else:
-            new_id = context.invokeFactory(id=id, type_name=type_name)
-            if new_id is None or new_id == '':
-               new_id = id
-            rme=getattr(context, new_id, None)
-            tname = rme.getTypeInfo().Title()
-            message = _(u'${tname} has been created.', mapping={u'tname' : tname})
-            transaction_note('Created %s with id %s in %s' % (rme.getTypeInfo().getId(), new_id, context.absolute_url()))
+        new_id = context.invokeFactory(id=id, type_name=type_name)
+        if new_id is None or new_id == '':
+           new_id = id
+        rme=getattr(context, new_id, None)
+        tname = rme.getTypeInfo().Title()
         # Perform the import
         try:
             text = context.REQUEST['BODY'] #request.BODY#request['BODY']
