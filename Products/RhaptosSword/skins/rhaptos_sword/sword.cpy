@@ -4,8 +4,6 @@ from Products.CNXMLTransforms.helpers import OOoImportError, doTransform, makeCo
 import transaction
 from AccessControl import getSecurityManager
 
-context = context.getParentNode() # since we use the URL scheme [folder]/sword/atom context is a DirectoryViewSurrogate (sword) instead of [folder]
-
 request = context.REQUEST
 response = context.REQUEST.RESPONSE 
 sword_tool = context.sword_tool
@@ -14,7 +12,7 @@ acceptingSwordRequests = sword_tool.acceptingSwordRequests
 
 member = context.portal_membership.getAuthenticatedMember()
 memberId = str(member)
-isAnonymousUser = ( memberId == 'Anonymous User' )
+isAnonymousUser = context.portal_membership.isAnonymousUser()
 
 method = request['REQUEST_METHOD']
 
@@ -22,7 +20,10 @@ context.plone_log("method is %s." % method)
 context.plone_log("member is %s." % memberId)
 context.plone_log("Accepting Sword Request? %s." % str(acceptingSwordRequests))
 
-if method == "GET":
+if isAnonymousUser:
+    response.setStatus('Unauthorized')
+    return response
+elif method == "GET":
     # service request
     if acceptingSwordRequests:
         state.setStatus('ServiceDiscovery')
@@ -33,9 +34,6 @@ if method == "GET":
 elif method == "POST":
     # content post
     if not acceptingSwordRequests:
-        response.setStatus('NotFound')
-        return response
-    elif isAnonymousUser:
         response.setStatus('NotFound')
         return response
     else:
@@ -50,7 +48,7 @@ elif method == "POST":
         tname = rme.getTypeInfo().Title()
         # Perform the import
         try:
-            text = context.REQUEST['BODY'] #request.BODY#request['BODY']
+            text = context.REQUEST['BODY']
             kwargs = {'original_file_name':'sword-import-file', 'user_name':getSecurityManager().getUser().getUserName()}
             text, subobjs, meta = doTransform(rme, "sword_to_folder", text, meta=1, **kwargs)
             if text:
