@@ -79,6 +79,3 @@ class SwordTool(UniqueObject, SimpleItem):
         """Turn sword processing on and off."""
         self.acceptingSwordRequests = acceptingSwordRequests
 
-
-
-
