@@ -1,0 +1,20 @@
+<tal:container 
+    xmlns:tal="http://xml.zope.org/namespaces/tal"
+><?xml version="1.0" encoding='utf-8'?>
+<sword:error xmlns="http://www.w3.org/2007/app"
+         xmlns:atom="http://www.w3.org/2005/Atom"
+         xmlns:sword="http://purl.org/net/sword/"
+         xmlns:dcterms="http://purl.org/dc/terms/"
+         url="http://cnx.org/help/Sword">
+
+  <author>
+    <name>Rhaptos repository</name>
+  </author>
+  <title>ERROR: Anonymous submission is not allowed</title>
+  <generator tal:attributes="uri string:${here/absolute_url}/sword">cnx.org</generator>
+  <summary>Anonymous posting is not allowed.</summary>
+  <sword:treatment>processing failed</sword:treatment>
+  <link rel="alternate" href="http://cnx.org/help/Sword" type="text/html"/>
+
+</sword:error>
+</tal:container>

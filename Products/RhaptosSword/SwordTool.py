@@ -23,6 +23,11 @@ import AccessControl
 
 # from getipaddr import getipaddr
 
+# Allow the sword.cpy file access to zipfile.BadZipfile
+from AccessControl import ModuleSecurityInfo
+ModuleSecurityInfo('zipfile').declarePublic('BadZipfile')
+
+
 ManagePermission = 'View management screens'
 
 import zLOG

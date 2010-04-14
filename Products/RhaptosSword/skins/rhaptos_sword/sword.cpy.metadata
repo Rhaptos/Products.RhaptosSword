@@ -4,3 +4,6 @@ title=Sword Service Request
 [actions]
 action.ServiceDiscovery=traverse_to:string:service_discovery
 action.ContentCreation=traverse_to:string:add_content
+action.SwordAnonymousPost=traverse_to:string:sword_anonymous_post
+action.SwordImportError=traverse_to:string:sword_import_error
+action.SwordErrorZip=traverse_to:string:sword_import_error
