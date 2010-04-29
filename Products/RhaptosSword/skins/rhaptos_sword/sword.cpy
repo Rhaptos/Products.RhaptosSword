@@ -72,6 +72,8 @@ elif method == "POST":
             # Parse the returned mdml and set attributes up on the ModuleEditor object
             rme.updateMdmlStr(meta.get('mdml'))
             context.plone_log("SWORD Import for %s with id=%s: Completed." % (memberId, new_id))
+            response.setStatus('Created')
+            return state.set(status='SwordImportSuccess', context=rme)
 
         except OOoImportError, e:
             transaction.abort()
@@ -85,4 +87,3 @@ elif method == "POST":
             context.plone_log("SWORD Import for %s with id=%s: Aborted. There were problems with the uploaded zip file." % (memberId, new_id))
             response.setStatus('BadRequest')
             return state.set(status='SwordErrorZip')
-

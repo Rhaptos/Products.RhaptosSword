@@ -1,0 +1,24 @@
+<tal:container 
+    xmlns:tal="http://xml.zope.org/namespaces/tal"
+><?xml version="1.0" encoding='utf-8'?>
+<entry xmlns="http://www.w3.org/2005/Atom"
+	 xmlns:sword="http://purl.org/net/sword/"
+    tal:define="title context/title;
+        timestamp context/revised;
+        memberid user;
+        import_url string:http://cnx.org/sword;
+        url context/absolute_url;
+    "
+    >
+    <title tal:content="title">My Deposit</title>
+    <id tal:content="url">1234</id>
+
+    <updated tal:content="timestamp">2010-04-01 12:34:56.789Z</updated>
+    <author><name tal:content="memberid">jbloggs</name></author>
+    <summary type="text" tal:content="context/abstract">A summary</summary>
+    <sword:userAgent tal:content="memberid"></sword:userAgent>
+    <generator uri="http://cnx.org/sword" version="??" tal:attributes="uri import_url"/>
+    <link rel="edit" href="http://cnx.org/Members/userid/module.2008-11-19.7209280058/view" tal:attributes="href url" />
+</entry>
+
+</tal:container>
