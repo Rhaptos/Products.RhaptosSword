@@ -69,11 +69,10 @@ elif method == "POST":
                 rme.manage_delObjects([rme.default_file,])
                 rme.invokeFactory('CNXML Document', rme.default_file, file=text, idprefix='zip-')
             makeContent(rme, subobjs)
-            # Add any additional, unmatched, aka uncredited authors
-            rme.setImportAuthors(['Sword Import Author1', 'Sword Import Author2'])
 
             # Parse the returned mdml and set attributes up on the ModuleEditor object
-            rme.updateMdmlStr(meta.get('mdml'))
+            # Add any additional, unmatched, aka uncredited authors
+            rme.updateProperties(meta)
             context.plone_log("SWORD Import for %s with id=%s: Completed." % (memberId, new_id))
             response.setStatus('Created')
             return state.set(status='SwordImportSuccess', context=rme)
