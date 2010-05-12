@@ -13,6 +13,9 @@ from OFS.SimpleItem import SimpleItem
 from Globals import InitializeClass
 from ZODB.PersistentList import PersistentList
 from Products.PageTemplates.PageTemplateFile import PageTemplateFile
+from Products.CNXMLDocument import XMLService
+from Products.CNXMLTransforms.helpers import CNXML2JSON_XSL
+from Products.CNXMLTransforms.helpers import MDML2JSON_XSL
 
 import AccessControl
 
@@ -84,3 +87,10 @@ class SwordTool(UniqueObject, SimpleItem):
         """Turn sword processing on and off."""
         self.acceptingSwordRequests = acceptingSwordRequests
 
+    security.declarePublic('cnxml2json')
+    def cnxml2json(self, content):
+        return XMLService.transform(content, CNXML2JSON_XSL)
+
+    security.declarePublic('mdml2json')
+    def mdml2json(self, content):
+        return XMLService.transform(content, MDML2JSON_XSL)
