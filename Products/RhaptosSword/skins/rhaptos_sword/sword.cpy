@@ -64,10 +64,12 @@ elif method == "POST":
             text = context.REQUEST['BODY']
             kwargs = {'original_file_name':'sword-import-file', 'user_name':getSecurityManager().getUser().getUserName()}
             text, subobjs, meta = doTransform(rme, "sword_to_folder", text, meta=1, **kwargs)
+            if not text:
+              raise BadZipfile
+
             context.plone_log("SWORD Import for %s with id=%s: Transformed metadata and transformed document to cnxml." % (memberId, new_id))
-            if text:
-                rme.manage_delObjects([rme.default_file,])
-                rme.invokeFactory('CNXML Document', rme.default_file, file=text, idprefix='zip-')
+            rme.manage_delObjects([rme.default_file,])
+            rme.invokeFactory('CNXML Document', rme.default_file, file=text, idprefix='zip-')
             makeContent(rme, subobjs)
 
             # Parse the returned mdml and set attributes up on the ModuleEditor object
@@ -89,4 +91,6 @@ elif method == "POST":
             transaction.abort()
             context.plone_log("SWORD Import for %s with id=%s: Aborted. There were problems with the uploaded zip file." % (memberId, new_id))
             response.setStatus('BadRequest')
-            return state.set(status='SwordErrorZip')
+            state.setStatus('SwordErrorZip')
+            return state.set(context=context)
+
