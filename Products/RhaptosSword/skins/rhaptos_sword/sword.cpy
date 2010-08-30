@@ -76,6 +76,8 @@ elif method == "POST":
             # Add any additional, unmatched, aka uncredited authors
             props = meta['properties']
             rme.updateProperties(props)
+            # Make sure the metadata gets into the cnxml
+            rme.editMetadata()
             context.plone_log("SWORD Import for %s with id=%s: Completed." % (memberId, new_id))
             response.setStatus('Created')
             return state.set(status='SwordImportSuccess', context=rme)
