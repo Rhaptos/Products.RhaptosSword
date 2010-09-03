@@ -43,6 +43,10 @@ elif method == "POST":
         context.plone_log("SWORD Import for %s: Aborted. Not accepting SWORD Requests." % memberId)
         response.setStatus('NotFound')
         return response
+    elif request.get_header('HTTP_X_NO_OP') == 'true':
+        context.plone_log("SWORD X-No-Op: true")
+        # Return 200 HTTP response by default
+        return state.set(status='SwordImportSuccess')
     else:
         # zipped word doc is part of the request
         # state.setStatus('ContentCreation')
