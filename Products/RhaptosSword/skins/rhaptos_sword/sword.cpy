@@ -65,23 +65,23 @@ elif method == "POST":
         if rme is not None: context.plone_log("SWORD Import for %s: Created module id=%s ." % (memberId, new_id))
         # Perform the import
         try:
-            text = context.REQUEST['BODY']
-            kwargs = {'original_file_name':'sword-import-file', 'user_name':getSecurityManager().getUser().getUserName()}
-            text, subobjs, meta = doTransform(rme, "sword_to_folder", text, meta=1, **kwargs)
-            if not text:
-              raise BadZipfile
+            payload = context.REQUEST['BODY']
+            if payload:
+              kwargs = {'original_file_name':'sword-import-file', 'user_name':getSecurityManager().getUser().getUserName()}
+              text, subobjs, meta = doTransform(rme, "sword_to_folder", payload, meta=1, **kwargs)
+              context.plone_log("SWORD Import for %s with id=%s: Transformed metadata and transformed document to cnxml." % (memberId, new_id))
+              rme.manage_delObjects([rme.default_file,])
 
-            context.plone_log("SWORD Import for %s with id=%s: Transformed metadata and transformed document to cnxml." % (memberId, new_id))
-            rme.manage_delObjects([rme.default_file,])
-            rme.invokeFactory('CNXML Document', rme.default_file, file=text, idprefix='zip-')
-            makeContent(rme, subobjs)
+              rme.invokeFactory('CNXML Document', rme.default_file, file=text, idprefix='zip-')
+              makeContent(rme, subobjs)
 
-            # Parse the returned mdml and set attributes up on the ModuleEditor object
-            # Add any additional, unmatched, aka uncredited authors
-            props = meta['properties']
-            rme.updateProperties(props)
-            # Make sure the metadata gets into the cnxml
-            rme.editMetadata()
+              # Parse the returned mdml and set attributes up on the ModuleEditor object
+              # Add any additional, unmatched, aka uncredited authors
+              props = meta['properties']
+              rme.updateProperties(props)
+              # Make sure the metadata gets into the cnxml
+              rme.editMetadata()
+
             context.plone_log("SWORD Import for %s with id=%s: Completed." % (memberId, new_id))
             response.setStatus('Created')
             return state.set(status='SwordImportSuccess', context=rme)
