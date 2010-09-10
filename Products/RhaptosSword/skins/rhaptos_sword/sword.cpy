@@ -70,9 +70,10 @@ elif method == "POST":
               kwargs = {'original_file_name':'sword-import-file', 'user_name':getSecurityManager().getUser().getUserName()}
               text, subobjs, meta = doTransform(rme, "sword_to_folder", payload, meta=1, **kwargs)
               context.plone_log("SWORD Import for %s with id=%s: Transformed metadata and transformed document to cnxml." % (memberId, new_id))
-              rme.manage_delObjects([rme.default_file,])
+              if text:
+                rme.manage_delObjects([rme.default_file,])
 
-              rme.invokeFactory('CNXML Document', rme.default_file, file=text, idprefix='zip-')
+                rme.invokeFactory('CNXML Document', rme.default_file, file=text, idprefix='zip-')
               makeContent(rme, subobjs)
 
               # Parse the returned mdml and set attributes up on the ModuleEditor object
