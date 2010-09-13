@@ -50,19 +50,24 @@ elif method == "POST":
     else:
         # zipped word doc is part of the request
         # state.setStatus('ContentCreation')
-        # If this folder allows Modules to be created, use it. Otherwise, use the user's home folder
-        cntxt = member.getHomeFolder()
-        for t in context.filtered_meta_types(member):
-            if t['name'] == 'Module Editor':
-              cntxt = context
-        context.plone_log("SWORD Import for %s: Creating module in %s ." % (memberId, cntxt))
+        # If this folder allows Modules to be created, use it. Otherwise, use
+        # the user's home folder. Could be extended in the future to a user
+        # configurable workgroup
+
         type_name = 'Module'
+        if context.portal_type in ['Workspace','Workgroup']:
+            cntxt = context
+        else:
+            cntxt = member.getHomeFolder()
+
+        context.plone_log("SWORD Import for %s: Creating module in %s ." % (memberId, cntxt))
         id=cntxt.generateUniqueId(type_name)
         new_id = cntxt.invokeFactory(id=id, type_name=type_name)
         if new_id is None or new_id == '':
            new_id = id
         rme=getattr(cntxt, new_id, None)
         if rme is not None: context.plone_log("SWORD Import for %s: Created module id=%s ." % (memberId, new_id))
+
         # Perform the import
         try:
             payload = context.REQUEST['BODY']
