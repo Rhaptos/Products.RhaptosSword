@@ -2,7 +2,7 @@
 ##parameters=
 from Products.CNXMLTransforms.helpers import OOoImportError, doTransform, makeContent
 import transaction
-from AccessControl import getSecurityManager
+from AccessControl import getSecurityManager, Unauthorized
 
 # allowed in SwordTool. Used for detecting import errors
 from zipfile import BadZipfile
@@ -55,14 +55,22 @@ elif method == "POST":
         # configurable workgroup
 
         type_name = 'Module'
-        if context.portal_type in ['Workspace','Workgroup']:
+        typeinfo = context.getTypeInfo()
+        if typeinfo and type_name in typeinfo.allowed_content_types:
             cntxt = context
         else:
             cntxt = member.getHomeFolder()
 
         context.plone_log("SWORD Import for %s: Creating module in %s ." % (memberId, cntxt))
         id=cntxt.generateUniqueId(type_name)
-        new_id = cntxt.invokeFactory(id=id, type_name=type_name)
+        try:
+            new_id = cntxt.invokeFactory(id=id, type_name=type_name)
+        except Unauthorized, e:
+            context.plone_log("SWORD Import for %s: Aborted. Not authorized for location and sending custom Unauthorized response." % memberId)
+            response.setStatus('Unauthorized')
+            state.setStatus('SwordAnonymousPost')
+            return state.set(context=context)
+
         if new_id is None or new_id == '':
            new_id = id
         rme=getattr(cntxt, new_id, None)
