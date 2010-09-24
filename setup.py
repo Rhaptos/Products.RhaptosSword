@@ -1,7 +1,11 @@
 from setuptools import setup, find_packages
 import os
 
-version = '1.0'
+def read(*rnames):
+    return open(os.path.join(os.path.dirname(__file__), *rnames)).read()
+
+version = read("Products", "RhaptosSword", "version.txt").strip()
+
 
 setup(name='Products.RhaptosSword',
       version=version,
@@ -19,7 +23,7 @@ setup(name='Products.RhaptosSword',
       url='http://rhaptos.org',
       license='GPL',
       packages=find_packages(exclude=['ez_setup']),
-      namespace_packages=['Products'],
+      namespace_packages=['Products',],
       include_package_data=True,
       zip_safe=False,
       install_requires=[

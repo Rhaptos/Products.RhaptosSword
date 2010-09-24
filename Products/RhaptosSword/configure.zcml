@@ -8,11 +8,9 @@
 
    <genericsetup:registerProfile
       name="default"
-      title="RhaptosSword"
+      title="Products.RhaptosSword"
       directory="profiles/default"
       description="Extension profile of RhaptosSword"
       provides="Products.GenericSetup.interfaces.EXTENSION"
       />
-
 </configure>
-
