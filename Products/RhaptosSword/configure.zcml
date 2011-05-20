@@ -13,4 +13,12 @@
       description="Extension profile of RhaptosSword"
       provides="Products.GenericSetup.interfaces.EXTENSION"
       />
+
+   <browser:page
+       for="Products.RhaptosModuleEditor.interfaces.IModule"
+       name="atom"
+       class=".browser.atom.AtomView"
+       attribute="replaceModule"
+       permission="zope2.View"
+    /> 
 </configure>
