@@ -15,10 +15,27 @@
       />
 
    <browser:page
-       for="Products.RhaptosModuleEditor.interfaces.IModule"
-       name="atom"
+       for="Products.RhaptosWorkgroup.interfaces.IWorkgroup"
+       name="atompub"
        class=".browser.atom.AtomView"
-       attribute="replaceModule"
+       attribute="addModule"
        permission="zope2.View"
     /> 
+
+   <browser:page
+       for="OFS.interfaces.IFolder"
+       name="atompub"
+       class=".browser.atom.AtomView"
+       attribute="addModule"
+       permission="zope2.View"
+    />
+
+   <browser:page
+       for="Products.RhaptosModuleEditor.interfaces.IModule"
+       name="atompub"
+       class=".browser.atom.AtomView"
+       attribute="editModule"
+       permission="zope2.View"
+   />
+
 </configure>
