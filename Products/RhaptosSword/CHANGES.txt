@@ -1,0 +1,6 @@
+RhaptosSword-1.1
+  -  extending sword import: more atompub support
+
+RhaptosSword-1.0
+  - initial release: word import only
+
