@@ -14,28 +14,7 @@
       provides="Products.GenericSetup.interfaces.EXTENSION"
       />
 
-   <browser:page
-       for="Products.RhaptosWorkgroup.interfaces.IWorkgroup"
-       name="atompub"
-       class=".browser.atom.AtomAddModule"
-       template="service_discovery.pt"
-       permission="zope2.View"
-    /> 
-
-   <browser:page
-       for="OFS.interfaces.IFolder"
-       name="atompub"
-       class=".browser.atom.AtomAddModule"
-       template="service_discovery.pt"
-       permission="zope2.View"
-    />
-
-   <browser:page
-       for="Products.RhaptosModuleEditor.interfaces.IModule"
-       name="atompub"
-       class=".browser.atom.AtomEditModule"
-       template="service_discovery.pt"
-       permission="zope2.View"
-   />
+    <!-- Because we have no z3c.autoinclude in plone2.5 land -->
+    <include package="rhaptos.swordservice.plone" />
 
 </configure>
