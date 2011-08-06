@@ -1,7 +1,8 @@
+from xml.dom.minidom import parse
+
 from zope.interface import Interface, implements
 from zope.publisher.interfaces.http import IHTTPRequest
 from zope.component import adapts, getMultiAdapter, queryAdapter, queryUtility
-from Acquisition import aq_inner, aq_base
 from webdav.NullResource import NullResource
 
 from Products.CMFCore.utils import getToolByName
@@ -23,21 +24,17 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
     adapts(IFolderish, IHTTPRequest)
 
 
-    def getObject(self, context, filename, request):
-        nullresource = NullResource(self.context, filename, request)
-        nullresource = nullresource.__of__(self.context)
-        nullresource.PUT(self.request, self.response)
-        # Look it up and finish up, then return it.
-        obj = self.context._getOb(filename)
-        return obj
-
-
-    def updateObject(self, obj, filename, content_type):
-        if content_type == ATOMPUB_CONTENT_TYPE:
+    def updateObject(self, obj, filename, request, response, content_type):
+        if content_type in self.ATOMPUB_CONTENT_TYPES:
             body = request.get('BODYFILE')
             body.seek(0)
             dom = parse(body)
-            mappings = self.getMetadataMapping(METADATA_MAPPING, dom)
+            mappings = self.getMetadataMapping(self.METADATA_MAPPING, dom)
             headers = self.getHeaders(dom, mappings)
-            obj.update_metadata(headers)
+            metadata = {}
+            for key, value in headers:
+                metadata[key] = value
+            obj = obj.__of__(self.context)
+            obj.update_metadata(**metadata)
+            obj.reindex(idxs=metadata.keys())
         return obj
