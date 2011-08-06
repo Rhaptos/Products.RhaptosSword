@@ -29,6 +29,10 @@ setup(name='Products.RhaptosSword',
       install_requires=[
           'setuptools',
           # -*- Extra requirements: -*-
+
+          # sword and atmopub add-ons
+          'rhaptos.swordservice.plone',
+
       ],
       entry_points="""
       # -*- Entry points: -*-
