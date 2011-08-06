@@ -21,17 +21,29 @@
     <!-- Make sure we can reach the sword adapters from our workspaces -->
     <five:implements                                                              
         class="Products.Archetypes.public.OrderedBaseFolder"
-        interface="Products.CMFCore.interfaces.IFolderish"
+        interface="Products.RhaptosSword.interfaces.IRhaptosSwordWorkspace"
         /> 
 
     <five:implements                                                              
         class="Products.CMFPlone.PloneFolder.PloneFolder"
-        interface="Products.CMFCore.interfaces.IFolderish"
+        interface="Products.RhaptosSword.interfaces.IRhaptosSwordWorkspace"
         /> 
 
     <five:implements                                                              
         class="Products.RhaptosWorkgroup.Workgroup.Workgroup"
-        interface="Products.CMFCore.interfaces.IFolderish"
+        interface="Products.RhaptosSword.interfaces.IRhaptosSwordWorkspace"
         /> 
+
+    <five:implements                                                              
+        class="Products.RhaptosModuleEditor.ModuleEditor.ModuleEditor"
+        interface="Products.RhaptosSword.interfaces.IRhaptosSwordWorkspace"
+        /> 
+
+    <adapter
+        for="Products.RhaptosSword.interfaces.IRhaptosSwordWorkspace
+             zope.publisher.interfaces.http.IHTTPRequest"
+        provides="Products.RhaptosSword.browser.workspace_swordadapter.IRhaptosWorkspaceSwordAdapter"
+        factory=".browser.workspace_swordadapter.RhaptosWorkspaceSwordAdapter"
+        />
 
 </configure>
