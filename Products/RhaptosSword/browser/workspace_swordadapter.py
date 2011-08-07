@@ -36,5 +36,5 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                 metadata[key] = value
             obj = obj.__of__(self.context)
             obj.update_metadata(**metadata)
-            obj.reindex(idxs=metadata.keys())
+            obj.reindexObject(idxs=metadata.keys())
         return obj
