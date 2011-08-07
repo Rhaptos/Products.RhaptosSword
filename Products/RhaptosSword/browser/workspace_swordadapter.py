@@ -1,3 +1,4 @@
+from DateTime import DateTime
 from xml.dom.minidom import parse
 
 from zope.interface import Interface, implements
@@ -23,18 +24,55 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
     """
     adapts(IFolderish, IHTTPRequest)
 
-
     def updateObject(self, obj, filename, request, response, content_type):
         if content_type in self.ATOMPUB_CONTENT_TYPES:
             body = request.get('BODYFILE')
             body.seek(0)
             dom = parse(body)
-            mappings = self.getMetadataMapping(self.METADATA_MAPPING, dom)
-            headers = self.getHeaders(dom, mappings)
+            headers = self.getHeaders(dom, self.METADATA_MAPPING)
             metadata = {}
             for key, value in headers:
-                metadata[key] = value
+                if value: metadata[key] = value
             obj = obj.__of__(self.context)
-            obj.update_metadata(**metadata)
+            self.updateMetadata(obj, metadata)
             obj.reindexObject(idxs=metadata.keys())
         return obj
+
+    def updateMetadata(self, obj, metadata):
+        title = metadata.get('title', '').strip()
+        abstract = metadata.get('abstract', '').strip()
+        language = metadata.get('language', '').strip()
+        subject = metadata.get('subject', [])
+        license = metadata.get('license', '').strip()
+        keywords = [kw.strip() for kw in metadata.get('keywords', [])\
+                    if kw.strip()]
+        GoogleAnalyticsTrackingCode =\
+                metadata.get('GoogleAnalyticsTrackingCode', '').strip()
+
+        # Uniqify and remove empty items from list
+        keywords = filter(None, dict(map(None,keywords,[])).keys())
+        keywords.sort(lambda x,y: cmp(x.lower(),y.lower()))
+
+        obj.manage_changeProperties(language=language)
+        obj.manage_changeProperties({'title' : title,
+                                     'abstract' : abstract,
+                                     'keywords' : keywords,
+                                     'revised' : DateTime(),
+                                     'subject' : subject
+                                    })
+        
+        if license:
+            try:
+                mdt = getToolByName(self.context, 'portal_moduledb')
+                mdt.getLicenseData(license)
+                obj.setLicense(license)
+            except IndexError:
+                # TODO: Fixme: we should raise some error, etc. here
+                license = None
+            except AttributeError:
+                obj.manage_changeProperties(license=license)
+
+        if GoogleAnalyticsTrackingCode:
+            obj.setGoogleAnalyticsTrackingCode(GoogleAnalyticsTrackingCode)
+
+        obj.editMetadata()
