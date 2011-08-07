@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <entry xmlns="http://www.w3.org/2005/Atom"
+       xmlns:cnxml="http://cnx.rice.edu/cnxml"
        xmlns:dcterms="http://purl.org/dc/terms/">
   <title>Atom-Powered Robots Run Amok</title>
   <id>urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a</id>
@@ -32,4 +33,6 @@
   <dcterms:references>References</dcterms:references>
   <dcterms:source>Source</dcterms:source>
   <dcterms:title>Title</dcterms:title>
+  <dcterms:license>http://creativecommons.org/licenses/by/1.0</dcterms:license>
+  <cnxml:googleAnalyticsTrackingCode>UA-xxxxxxx-x</cnxml:googleAnalyticsTrackingCode>
 </entry>
