@@ -9,8 +9,6 @@
   <author><name>John Doe</name></author>
   <!-- some embedded metadata -->
   <dcterms:sub>The abstract</dcterms:sub>
-  <dcterms:subject>Arts</dcterms:subject>
-  <dcterms:subject>Business</dcterms:subject>
   <dcterms:publisher>Publisher</dcterms:publisher>
   <dcterms:description>Description</dcterms:description>
   <dcterms:contributors>The contributurs</dcterms:contributors>
@@ -36,6 +34,15 @@
   <dcterms:source>Source</dcterms:source>
   <dcterms:license>http://creativecommons.org/licenses/by/1.0</dcterms:license>
   <cnxml:googleAnalyticsTrackingCode>UA-xxxxxxx-x</cnxml:googleAnalyticsTrackingCode>
+  <md:keywordlist>
+    <md:keyword>kw1</md:keyword>
+    <md:keyword>kw2</md:keyword>
+  </md:keywordlist>
+  <md:subjectlist>
+    <md:subject>Science and Technology</md:subject>
+    <md:subject>Social Sciences</md:subject>
+  </md:subjectlist>
+  <md:abstract>the summary</md:abstract>
   <md:actors>
     <md:person userid="admin">
       <md:firstname></md:firstname>
@@ -55,4 +62,7 @@
     <md:role type="maintainer">admin rijk</md:role>
     <md:role type="licensor">admin rijk</md:role>
   </md:roles>
+  <md:description_of_changes>
+      Some text description of what changed.
+  </md:description_of_changes>
 </entry>
