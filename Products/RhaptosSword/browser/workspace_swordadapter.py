@@ -13,22 +13,21 @@ from rhaptos.swordservice.plone.browser.sword import PloneFolderSwordAdapter
 from rhaptos.swordservice.plone.browser.sword import ISWORDContentUploadAdapter 
 
 
+METADATA_MAPPING =\
+        {'title'   : 'title',
+         'keywords': 'keywords',
+         'abstract': 'abstract',
+         'language': 'language',
+         'subject' : 'subject',
+         'license' : 'license',
+         'googleAnalyticsTrackingCode': 'GoogleAnalyticsTrackingCode',
+        }
+
+
 class IRhaptosWorkspaceSwordAdapter(ISWORDContentUploadAdapter):
     """ Marker interface for SWORD service specific to the Rhaptos 
         implementation.
     """
-
-
-def validateLicense(context, license_url):
-    """
-    We try to lookup the license details based on the url.
-    If we don't have this license in the database, it will raise an
-    exception. The whole process should stop at that point.
-    """
-    mdt = getToolByName(context, 'portal_moduledb')
-    mdt.getLicenseData(license_url)
-    return license_url
-
 
 
 class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
@@ -36,20 +35,6 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
     """
     adapts(IFolderish, IHTTPRequest)
     
-    METADATA_MAPPING =\
-            {'title'   : 'title',
-             'keywords': 'keywords',
-             'abstract': 'abstract',
-             'language': 'language',
-             'subject' : 'subject',
-             'license' : 'license',
-             'googleAnalyticsTrackingCode': 'GoogleAnalyticsTrackingCode',
-            }
-    
-    VALIDATORS =\
-            {'license': validateLicense,}
-
-
     def updateObject(self, obj, filename, request, response, content_type):
         if content_type in self.ATOMPUB_CONTENT_TYPES:
             body = request.get('BODYFILE')
@@ -57,7 +42,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             dom = parse(body)
 
             obj = obj.__of__(self.context)
-            metadata = self.getMetadata(dom, self.METADATA_MAPPING)
+            metadata = self.getMetadata(dom, METADATA_MAPPING)
             obj.update_metadata(**metadata)
             obj.reindexObject(idxs=metadata.keys())
         return obj
@@ -68,6 +53,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         metadata = {}
         for key, value in headers:
             if key == 'license':
-                value = validateLicense(self.context, value)
+                mdt = getToolByName(self.context, 'portal_moduledb')
+                mdt.getLicenseData(value)
             if value: metadata[key] = value
         return metadata
