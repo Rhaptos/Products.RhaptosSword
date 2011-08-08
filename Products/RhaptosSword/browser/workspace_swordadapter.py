@@ -16,7 +16,7 @@ CNX_MD_NAMESPACE = 'http://cnx.rice.edu/mdml'
 
 METADATA_MAPPING =\
         {'title'   : 'title',
-         'keywords': 'keywords',
+         'keyword' : 'keywords',
          'abstract': 'abstract',
          'language': 'language',
          'subject' : 'subject',
@@ -57,6 +57,8 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             if key == 'license':
                 mdt = getToolByName(self.context, 'portal_moduledb')
                 mdt.getLicenseData(value)
+            if key == 'keywords':
+                value = value.split('\n')
             if value: metadata[key] = value
         return metadata
 
