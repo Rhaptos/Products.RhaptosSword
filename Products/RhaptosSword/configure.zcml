@@ -14,11 +14,12 @@
       provides="Products.GenericSetup.interfaces.EXTENSION"
       />
 
+    <include package=".browser"/>              
+
     <!-- Because we have no z3c.autoinclude in plone2.5 land -->
     <include package="rhaptos.swordservice.plone" />
     <include package="rhaptos.atompub.plone" />
     
-    <!-- Make sure we can reach the sword adapters from our workspaces -->
     <five:implements                                                              
         class="Products.Archetypes.public.OrderedBaseFolder"
         interface="Products.RhaptosSword.interfaces.IRhaptosSwordWorkspace"
@@ -29,6 +30,7 @@
         interface="Products.RhaptosSword.interfaces.IRhaptosSwordWorkspace"
         /> 
 
+    <!-- Make sure we can reach the sword adapters from our workspaces -->
     <five:implements                                                              
         class="Products.RhaptosWorkgroup.Workgroup.Workgroup"
         interface="Products.RhaptosSword.interfaces.IRhaptosSwordWorkspace"
@@ -36,7 +38,7 @@
 
     <five:implements                                                              
         class="Products.RhaptosModuleEditor.ModuleEditor.ModuleEditor"
-        interface="Products.RhaptosSword.interfaces.IRhaptosSwordWorkspace"
+        interface="Products.RhaptosSword.interfaces.IRhaptosSwordCollection"
         /> 
 
     <adapter
