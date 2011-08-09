@@ -13,3 +13,7 @@ from zope.interface import Interface
 class IRhaptosSwordWorkspace(Interface):
     """ Marker interface for SWORD service capable Rhaptos worspaces.
     """
+
+class IRhaptosSwordCollection(Interface):
+    """ Marker interface for SWORD service capable Rhaptos collections.
+    """
