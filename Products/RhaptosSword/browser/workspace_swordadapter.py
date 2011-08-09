@@ -51,6 +51,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
 
 
     def getMetadata(self, dom, mapping):
+        mdt = getToolByName(self.context, 'portal_moduledb')
         headers = self.getHeaders(dom, mapping)
         metadata = {}
         for key, value in headers:
@@ -59,6 +60,19 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                 mdt.getLicenseData(value)
             if key == 'keywords':
                 value = value.split('\n')
+            if key == 'language':
+                plt = getToolByName(self.context, 'portal_languages')
+                languages = plt.getAvailableLanguages()
+                if value not in languages.keys():
+                    raise 'The language %s is not valid.' %value
+            if key == 'subject':
+                values = value.split('\n')
+                subjects = mdt.sqlGetTags(scheme='ISKME subject').tuples()
+                subjects = [tup[1].lower() for tup in subjects]
+                for v in values:
+                    if v.lower() not in subjects:
+                        raise 'The subject %s is invalid.' %v
+
             if value: metadata[key] = value
         return metadata
 
