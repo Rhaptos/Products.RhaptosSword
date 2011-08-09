@@ -8,9 +8,15 @@ from webdav.NullResource import NullResource
 
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.interfaces import IFolderish
+from Products.Five import BrowserView
 
+from rhaptos.swordservice.plone.interfaces import ISWORDDepositReceipt
 from rhaptos.swordservice.plone.browser.sword import PloneFolderSwordAdapter
 from rhaptos.swordservice.plone.browser.sword import ISWORDContentUploadAdapter 
+
+class ValidationError(Exception):
+    """ Basic validation error
+    """
 
 CNX_MD_NAMESPACE = 'http://cnx.rice.edu/mdml'
 
@@ -45,7 +51,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             obj = obj.__of__(self.context)
             metadata = self.getMetadata(dom, METADATA_MAPPING)
             obj.update_metadata(**metadata)
-            self.updateRoles(obj, dom)
+            #self.addPeople(obj, dom)
             obj.reindexObject(idxs=metadata.keys())
         return obj
 
@@ -64,17 +70,32 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                 plt = getToolByName(self.context, 'portal_languages')
                 languages = plt.getAvailableLanguages()
                 if value not in languages.keys():
-                    raise 'The language %s is not valid.' %value
+                    raise ValidationError('The language %s is not valid.' %value)
             if key == 'subject':
                 values = value.split('\n')
                 subjects = mdt.sqlGetTags(scheme='ISKME subject').tuples()
                 subjects = [tup[1].lower() for tup in subjects]
                 for v in values:
                     if v.lower() not in subjects:
-                        raise 'The subject %s is invalid.' %v
+                        raise ValidationError('The subject %s is invalid.' %v)
 
             if value: metadata[key] = value
         return metadata
+
+
+    def addPeople(self, obj, dom):
+        newRoles = {}
+        for element in dom.getElementsByTagNameNS(CNX_MD_NAMESPACE, 'role'):
+            role = element.getAttribute('type').capitalize()
+            newRoles[role] = element.firstChild.nodeValue.split(' ')
+
+        user_role_delta = self.context.generateCollaborationRequests(
+                newUser=True, newRoles=newRoles)
+        for p in user_role_delta.keys():
+            collabs = list(self.context.getCollaborators())
+            if p not in collabs:
+                self.context.addCollaborator(p)
+                self.context.requestCollaboration(p, user_role_delta[p])
 
 
     def updateRoles(self, obj, dom):
@@ -100,6 +121,28 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             if user_id not in updateRoles.keys() and user_id != obj.Creator():
                 deleteRoles.append(user_id)
 
-        self.update_roles(updateRoles = updateRoles,
+        obj.update_roles(updateRoles = updateRoles,
                           deleteRoles = deleteRoles,
                           cancelRoles = cancelRoles)
+
+
+class DepositReceipt(BrowserView):
+    """ Adapts a context and renders an edit document for it. This should
+        only be possible for uploaded content. This class is therefore bound
+        to ATFile (for the default plone installation) in zcml. """
+    implements(ISWORDDepositReceipt)
+
+
+    def information(self, ob=None):
+        """ Return additional or overriding information about our context. By
+            default there is no extra information, but if you register an
+            adapter for your context that provides us with a
+            ISWORDContentAdapter, you can generate or override that extra
+            information by implementing a method named information that
+            returns a dictionary.  Valid keys are author and updated. """
+        if ob is None:
+            ob = self.context
+        adapter = queryAdapter(ob, ISWORDContentAdapter)
+        if adapter is not None:
+            return adapter.information()
+        return {}
