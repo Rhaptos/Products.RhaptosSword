@@ -76,7 +76,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         assert "<sword:error" not in xml, xml
 
         # Test that we can still reach the edit-iri
-        assert self.portal.restrictedTraverse('perry-zip/sword/edit')
+        assert self.folder.restrictedTraverse('perry-zip/sword/edit')
 
 def test_suite():
     from unittest import TestSuite, makeSuite
