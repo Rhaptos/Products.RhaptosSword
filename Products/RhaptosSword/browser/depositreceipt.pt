@@ -48,9 +48,7 @@
     <md:roles>
     <tal:pending_roles define="roles_and_users python:view.get_roles(pending_collaborations)">
         <md:role tal:repeat="role python:roles_and_users.keys()"
-            type="type" tal:attributes="type role">
-            <tal:userids replace="python:roles_and_users[role].strip()">userids</tal:userids>
-        </md:role>
+            type="type" tal:attributes="type role"><tal:userids replace="python:roles_and_users[role].strip(' ')">userids</tal:userids></md:role>
     </tal:pending_roles>
     </md:roles>
 
