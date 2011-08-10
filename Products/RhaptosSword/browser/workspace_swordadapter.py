@@ -8,7 +8,9 @@ from webdav.NullResource import NullResource
 
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.interfaces import IFolderish
+
 from Products.Five import BrowserView
+from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 
 from rhaptos.swordservice.plone.interfaces import ISWORDDepositReceipt
 from rhaptos.swordservice.plone.browser.sword import PloneFolderSwordAdapter
@@ -89,13 +91,13 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             role = element.getAttribute('type').capitalize()
             newRoles[role] = element.firstChild.nodeValue.split(' ')
 
-        user_role_delta = self.context.generateCollaborationRequests(
+        user_role_delta = obj.generateCollaborationRequests(
                 newUser=True, newRoles=newRoles)
         for p in user_role_delta.keys():
-            collabs = list(self.context.getCollaborators())
+            collabs = list(obj.getCollaborators())
             if p not in collabs:
-                self.context.addCollaborator(p)
-                self.context.requestCollaboration(p, user_role_delta[p])
+                obj.addCollaborator(p)
+                obj.requestCollaboration(p, user_role_delta[p])
 
 
     def updateRoles(self, obj, dom):
@@ -122,16 +124,23 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                 deleteRoles.append(user_id)
 
         obj.update_roles(updateRoles = updateRoles,
-                          deleteRoles = deleteRoles,
-                          cancelRoles = cancelRoles)
+                         deleteRoles = deleteRoles,
+                         cancelRoles = cancelRoles)
 
 
-class DepositReceipt(BrowserView):
+class DepositReceiptAdapter(object):
     """ Adapts a context and renders an edit document for it. This should
         only be possible for uploaded content. This class is therefore bound
         to ATFile (for the default plone installation) in zcml. """
     implements(ISWORDDepositReceipt)
+    
+    depositreceipt = ViewPageTemplateFile('depositreceipt.pt')
 
+    def __init__(self, context):
+        self.context = context
+
+    def __call__(self, swordview):
+        return self.depositreceipt
 
     def information(self, ob=None):
         """ Return additional or overriding information about our context. By
