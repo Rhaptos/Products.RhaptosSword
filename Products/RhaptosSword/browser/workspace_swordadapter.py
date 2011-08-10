@@ -59,6 +59,13 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
 
 
     def getMetadata(self, dom, mapping):
+        """
+        TODO:
+            Set the attribution_note on the module.
+            Investigate using 'getLanguagesWithoutSubtypes' and
+            'getLanguageWithSubtypes' instead of sql call.
+
+        """
         mdt = getToolByName(self.context, 'portal_moduledb')
         headers = self.getHeaders(dom, mapping)
         metadata = {}
@@ -174,11 +181,6 @@ class DepositReceipt(BrowserView):
     """
     implements(ISWORDDepositReceipt)
 
-    def __call__(self):
-        """ Temp call method as debug hook.
-        """
-        return self.index()
-    
 
     def pending_collaborations(self):
         return self.context.getPendingCollaborations()
@@ -198,3 +200,9 @@ class DepositReceipt(BrowserView):
                 userids = userids + ' %s' %userid
                 roles_and_users[role] = userids
         return roles_and_users
+
+    def has_required_metadata(self):
+        obj = self.context.aq_inner
+        for key, value in METADATA_MAPPING.items():
+            if not getattr(obj, key, None): return False
+        return True
