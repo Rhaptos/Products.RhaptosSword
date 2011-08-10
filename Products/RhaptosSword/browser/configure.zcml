@@ -7,7 +7,7 @@
     <browser:page
         for="Products.RhaptosSword.interfaces.IRhaptosSwordCollection"
         name="rhaptos-deposit-receipt"
-        class=".workspace_swordadapter.DepositReceipt"
+        class=".views.DepositReceipt"
         template="depositreceipt.pt"
         permission="zope2.View"
         />
