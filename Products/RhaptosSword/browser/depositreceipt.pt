@@ -2,7 +2,9 @@
 <entry xmlns="http://www.w3.org/2005/Atom"
        xmlns:sword="http://purl.org/net/sword/"
        xmlns:dcterms="http://purl.org/dc/terms/"
-       xmlns:tal="http://xml.zope.org/namespaces/tal">
+       xmlns:md="http://cnx.rice.edu/mdml"
+       xmlns:tal="http://xml.zope.org/namespaces/tal"
+       tal:define="pending_collaborations view/pending_collaborations">
 
     <link rel="edit" href="edit-iri"
           tal:attributes="href string:${context/absolute_url}/sword/edit" />
@@ -29,5 +31,21 @@
     <dcterms:available tal:content="context/getEffectiveDate">Date Available</dcterms:available>
     <dcterms:description tal:content="context/Description">Description</dcterms:description>
     <dcterms:title tal:content="context/Title">Title</dcterms:title>
-
+    <tal:pending_collaborations repeat="userid pending_collaborations/keys">
+    <md:actors>
+        <md:person userid="user id"
+            tal:define="user python:view.get_user(userid)"
+            tal:attributes="userid userid">
+            <md:firstname tal:content="user/firstname">first name</md:firstname>
+            <md:surname tal:content="user/surname">surname</md:surname>
+            <md:fullname tal:content="user/fullname">full name</md:fullname>
+            <md:email tal:content="user/email">email</md:email>
+        </md:person>
+    </md:actors>
+    <md:roles>
+        <md:role type="author">admin</md:role>
+        <md:role type="maintainer">admin</md:role>
+        <md:role type="licensor">admin</md:role>
+    </md:roles>
+    </tal:pending_collaborations>
 </entry>
