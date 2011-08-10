@@ -8,5 +8,14 @@
         for="Products.RhaptosSword.interfaces.IRhaptosSwordCollection"
         provides="rhaptos.swordservice.plone.interfaces.ISWORDDepositReceipt"
         factory=".workspace_swordadapter.DepositReceiptAdapter" />
+    
+    <browser:page
+        for="Products.RhaptosSword.interfaces.IRhaptosSwordCollection"
+        name="rhaptos-deposit-receipt"
+        class=".workspace_swordadapter.DepositReceipt"
+        template="depositreceipt.pt"
+        permission="zope2.View"
+        />
+
 
 </configure>

@@ -155,3 +155,13 @@ class DepositReceiptAdapter(object):
         if adapter is not None:
             return adapter.information()
         return {}
+
+
+class DepositReceipt(BrowserView):
+    implements(ISWORDDepositReceipt)
+
+    def __call__(self):
+        """ Temp call method as debug hook.
+        """
+        return self.index()
+
