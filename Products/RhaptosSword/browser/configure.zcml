@@ -4,11 +4,6 @@
     xmlns:zcml="http://namespaces.zope.org/zcml"
     xmlns:five="http://namespaces.zope.org/five">
 
-    <adapter
-        for="Products.RhaptosSword.interfaces.IRhaptosSwordCollection"
-        provides="rhaptos.swordservice.plone.interfaces.ISWORDDepositReceipt"
-        factory=".workspace_swordadapter.DepositReceiptAdapter" />
-    
     <browser:page
         for="Products.RhaptosSword.interfaces.IRhaptosSwordCollection"
         name="rhaptos-deposit-receipt"

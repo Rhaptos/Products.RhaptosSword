@@ -44,8 +44,13 @@
     <adapter
         for="Products.RhaptosSword.interfaces.IRhaptosSwordWorkspace
              zope.publisher.interfaces.http.IHTTPRequest"
-        provides="Products.RhaptosSword.browser.workspace_swordadapter.IRhaptosWorkspaceSwordAdapter"
-        factory=".browser.workspace_swordadapter.RhaptosWorkspaceSwordAdapter"
+        provides="Products.RhaptosSword.adapters.IRhaptosWorkspaceSwordAdapter"
+        factory=".adapters.RhaptosWorkspaceSwordAdapter"
         />
+
+    <adapter
+        for="Products.RhaptosSword.interfaces.IRhaptosSwordCollection"
+        provides="rhaptos.swordservice.plone.interfaces.ISWORDDepositReceipt"
+        factory=".adapters.DepositReceiptAdapter" />
 
 </configure>
