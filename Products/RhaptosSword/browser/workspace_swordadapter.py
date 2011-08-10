@@ -53,7 +53,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             obj = obj.__of__(self.context)
             metadata = self.getMetadata(dom, METADATA_MAPPING)
             obj.update_metadata(**metadata)
-            #self.addPeople(obj, dom)
+            #self.addRoles(obj, dom)
             obj.reindexObject(idxs=metadata.keys())
         return obj
 
@@ -85,7 +85,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         return metadata
 
 
-    def addPeople(self, obj, dom):
+    def addRoles(self, obj, dom):
         newRoles = {}
         for element in dom.getElementsByTagNameNS(CNX_MD_NAMESPACE, 'role'):
             role = element.getAttribute('type').capitalize()
@@ -130,8 +130,8 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
 
 class DepositReceiptAdapter(object):
     """ Adapts a context and renders an edit document for it. This should
-        only be possible for uploaded content. This class is therefore bound
-        to ATFile (for the default plone installation) in zcml. """
+        only be possible for uploaded content.
+    """
     implements(ISWORDDepositReceipt)
     
     depositreceipt = ViewPageTemplateFile('depositreceipt.pt')
@@ -187,3 +187,14 @@ class DepositReceipt(BrowserView):
     def get_user(self, userid):
         pmt = getToolByName(self.context, 'portal_membership')
         return pmt.getMemberById(userid)
+
+
+    def get_roles(self, collaboration_requests):
+        roles_and_users = {}
+        for userid, collab_request in collaboration_requests.items():
+            roles = collab_request.roles 
+            for role, action in roles.items():
+                userids = roles_and_users.get(role, '')
+                userids = userids + ' %s' %userid
+                roles_and_users[role] = userids
+        return roles_and_users
