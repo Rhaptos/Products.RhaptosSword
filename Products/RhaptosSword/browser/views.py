@@ -3,6 +3,7 @@ from zope.interface import Interface, implements
 from Products.CMFCore.utils import getToolByName
 
 from Products.Five import BrowserView
+from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 
 from rhaptos.swordservice.plone.interfaces import ISWORDDepositReceipt
 
@@ -25,6 +26,10 @@ class DepositReceipt(BrowserView):
     """
     implements(ISWORDDepositReceipt)
 
+    depositreceipt = ViewPageTemplateFile('depositreceipt.pt')
+    
+    def __call__(self, upload=True):
+        return self.depositreceipt()
 
     def pending_collaborations(self):
         return self.context.getPendingCollaborations()

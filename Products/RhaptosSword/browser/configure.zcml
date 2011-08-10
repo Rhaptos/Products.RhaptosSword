@@ -8,9 +8,13 @@
         for="Products.RhaptosSword.interfaces.IRhaptosSwordCollection"
         name="rhaptos-deposit-receipt"
         class=".views.DepositReceipt"
-        template="depositreceipt.pt"
         permission="zope2.View"
         />
 
+    <adapter
+        for="Products.RhaptosSword.interfaces.IRhaptosSwordCollection
+             zope.publisher.interfaces.http.IHTTPRequest"
+        provides="rhaptos.swordservice.plone.interfaces.ISWORDDepositReceipt"
+        factory=".views.DepositReceipt" />
 
 </configure>

@@ -32,6 +32,16 @@
 
     <!-- Make sure we can reach the sword adapters from our workspaces -->
     <five:implements                                                              
+        class="Products.CMFPlone.PloneFolder.PloneFolder"
+        interface="Products.RhaptosSword.interfaces.IRhaptosSwordWorkspace"
+        />
+
+    <five:implements                                                              
+       class="Products.Archetypes.public.OrderedBaseFolder"
+       interface="Products.RhaptosSword.interfaces.IRhaptosSwordWorkspace"
+       />
+
+    <five:implements                                                              
         class="Products.RhaptosWorkgroup.Workgroup.Workgroup"
         interface="Products.RhaptosSword.interfaces.IRhaptosSwordWorkspace"
         /> 
@@ -47,10 +57,5 @@
         provides="Products.RhaptosSword.adapters.IRhaptosWorkspaceSwordAdapter"
         factory=".adapters.RhaptosWorkspaceSwordAdapter"
         />
-
-    <adapter
-        for="Products.RhaptosSword.interfaces.IRhaptosSwordCollection"
-        provides="rhaptos.swordservice.plone.interfaces.ISWORDDepositReceipt"
-        factory=".adapters.DepositReceiptAdapter" />
 
 </configure>
