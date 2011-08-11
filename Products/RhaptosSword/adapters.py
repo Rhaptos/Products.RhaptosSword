@@ -58,7 +58,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             dom = parse(body)
             metadata = self.getMetadata(dom, METADATA_MAPPING)
             obj.update_metadata(**metadata)
-            #self.addRoles(obj, dom)
+            self.addRoles(obj, dom)
             obj.reindexObject(idxs=metadata.keys())
         elif content_type == 'application/zip':
             kwargs = {
@@ -114,7 +114,8 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         newRoles = {}
         for element in dom.getElementsByTagNameNS(CNX_MD_NAMESPACE, 'role'):
             role = element.getAttribute('type').capitalize()
-            newRoles[role] = element.firstChild.nodeValue.split(' ')
+            newRoles[role] =\
+                    [str(id) for id in element.firstChild.nodeValue.split(' ')]
 
         user_role_delta = obj.generateCollaborationRequests(
                 newUser=True, newRoles=newRoles)
