@@ -168,8 +168,9 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         uploadrequest.set('PARENTS', [self.portal.workspace])
 
         # Call the sword view on this request to perform the upload
-        xml = getMultiAdapter(
-            (self.portal.workspace, uploadrequest), Interface, 'sword')()
+        adapter = getMultiAdapter(
+                (self.portal.workspace, uploadrequest), Interface, 'sword')
+        xml = adapter()
         
 
         assert "<sword:error" not in xml, xml
