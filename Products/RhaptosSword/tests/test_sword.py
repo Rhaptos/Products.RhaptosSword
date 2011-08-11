@@ -18,6 +18,10 @@ from Products.PloneTestCase import PloneTestCase
 from rhaptos.swordservice.plone.browser.sword import ISWORDService
 from rhaptos.swordservice.plone.browser.sword import ServiceDocument
 
+from Testing import ZopeTestCase
+ZopeTestCase.installProduct('RhaptosSword')
+ZopeTestCase.installProduct('RhaptosModuleEditor')
+
 PloneTestCase.setupPloneSite()
 
 def clone_request(req, response=None, env=None):
@@ -77,6 +81,43 @@ class TestSwordService(PloneTestCase.PloneTestCase):
 
         # Test that we can still reach the edit-iri
         assert self.folder.restrictedTraverse('perry.zip/sword/edit')
+
+
+    def testMetadata(self):
+        """http://localhost:8080/Members/admin/@@sword"""
+        self.addProduct('RhaptosSword')
+        self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+
+        file = open(
+                './src/Products.RhaptosSword/Products/RhaptosSword/tests/data/entry.xml',
+                'rb')
+        content = file.read()
+        file.close()
+        # Upload a zip file
+        env = {
+            'CONTENT_TYPE': 'application/atom+xml;type=entry',
+            'CONTENT_LENGTH': len(content),
+            'IN-PROGRESS': 'True',
+            'REQUEST_METHOD': 'POST',
+            'SERVER_NAME': 'nohost',
+            'SERVER_PORT': '80'
+        }
+        uploadresponse = HTTPResponse(stdout=StringIO())
+        uploadrequest = clone_request(self.app.REQUEST, uploadresponse, env)
+        uploadrequest.set('BODYFILE', StringIO(content))
+        # Fake PARENTS
+        uploadrequest.set('PARENTS', [self.portal.workspace])
+
+        # Call the sword view on this request to perform the upload
+        xml = getMultiAdapter(
+            (self.portal.workspace, uploadrequest), Interface, 'sword')()
+        
+
+        assert "<sword:error" not in xml, xml
+
+        # Test that we can reach the edit-iri
+        # TODO: will have to open the recceipt and use the edit iri returned.
+
 
 def test_suite():
     from unittest import TestSuite, makeSuite
