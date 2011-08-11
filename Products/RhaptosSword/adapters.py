@@ -61,20 +61,17 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             #self.addRoles(obj, dom)
             obj.reindexObject(idxs=metadata.keys())
         elif content_type == 'application/zip':
-            try:
-                kwargs = {
-                    'original_file_name': 'sword-import-file',
-                    'user_name': getSecurityManager().getUser().getUserName()
-                }
-                text, subobjs, meta = doTransform(obj, "zip_to_folder",
-                    body.read(), meta=1, **kwargs)
-                if text:
-                    obj.manage_delObjects([obj.default_file,])
-                    obj.invokeFactory('CNXML Document', obj.default_file,
-                        file=text, idprefix='zip-')
-                makeContent(obj, subobjs)
-            except BadZipfile, e:
-                transaction.abort()
+            kwargs = {
+                'original_file_name': 'sword-import-file',
+                'user_name': getSecurityManager().getUser().getUserName()
+            }
+            text, subobjs, meta = doTransform(obj, "zip_to_folder",
+                body.read(), meta=1, **kwargs)
+            if text:
+                obj.manage_delObjects([obj.default_file,])
+                obj.invokeFactory('CNXML Document', obj.default_file,
+                    file=text, idprefix='zip-')
+            makeContent(obj, subobjs)
                 
         return obj
 
