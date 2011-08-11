@@ -19,10 +19,18 @@ from rhaptos.swordservice.plone.browser.sword import ISWORDService
 from rhaptos.swordservice.plone.browser.sword import ServiceDocument
 
 from Testing import ZopeTestCase
-ZopeTestCase.installProduct('RhaptosSword')
-ZopeTestCase.installProduct('RhaptosModuleEditor')
+ZopeTestCase.installProduct('Products.RhaptosSword')
+ZopeTestCase.installProduct('Products.RhaptosModuleEditor')
 
 PloneTestCase.setupPloneSite()
+
+#PloneTestCase.setupPloneSite(extension_profiles=['Products.RhaptosModuleEditor',])
+# setupPloneSite accepts an optional products argument, which allows you to
+# specify a list of products that will be added to the portal using the
+# quickinstaller tool. Since 0.8.2 you can also pass an extension_profiles
+# argument to import GS extension profiles.
+
+DIRNAME = os.path.dirname(__file__)
 
 def clone_request(req, response=None, env=None):
     # Return a clone of the current request object.
@@ -87,10 +95,10 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         """http://localhost:8080/Members/admin/@@sword"""
         self.addProduct('RhaptosSword')
         self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        self.addProfile('Products.RhaptosModuleEditor')
 
-        file = open(
-                './src/Products.RhaptosSword/Products/RhaptosSword/tests/data/entry.xml',
-                'rb')
+        xml = os.path.join(DIRNAME, 'data', 'entry.xml')
+        file = open(xml, 'rb')
         content = file.read()
         file.close()
         # Upload a zip file
