@@ -24,13 +24,13 @@
           tal:attributes="href item/absolute_url" />
 
     <sword:treatment tal:content="string:Stored as ${context/id}">Stored</sword:treatment>
-    <title tal:content="context/Title">My Deposit</title>
+    <title tal:content="context/title">My Deposit</title>
     <id tal:content="context/absolute_url">1234</id>
-    <updated tal:content="context/modified">2008-08-18T14:27:08Z</updated>
-    <author><name tal:content="context/Creator">jbloggs</name></author>
-    <dcterms:available tal:content="context/getEffectiveDate">Date Available</dcterms:available>
-    <dcterms:description tal:content="context/Description">Description</dcterms:description>
-    <dcterms:title tal:content="context/Title">Title</dcterms:title>
+    <updated tal:content="context/created">2008-08-18T14:27:08Z</updated>
+    <author><name tal:content="context/authors">jbloggs</name></author>
+    <dcterms:available tal:content="context/revised">Date Available</dcterms:available>
+    <dcterms:description tal:content="context/abstract">Description</dcterms:description>
+    <dcterms:title tal:content="context/title">Title</dcterms:title>
     
     <sword:requested-roles>
         <md:actors>
