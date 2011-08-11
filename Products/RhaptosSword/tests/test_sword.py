@@ -21,6 +21,7 @@ from rhaptos.swordservice.plone.browser.sword import ServiceDocument
 from Testing import ZopeTestCase
 ZopeTestCase.installProduct('RhaptosSword')
 ZopeTestCase.installProduct('RhaptosModuleEditor')
+ZopeTestCase.installProduct('RhaptosRepository')
 ZopeTestCase.installProduct('CNXMLDocument')
 
 PloneTestCase.setupPloneSite()
@@ -66,6 +67,7 @@ class StubLanuageTool(SimpleItem):
 
     def getLanguageBindings(self):
         return ('en', 'en', [])
+
 
 def clone_request(req, response=None, env=None):
     # Return a clone of the current request object.
@@ -134,8 +136,10 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.addProfile('Products.RhaptosModuleEditor:default')
         self.addProfile('Products.CNXMLDocument:default')
         self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        self.portal.manage_addProduct['RhaptosRepository'].manage_addRepository('content') 
         self.portal._setObject('portal_moduledb', StubModuleDB())
         self.portal._setObject('portal_languages', StubLanuageTool())
+        #self.portal._setObject('content', StubContentRepo())
 
         xml = os.path.join(DIRNAME, 'data', 'entry.xml')
         file = open(xml, 'rb')
