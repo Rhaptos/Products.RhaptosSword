@@ -34,16 +34,34 @@ DIRNAME = os.path.dirname(__file__)
 
 from OFS.SimpleItem import SimpleItem
 
+class StubZRDBResult(object):
+    def tuples(self):
+        return [(1, 'Arts', 'ISKME subject'),
+                (2, 'Business', 'ISKME subject'),
+                (3, 'Humanities', 'ISKME subject'),
+                (4, 'Mathematics and Statistics', 'ISKME subject'),
+                (5, 'Science and Technology', 'ISKME subject'),
+                (6, 'Social Sciences', 'ISKME subject')
+               ]
+
 class StubModuleDB(SimpleItem):
 
     def __init__(self):
         self.id = 'portal_moduledb'
 
-    def getLicenceData(self, url):
-        return {}
+    def getLicenseData(self, url):
+        return True
 
     def sqlGetTags(self, scheme):
-        return ()
+        return StubZRDBResult()
+
+class StubLanuageTool(SimpleItem):
+
+    def __init__(self):
+        self.id = 'language_tool'
+
+    def getAvailableLanguages(self):
+        return {'en': 'English'}
 
 def clone_request(req, response=None, env=None):
     # Return a clone of the current request object.
@@ -111,6 +129,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.addProfile('Products.RhaptosModuleEditor:default')
         self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
         self.portal._setObject('portal_moduledb', StubModuleDB())
+        self.portal._setObject('portal_languages', StubLanuageTool())
 
         xml = os.path.join(DIRNAME, 'data', 'entry.xml')
         file = open(xml, 'rb')
