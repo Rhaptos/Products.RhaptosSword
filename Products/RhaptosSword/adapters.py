@@ -66,33 +66,15 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                     'original_file_name': 'sword-import-file',
                     'user_name': getSecurityManager().getUser().getUserName()
                 }
-                text, subobjs, meta = doTransform(obj, "sword_to_folder",
+                text, subobjs, meta = doTransform(obj, "zip_to_folder",
                     body.read(), meta=1, **kwargs)
                 if text:
-                  obj.manage_delObjects([obj.default_file,])
-
-                  obj.invokeFactory('CNXML Document', obj.default_file, file=text, idprefix='zip-')
+                    obj.manage_delObjects([obj.default_file,])
+                    obj.invokeFactory('CNXML Document', obj.default_file,
+                        file=text, idprefix='zip-')
                 makeContent(obj, subobjs)
-
-                # Parse the returned mdml and set attributes up on the ModuleEditor object
-                # Add any additional, unmatched, aka uncredited authors
-                props = meta['properties']
-                obj.updateProperties(props)
-                # Make sure the metadata gets into the cnxml
-                obj.editMetadata()
-            except OOoImportError, e:
-                transaction.abort()
-                context.plone_log("SWORD Import for %s with id=%s: Aborted. There were problems transforming the openoffice or word document." % (memberId, new_id))
-                message = context.translate("message_could_not_import", {"errormsg":e}, domain="rhaptos",
-                                            default="Could not import file. %s" % e)
-                response.setStatus('BadRequest')
-                return state.set(status='SwordImportError', portal_status_message=message)
             except BadZipfile, e:
                 transaction.abort()
-                context.plone_log("SWORD Import for %s with id=%s: Aborted. There were problems with the uploaded zip file." % (memberId, new_id))
-                response.setStatus('BadRequest')
-                state.setStatus('SwordErrorZip')
-                return state.set(context=context)
                 
         return obj
 
