@@ -139,7 +139,6 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.portal.manage_addProduct['RhaptosRepository'].manage_addRepository('content') 
         self.portal._setObject('portal_moduledb', StubModuleDB())
         self.portal._setObject('portal_languages', StubLanuageTool())
-        #self.portal._setObject('content', StubContentRepo())
 
         xml = os.path.join(DIRNAME, 'data', 'entry.xml')
         file = open(xml, 'rb')
