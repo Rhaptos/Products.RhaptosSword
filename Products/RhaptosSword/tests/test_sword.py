@@ -32,6 +32,19 @@ PloneTestCase.setupPloneSite()
 
 DIRNAME = os.path.dirname(__file__)
 
+from OFS.SimpleItem import SimpleItem
+
+class StubModuleDB(SimpleItem):
+
+    def __init__(self):
+        self.id = 'portal_moduledb'
+
+    def getLicenceData(self, url):
+        return {}
+
+    def sqlGetTags(self, scheme):
+        return ()
+
 def clone_request(req, response=None, env=None):
     # Return a clone of the current request object.
     environ = req.environ.copy()
@@ -93,8 +106,11 @@ class TestSwordService(PloneTestCase.PloneTestCase):
 
     def testMetadata(self):
         """http://localhost:8080/Members/admin/@@sword"""
+        # XXX: the next 3 lines need to move to afterSetup but
+        # afterSetup is not being called for some reason
         self.addProfile('Products.RhaptosModuleEditor:default')
         self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        self.portal._setObject('portal_moduledb', StubModuleDB())
 
         xml = os.path.join(DIRNAME, 'data', 'entry.xml')
         file = open(xml, 'rb')
