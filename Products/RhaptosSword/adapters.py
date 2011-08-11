@@ -45,6 +45,11 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
     """
     adapts(IFolderish, IHTTPRequest)
     
+    def generateFilename(self, name):
+        """ Override this method to ignore the name passed in
+            content-disposition. """
+        return self.context.generateUniqueId('Module')
+
     def updateObject(self, obj, filename, request, response, content_type):
         body = request.get('BODYFILE')
         body.seek(0)
