@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<document xmlns="http://cnx.rice.edu/cnxml"
+    xmlns:cnxorg="http://cnx.rice.edu/system-info"
+    xmlns:m="http://www.w3.org/1998/Math/MathML"
+    xmlns:md="http://cnx.rice.edu/mdml"
+    xmlns:q="http://cnx.rice.edu/qml/1.0"
+    xmlns:bib="http://bibtexml.sf.net/"
+    id="new" module-id="" cnxml-version="0.7">
+  <title>Box Plots Statistics for Non Majors</title>
+  <metadata xmlns:md="http://cnx.rice.edu/mdml" mdml-version="0.5">
+  <!-- WARNING! The 'metadata' section is read only. Do not edit below.
+       Changes to the metadata section in the source will not be saved. -->
+  <md:repository>http://cnx.org/content</md:repository>
+  <md:content-url>http://cnx.org/content/m35078/latest/</md:content-url>
+  <md:content-id>m35078</md:content-id>
+  <md:title>Box Plots</md:title>
+  <md:short-title>Plots</md:short-title>
+  <md:subtitle>The Plots Thicken</md:subtitle>
+  <md:version>1.1</md:version>
+  <md:created>2010/08/10 11:41:00.383 GMT-5</md:created>
+  <md:revised>2010/08/10 12:47:45.522 GMT-5</md:revised>
+  <md:actors>
+    <md:person userid="mrdwab">
+      <md:firstname>Ananda</md:firstname>
+      <md:surname>Mahto</md:surname>
+      <md:fullname>Ananda Mahto</md:fullname>
+      <md:email>ananda@mahto.info</md:email>
+    </md:person>
+  </md:actors>
+  <md:roles>
+    <md:role type="author">mrdwab</md:role>
+    <md:role type="maintainer">mrdwab</md:role>
+    <md:role type="licensor">mrdwab</md:role>
+  </md:roles>
+  <md:license url="http://creativecommons.org/licenses/by/3.0/"/>
+  <!-- For information on license requirements for use or modification, see license url in the
+       above <md:license> element.
+       For information on formatting required attribution, see the URL:
+         CONTENT_URL/content_info#cnx_cite_header
+       where CONTENT_URL is the value provided above in the <md:content-url> element.
+  -->
+  <md:extended-attribution>
+    <link-group type="sponsor">
+      <link url="http://openeducation.edu/">Open Education University</link>
+    </link-group>
+  </md:extended-attribution>
+  <md:derived-from url="http://cnx.org/content/m16296/1.8/">
+  </md:derived-from>
+  <md:keywordlist>
+    <md:keyword>box</md:keyword>
+    <md:keyword>median</md:keyword>
+    <md:keyword>quartiles</md:keyword>
+  </md:keywordlist>
+  <md:subjectlist>
+    <md:subject>Mathematics and Statistics</md:subject>
+  </md:subjectlist>
+  <md:education-levellist>
+    <md:education-level>High School</md:education-level>
+  </md:education-levellist>
+  <md:abstract>All you wanted to know about Box Plots and more.</md:abstract>
+  <md:language>en</md:language>
+  <!-- WARNING! The 'metadata' section is read only. Do not edit above.
+       Changes to the metadata section in the source will not be saved. -->
+</metadata>
+
+<content>
+    <para id="delete_me"><emphasis>Box plots</emphasis> or <emphasis>box-whisker plots </emphasis>give a good graphical image of the concentration of the data.  They also show how far from most of the data the extreme values are.  The box plot is constructed from five values: the smallest value, the first quartile, the median, the third quartile, and the largest value.  The median, the first quartile, and the third quartile will be discussed here, and then again in the section on measuring data in this chapter.  We use these values to compare how close other data values are to them.</para><para id="element-681">The <term target-id="median">median</term>, a number, is a way of measuring the "center" of the data.  You can think of the median as the "middle value," although it does not actually have to be one of the observed values.  It is a number that separates ordered data into halves.  Half the values are the same number or smaller than the median and half the values are the same number or larger.  For example, consider the following data:</para><para id="element-324">1, 11.5, 6, 7.2, 4, 8, 9, 10, 6.8, 8.3, 2, 2, 10, 1</para><para id="element-398">Ordered from smallest to largest:  </para><para id="element-567">1, 1, 2, 2, 4, 6, <emphasis>6.8</emphasis>, <emphasis>7.2</emphasis>, 8, 8.3, 9, 10, 10, 11.5</para><para id="element-546">The median is between the 7th value, 6.8, and the 8th value 7.2.  To find the median, add the two values together and divide by 2.</para><equation id="element-293"><m:math><m:apply>
+  <m:eq/>
+  <m:apply>
+    <m:divide/>
+    <m:apply>
+      <m:plus/>
+      <m:cn>6.8</m:cn>
+      <m:cn>7.2</m:cn>
+    </m:apply>
+    <m:cn>2</m:cn>
+  </m:apply>
+  <m:cn>7</m:cn>
+</m:apply>
+</m:math></equation>
+
+
+<para id="element-995">The median is 7.  Half of the values are smaller than 7 and half of the values are larger than 7. </para><para id="element-308"><term target-id="quartiles">Quartiles</term> are numbers that separate the data into quarters.  Quartiles may or may not be part of the data.  To find the quartiles, first find the median or second quartile.  The first quartile is the middle value of the lower half of the data and the third quartile is the middle value of the upper half of the data.  To get the idea, consider the same data set shown above.</para><para id="element-805">The median or <emphasis>second quartile</emphasis> is 7.  The lower half of the data is 1, 1, 2, 2, 4, 6, 6.8.  The middle value of the lower half is 2. </para><para id="element-987">1, 1, 2, <emphasis>2</emphasis>, 4, 6, 6.8</para><para id="element-227">The number 2, which is part of the data, is the <emphasis>first quartile</emphasis>.  One-fourth of the values are the same or less than 2 and three-fourths of the values are more than 2.     </para><para id="element-54">The upper half of the data is 7.2, 8, 8.3, 9, 10, 10, 11.5.  The middle value of the upper half is 9. </para><para id="element-478">7.2, 8, 8.3, <emphasis>9</emphasis>, 10, 10, 11.5</para><para id="element-386">The number 9, which is part of the data, is the <emphasis>third quartile</emphasis>.  Three-fourths of the values are less than 9 and one-fourth of the values are more than 9.</para><para id="element-175">To construct a box plot, use a horizontal number line and a rectangular box.  The smallest and largest data values label the endpoints of the axis.  The first quartile marks one end of the box and the third quartile marks the other end of the box.  <emphasis>The middle fifty percent of the data fall inside the box. </emphasis>The "whiskers" extend from the ends of the box to the smallest and largest data values.  The box plot gives a good quick picture of the data.</para>
+
+
+
+<para id="element-23123">Using the data from the start of this section, recall that the first quartile is 2, the median is 7, and the third quartile is 9.  The smallest value is 1 and the largest value is 11.5.  The box plot is constructed as follows: 
+ 
+<figure id="boxplot1"><media id="id1164613625276" alt="Horizontal boxplot's first whisker extends from the smallest value, 1, to the first quartile, 2, the box begins at the first quartile and extends to the third quartile, 9, a vertical dashed line is drawn at the median, 7, and the second whisker extends from the third quartile to the largest value of 11.5." display="block"><image src="Ch2_boxplot_1.png" mime-type="image/png" print-width="4in"/></media></figure></para>
+
+<para id="element-303">The two whiskers extend from the first quartile to the smallest value and from the third quartile to the largest value.  The median is shown with a dashed line.</para><section id="eip-234"><title>Making a Box Plot in R</title><para id="eip-846">As with histograms, box plots are very easy to make in R. They are made using the <code>boxplot()</code> function. By default, R orients the box plot vertically; to change this, simply add the argument <code>horizontal = T</code> to the function. For most simple plots, no additional arguments are required. You may also want to change the size of the R graph window to view the box plot in a more aesthetic scale.
+</para><para id="eip-262">Here is how you would create the box plot in R using the same data from the start of this section.</para><code id="eip-125" display="block">
+&gt; a = c(1, 11.5, 6, 7.2, 4, 8, 9, 10, 6.8, 8.3, 2, 2, 10, 1)
+&gt; boxplot(a, horizontal = T)
+</code><para id="eip-363"><figure id="rboxplotfig"><media id="rboxplot" alt="Horizontal boxplot" display="block"><image src="boxplot-in-r.png" mime-type="image/png" print-width="4in"/></media></figure></para></section><example id="element-32"><para id="element-676">
+The following data are the heights of 40 students in a statistics class.
+</para><para id="element-731">59, 60, 61, 62, 62, 63, 63, 64, 64, 64, 65, 65, 65, 65, 65, 65, 65, 65, 65, 66, 66, 67, 67, 68, 68, 69, 70, 70, 70, 70, 70, 71, 71, 72, 72, 73, 74, 74, 75, 77</para><para id="element-483">Construct a box plot with the following properties:</para><list id="element-172" list-type="bulleted"><item>Smallest value = 59</item>
+<item>Largest value = 77</item>
+<item>Q1: First quartile = 64.5</item>
+<item>Q2: Second quartile or median= 66</item>
+<item>Q3: Third quartile = 70</item></list> 
+<para id="newpara"><figure id="boxplot2"><media id="id1164609221313" alt="Horizontal boxplot with first whisker extending from smallest value, 59, to Q1, 64.5, box beginning from Q1 to Q3, 70, median dashed line at Q2, 66, and second whisker extending from Q3 to largest value, 77." display="block"><image src="Ch2_boxplot_2.png" mime-type="image/png" print-width="4in"/></media></figure></para>
+<list id="element-754" list-type="labeled-item" mark-suffix=".">
+<item><label>a</label>Each quarter has 25% of the data.</item>
+
+<item><label>b</label>The spreads of the four quarters are 64.5 - 59 = 5.5 (first quarter), 66 - 64.5 = 1.5 (second quarter), 70 - 66 = 4 (3rd quarter), and 77 - 70 = 7 (fourth quarter). So, the second quarter has the smallest spread and the fourth quarter has the largest spread.</item> 
+
+<item><label>c</label>Interquartile Range:  <m:math> <m:mi>IQR </m:mi><m:mo>=</m:mo> <m:mi>Q3 </m:mi><m:mo>-</m:mo> <m:mi>Q1 </m:mi><m:mo>=</m:mo>  <m:mn>70</m:mn> <m:mo>-</m:mo><m:mn> 64.5</m:mn> <m:mo>= </m:mo><m:mn>5.5</m:mn></m:math>.</item>
+
+<item><label>d</label>The interval 59 through 65 has more than 25% of the data so it has more data in it than the interval 66 through 70 which has 25% of the data.</item>
+</list><para id="element-155">For some sets of data, some of the largest value, smallest value, first quartile, median, and third quartile may be the same. For instance, you might have a data set in which the median and the third quartile are the same.  In this case, the diagram would not have a dotted line inside the box displaying the median.  The right side of the box would display both the third quartile and the median.  For example, if the smallest value and the first quartile were both 1, the median and the third quartile were both 5, and the largest value was 7, the box plot would look as follows:
+
+<figure id="boxplot3"><media id="id1164604286156" alt="Horizontal boxplot box begins at the smallest value and Q1, 1, until the Q3 and median, 5, no median line is designated, and has its lone whisker extending from the Q3 to the largest value, 7." display="block"><image src="Ch2_boxplot_3.png" mime-type="image/png" print-width="4in"/></media></figure> </para>  </example>
+<example id="element-583"><para id="element-601">
+Test scores for a college statistics class held during the day are:
+</para><para id="element-891">99, 56, 78, 55.5, 32, 90, 80, 81, 56, 59, 45, 77, 84.5, 84, 70, 72, 68, 32, 79, 90</para><para id="element-212">Test scores for a college statistics class held during the evening are:</para>
+<para id="element-763">98, 78, 68, 83, 81, 89, 88, 76, 65, 45, 98, 90, 80, 84.5, 85, 79, 78, 98, 90, 79, 81, 25.5</para>
+<exercise id="element-23526">
+
+<problem id="id1164631607520">
+<list id="element-778" list-type="bulleted"><item>What are the smallest and largest data values for each data set?  </item>
+<item>What is the median, the first quartile, and the third quartile for each data set?  </item>
+
+<item>Create a boxplot for each set of data.</item>
+<item>Which boxplot has the widest spread for the middle 50% of the data (the data between 
+      the first and third quartiles)?  What does this mean for that set of data in comparison to the other set of data?</item>
+<item>For each data set, what percent of the data is between the smallest value and the first quartile? (Answer: 25%)  the first quartile and the median?  (Answer: 25%)  the median and the third quartile?  the third quartile and the largest value?  What percent of the data is between the first quartile and the largest value?  (Answer:  75%)</item>
+</list>
+</problem>
+<solution id="element-601s" print-placement="end">
+ <list id="element-106" list-type="bulleted"><title>First Data Set</title><item><m:math><m:mi>Xmin</m:mi><m:mo> = </m:mo><m:mn>32</m:mn></m:math></item>
+<item><m:math><m:mi>Q1</m:mi><m:mo> = </m:mo><m:mn>56</m:mn></m:math></item>
+<item><m:math><m:mi>M</m:mi><m:mo> = </m:mo><m:mn>74.5</m:mn></m:math></item>
+<item><m:math><m:mi>Q3</m:mi><m:mo> = </m:mo><m:mn>82.5</m:mn></m:math></item>
+<item><m:math><m:mi>Xmax</m:mi><m:mo> = </m:mo><m:mn>99</m:mn></m:math></item></list>
+
+<list id="element-1062" list-type="bulleted"><title>Second Data Set</title><item><m:math><m:mi>Xmin</m:mi><m:mo> = </m:mo><m:mn>25.5</m:mn></m:math></item>
+<item><m:math><m:mi>Q1</m:mi><m:mo> = </m:mo><m:mn>78</m:mn></m:math></item>
+<item><m:math><m:mi>M</m:mi><m:mo> = </m:mo><m:mn>81</m:mn></m:math></item>
+<item><m:math><m:mi>Q3</m:mi><m:mo> = </m:mo><m:mn>89</m:mn></m:math></item>
+<item><m:math><m:mi>Xmax</m:mi><m:mo> = </m:mo><m:mn>98</m:mn></m:math></item></list>
+
+<para id="newpara2"><figure id="boxplot4"><media id="id1164615428829" alt="Two box plots over a number line from 0 to 100.  The top plot shows a whisker from 32 to 56, a solid line at 56, a dashed line at 74.5, a solid line at 82.5, and a whisker from 82.5 to 99.  The lower plot shows a whisker from 25.5 to 78, solid line at 78, dashed line at 81, solid line at 89, and a whisker from 89 to 98." display="block"><image src="example2-6solution.png" mime-type="image/png" print-width="3in"/></media></figure></para>
+
+</solution>
+</exercise><para id="element-185">The first data set (the top box plot) has the widest spread for the middle 50% of the data.  <m:math><m:mi>IQR</m:mi><m:mo> = </m:mo><m:mi>Q3</m:mi><m:mo> - </m:mo><m:mi>Q1</m:mi></m:math>
+
+is 
+
+<m:math><m:mn>82.5</m:mn><m:mo> - </m:mo><m:mn>56</m:mn><m:mo> = </m:mo>
+<m:mn>26.5</m:mn></m:math>
+
+for the first data set and 
+
+<m:math><m:mn>89</m:mn><m:mo> - </m:mo><m:mn>78</m:mn><m:mo> = </m:mo>
+<m:mn>11</m:mn></m:math>
+
+for the second data set.  So, the first set of data has its middle 50% of scores more spread out.</para><para id="element-7">25% of the data is between <m:math><m:mi>M</m:mi></m:math> and <m:math><m:mi>Q3</m:mi></m:math> and 25% is between <m:math><m:mi>Q3</m:mi></m:math> and <m:math><m:mi>Xmax</m:mi></m:math>.</para>
+</example>
+
+
+  </content>
+  <glossary>
+ <definition id="median">
+    <term> Median</term>
+    <meaning id="id1164618423329">
+   A number that separates ordered data into halves: half the values are the same number or smaller than the median and half the values are the same number or larger than the median. The median may or may not be part of the data.
+    </meaning>
+  </definition>
+<definition id="quartiles">
+    <term>Quartiles</term>
+    <meaning id="id1164616658095">
+The numbers that separate the data into quarters. Quartiles may or may not be part of the data. The second quartile is the median of the data.
+    </meaning>
+  </definition>
+
+</glossary>
+</document>
