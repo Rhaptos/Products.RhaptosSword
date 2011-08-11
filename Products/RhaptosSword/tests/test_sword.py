@@ -12,6 +12,7 @@ from Acquisition import aq_base
 from ZPublisher.HTTPRequest import HTTPRequest
 from ZPublisher.HTTPResponse import HTTPResponse
 from Products.Five import BrowserView
+from Products.CMFCore.interfaces import IFolderish
 
 from Products.PloneTestCase import PloneTestCase
 
@@ -129,6 +130,10 @@ class TestSwordService(PloneTestCase.PloneTestCase):
 
         # Test that we can still reach the edit-iri
         assert self.folder.restrictedTraverse('perry.zip/sword/edit')
+
+
+    def testFoldersAreFolderish(self):
+        self.assertTrue(IFolderish.providedBy(self.folder), "Folders are not Folderish")
 
 
     def testMetadata(self):
