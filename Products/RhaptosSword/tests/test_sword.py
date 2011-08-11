@@ -19,8 +19,8 @@ from rhaptos.swordservice.plone.browser.sword import ISWORDService
 from rhaptos.swordservice.plone.browser.sword import ServiceDocument
 
 from Testing import ZopeTestCase
-ZopeTestCase.installProduct('Products.RhaptosSword')
-ZopeTestCase.installProduct('Products.RhaptosModuleEditor')
+ZopeTestCase.installProduct('RhaptosSword')
+ZopeTestCase.installProduct('RhaptosModuleEditor')
 
 PloneTestCase.setupPloneSite()
 
@@ -93,9 +93,8 @@ class TestSwordService(PloneTestCase.PloneTestCase):
 
     def testMetadata(self):
         """http://localhost:8080/Members/admin/@@sword"""
-        self.addProduct('RhaptosSword')
+        self.addProfile('Products.RhaptosModuleEditor:default')
         self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
-        self.addProfile('Products.RhaptosModuleEditor')
 
         xml = os.path.join(DIRNAME, 'data', 'entry.xml')
         file = open(xml, 'rb')
