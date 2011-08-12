@@ -34,6 +34,8 @@ PloneTestCase.setupPloneSite()
 # argument to import GS extension profiles.
 
 DIRNAME = os.path.dirname(__file__)
+BAD_FILE = 'bad_entry.xml'
+GOOD_FILE = 'entry.xml'
 
 from OFS.SimpleItem import SimpleItem
 
@@ -91,6 +93,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
     def afterSetup(self):
         pass
 
+
     def testSwordService(self):
         request = self.portal.REQUEST
 
@@ -136,23 +139,20 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.assertTrue(IFolderish.providedBy(self.folder), "Folders are not Folderish")
 
 
-    def testMetadata(self):
-        """http://localhost:8080/Members/admin/@@sword"""
-        # XXX: the next 3 lines need to move to afterSetup but
-        # afterSetup is not being called for some reason
+    def createUploadRequest(self, filename):
+        # XXX: This method needs to move to afterSetup, but afterSetup is not
+        # being called for some reason.
         self.addProduct('RhaptosSword')
         self.addProfile('Products.RhaptosModuleEditor:default')
         self.addProfile('Products.CNXMLDocument:default')
-        self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
         self.portal.manage_addProduct['RhaptosRepository'].manage_addRepository('content') 
         self.portal._setObject('portal_moduledb', StubModuleDB())
         self.portal._setObject('portal_languages', StubLanuageTool())
 
-        xml = os.path.join(DIRNAME, 'data', 'entry.xml')
+        xml = os.path.join(DIRNAME, 'data', filename)
         file = open(xml, 'rb')
         content = file.read()
         file.close()
-        # Upload a zip file
         env = {
             'CONTENT_TYPE': 'application/atom+xml;type=entry',
             'CONTENT_LENGTH': len(content),
@@ -166,13 +166,32 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         uploadrequest.set('BODYFILE', StringIO(content))
         # Fake PARENTS
         uploadrequest.set('PARENTS', [self.portal.workspace])
+        return uploadrequest
+
+
+    def __test_publishBadAtomXML(self):
+        """
+         See what happens when we throw bad xml at the import funtionality.
+        """
+        self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        uploadrequest = self.createUploadRequest('bad_entry.xml')
 
         # Call the sword view on this request to perform the upload
         adapter = getMultiAdapter(
                 (self.portal.workspace, uploadrequest), Interface, 'sword')
         xml = adapter()
-        
+        self.failUnlessRaises(ExpatError, view)
 
+
+    def testMetadata(self):
+        """ See if the metadata is added correctly. """
+        self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        uploadrequest = self.createUploadRequest('entry.xml')
+
+        # Call the sword view on this request to perform the upload
+        adapter = getMultiAdapter(
+                (self.portal.workspace, uploadrequest), Interface, 'sword')
+        xml = adapter()
         assert "<sword:error" not in xml, xml
 
         # Test that we can reach the edit-iri
