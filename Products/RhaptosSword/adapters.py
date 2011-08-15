@@ -14,7 +14,9 @@ from Products.CNXMLTransforms.helpers import OOoImportError, doTransform, makeCo
 
 from rhaptos.swordservice.plone.interfaces import ISWORDDepositReceipt
 from rhaptos.swordservice.plone.browser.sword import PloneFolderSwordAdapter
+from rhaptos.swordservice.plone.browser.sword import RetrieveContent
 from rhaptos.swordservice.plone.browser.sword import ISWORDContentUploadAdapter 
+from rhaptos.swordservice.plone.browser.sword import ISWORDRetrieveContentAdapter
 
 
 class ValidationError(Exception):
@@ -35,6 +37,12 @@ METADATA_MAPPING =\
 
 
 class IRhaptosWorkspaceSwordAdapter(ISWORDContentUploadAdapter):
+    """ Marker interface for SWORD service specific to the Rhaptos 
+        implementation.
+    """
+
+
+class IRhaptosContentRetrieveAdapter(ISWORDRetrieveContentAdapter):
     """ Marker interface for SWORD service specific to the Rhaptos 
         implementation.
     """
@@ -182,3 +190,8 @@ class DepositReceiptAdapter(object):
             return adapter.information()
         return {}
 
+
+class RhaptosContentRetrieveAdapter(RetrieveContent):
+
+    def __call__(self):
+        return self.context.module_export(format='zip')
