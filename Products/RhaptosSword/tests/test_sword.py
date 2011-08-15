@@ -170,7 +170,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         return uploadrequest
 
 
-    def __test_publishBadAtomXML(self):
+    def _test_publishBadAtomXML(self):
         """
          See what happens when we throw bad xml at the import funtionality.
         """
@@ -196,7 +196,6 @@ class TestSwordService(PloneTestCase.PloneTestCase):
 
 
     def testSwordServiceRetrieveContent(self):
-        import pdb;pdb.set_trace()
         view = self.portal.restrictedTraverse('sword')
         env = {
             'REQUEST_METHOD': 'GET',
