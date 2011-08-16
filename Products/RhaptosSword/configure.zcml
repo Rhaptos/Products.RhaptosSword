@@ -51,11 +51,6 @@
         interface="Products.RhaptosSword.interfaces.IRhaptosSwordCollection"
         /> 
 
-    <five:implements                                                              
-        class="Products.RhaptosModuleEditor.ModuleEditor.ModuleEditor"
-        interface="rhaptos.atompub.plone.interfaces.IAtomFeedProvider"
-        /> 
-
     <adapter
         for="Products.RhaptosSword.interfaces.IRhaptosSwordWorkspace
              zope.publisher.interfaces.http.IHTTPRequest"

@@ -6,7 +6,6 @@ from Products.Five import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 
 from rhaptos.swordservice.plone.interfaces import ISWORDDepositReceipt
-from rhaptos.atompub.plone.browser.atompub import AtomFeed as BasicAtomFeed
 from rhaptos.atompub.plone.browser.atompub import IAtomFeed
 
 from Products.RhaptosSword.adapters import METADATA_MAPPING
@@ -59,12 +58,9 @@ class DepositReceipt(BrowserView):
         return True
 
 
-class AtomFeed(BasicAtomFeed):
+class AtomFeed(BrowserView):
     """
     """
-    implements(IAtomFeed)
-    
-
     def getAuthors(self):
         authors = getattr(self.context, 'authors', '')
         return ' '.join(authors)
