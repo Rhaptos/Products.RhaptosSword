@@ -11,6 +11,14 @@
         permission="zope2.View"
         />
 
+    <browser:page
+        for="rhaptos.atompub.plone.interfaces.IAtomFeedProvider"
+        name="atom"
+        class=".views.AtomFeed"
+        template="atom.pt"
+        permission="zope2.View"
+        />
+
     <adapter
         for="Products.RhaptosSword.interfaces.IRhaptosSwordCollection
              zope.publisher.interfaces.http.IHTTPRequest"

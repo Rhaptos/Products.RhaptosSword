@@ -6,6 +6,8 @@ from Products.Five import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 
 from rhaptos.swordservice.plone.interfaces import ISWORDDepositReceipt
+from rhaptos.atompub.plone.browser.atompub import AtomFeed as BasicAtomFeed
+from rhaptos.atompub.plone.browser.atompub import IAtomFeed
 
 from Products.RhaptosSword.adapters import METADATA_MAPPING
 
@@ -55,3 +57,24 @@ class DepositReceipt(BrowserView):
         for key, value in METADATA_MAPPING.items():
             if not getattr(obj, key, None): return False
         return True
+
+
+class AtomFeed(BasicAtomFeed):
+    """
+    """
+    implements(IAtomFeed)
+    
+
+    def getAuthors(self):
+        authors = getattr(self.context, 'authors', '')
+        return ' '.join(authors)
+
+    
+    def getLicense(self):
+        license = getattr(self.context, 'license', None)
+        return license
+
+
+    def entries(self):
+        meta_types = ['CMF CNXML File', 'UnifiedFile',]
+        return self.context.objectValues(spec=meta_types)
