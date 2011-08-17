@@ -272,6 +272,11 @@ class TestSwordService(PloneTestCase.PloneTestCase):
             elif rel == 'http://purl.org/net/sword/terms/originalDeposit':
                 self.assertEqual(href,
                     module.absolute_url(), 'Original deposit IRI is incorrect.')
+
+        state = dom.getElementsByTagNameNS('http://purl.org/net/sword/', 'state')
+        self.failUnless(len(state) > 0)
+        href = str(state[0].attributes['href'].value)
+        self.assertEqual(href, module.absolute_url(), 'State IRI is incorrect.')
         
 
 
