@@ -8,6 +8,7 @@
     <title type="text" tal:content="context/Title">
         Document title
     </title>
+    <link tal:attributes="href context/absolute_url" rel="self" />
     <author tal:content="view/getAuthors|string:">rhaptos</author>
     <id tal:content="context/getId">Unique id</id>
     <license tal:content="view/getLicense|nothing">
