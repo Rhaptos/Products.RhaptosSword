@@ -4,6 +4,9 @@ if __name__ == '__main__':
 
 from StringIO import StringIO
 from base64 import decodestring
+
+from xml.dom.minidom import parseString
+
 from zope.publisher.interfaces.http import IHTTPRequest
 from zope.component import getAdapter, getMultiAdapter
 from zope.publisher.interfaces import IPublishTraverse
@@ -245,6 +248,31 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         view = module.restrictedTraverse('@@statement')
         xml = view()
         assert "<sword:error" not in xml, xml
+
+        dom = parseString(xml)
+        edit_iri = module.absolute_url() + '/sword/edit'
+        edit_media_iri = module.absolute_url()
+        statement_iri = module.absolute_url() + '/sword/@@statement'
+        links = dom.getElementsByTagName('link')
+        for link in links:
+            rel = str(link.attributes['rel'].value)
+            href = str(link.attributes['href'].value)
+            if rel == 'edit':
+                self.assertEqual(href,
+                    edit_iri, 'Edit IRI is incorrect.')
+            elif rel == 'edit-media':
+                self.assertEqual(href,
+                    edit_media_iri, 'Media IRI is incorrect.')
+            elif rel == 'http://purl.org/net/sword/terms/add':
+                self.assertEqual(href,
+                    edit_iri, 'Termas add IRI is incorrect.')
+            elif rel == 'http://purl.org/net/sword/terms/statement':
+                self.assertEqual(href,
+                    statement_iri, 'Statement IRI is incorrect.')
+            elif rel == 'http://purl.org/net/sword/terms/originalDeposit':
+                self.assertEqual(href,
+                    module.absolute_url(), 'Original deposit IRI is incorrect.')
+        
 
 
 def test_suite():
