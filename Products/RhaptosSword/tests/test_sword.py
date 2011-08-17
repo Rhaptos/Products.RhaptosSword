@@ -196,7 +196,17 @@ class TestSwordService(PloneTestCase.PloneTestCase):
 
 
     def testSwordServiceRetrieveContent(self):
-        view = self.portal.restrictedTraverse('sword')
+        self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        uploadrequest = self.createUploadRequest('m11868_1.6.zip')
+        uploadrequest['CONTENT_TYPE'] = 'application/zip'
+        uploadrequest['CONTENT_DISPOSITION'] = 'attachment; filename=perry.zip'
+
+        # Call the sword view on this request to perform the upload
+        self.setRoles(('Manager',))
+        adapter = getMultiAdapter(
+                (self.portal.workspace, uploadrequest), Interface, 'sword')
+        xml = adapter()
+
         env = {
             'REQUEST_METHOD': 'GET',
             'SERVER_NAME': 'nohost',
@@ -205,10 +215,20 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         getresponse = HTTPResponse(stdout=StringIO())
         getrequest = clone_request(self.app.REQUEST, getresponse, env)
 
-        self.setRoles(('Manager',))
+        content_file = self.portal.workspace['perry.zip']
         adapter = getMultiAdapter(
-            (self.portal, getrequest), Interface, 'sword')
+            (content_file, getrequest), Interface, 'sword')
+        zipfile = adapter()
+        print zipfile 
+
+    
+    def testSwordServiceStatement(self):
+        self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        uploadrequest = self.createUploadRequest('entry.xml')
+        adapter = getMultiAdapter(
+                (self.portal.workspace, uploadrequest), Interface, 'sword')
         xml = adapter()
+        self.fail()
 
 
 def test_suite():
