@@ -6,6 +6,7 @@ from Products.Five import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 
 from rhaptos.swordservice.plone.interfaces import ISWORDDepositReceipt
+from rhaptos.swordservice.plone.browser.sword import SWORDStatement 
 from rhaptos.atompub.plone.browser.atompub import IAtomFeed
 
 from Products.RhaptosSword.adapters import METADATA_MAPPING
@@ -30,6 +31,8 @@ class DepositReceipt(BrowserView):
     depositreceipt = ViewPageTemplateFile('depositreceipt.pt')
     
     def __call__(self, upload=True):
+        self.request.response.setHeader(
+                'Location', self.context.absolute_url() + '/sword/edit')
         return self.depositreceipt()
 
     def pending_collaborations(self):
@@ -74,3 +77,37 @@ class AtomFeed(BrowserView):
     def entries(self):
         meta_types = ['CMF CNXML File', 'UnifiedFile',]
         return self.context.objectValues(spec=meta_types)
+
+
+class RhaptosSWORDStatement(SWORDStatement):
+   
+    def __init__(self, context, request):
+        super(RhaptosSWORDStatement, self).__init__(context, request)
+        self.missing_metadata = self.check_metadata()
+        self.has_required_metadata = True
+        if self.missing_metadata: self.has_required_metadata = False
+
+
+    def check_metadata(self):
+        obj = self.context.aq_inner
+        missing_metadata = []
+        for key, value in METADATA_MAPPING.items():
+            if not getattr(obj, key, None):
+                missing_metadata.append(key)
+        return missing_metadata
+
+
+    def collaborators(self):
+        pending_collabs = self.pending_collabs()
+        current_collabs = self.current_collabs()
+        collaborators = {'pending_collabs': pending_collabs,
+                        }
+        return collaborators
+    
+
+    def pending_collabs(self):
+        return self.context.getPendingCollaborations()
+
+    
+    def current_collabs(self):
+        return {} 

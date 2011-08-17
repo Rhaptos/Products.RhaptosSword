@@ -196,7 +196,10 @@ class TestSwordService(PloneTestCase.PloneTestCase):
 
 
     def testSwordServiceRetrieveContent(self):
+        # getting a transaction to commit, just in case later steps fail and
+        # cause an abort.
         self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+
         uploadrequest = self.createUploadRequest('m11868_1.6.zip')
         uploadrequest['CONTENT_TYPE'] = 'application/zip'
         uploadrequest['CONTENT_DISPOSITION'] = 'attachment; filename=perry.zip'
@@ -214,6 +217,12 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         }
         getresponse = HTTPResponse(stdout=StringIO())
         getrequest = clone_request(self.app.REQUEST, getresponse, env)
+        
+        ids = self.portal.objectIds(),
+        assert 'workspace' in ids, 'No workspace found!'
+
+        ids = self.portal.workspace.objectIds(),
+        assert 'perry.zip' in ids, 'Resource create failed.'
 
         content_file = self.portal.workspace['perry.zip']
         adapter = getMultiAdapter(
@@ -223,12 +232,19 @@ class TestSwordService(PloneTestCase.PloneTestCase):
 
     
     def testSwordServiceStatement(self):
+        self.setRoles(('Manager',))
         self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
         uploadrequest = self.createUploadRequest('entry.xml')
         adapter = getMultiAdapter(
                 (self.portal.workspace, uploadrequest), Interface, 'sword')
         xml = adapter()
-        self.fail()
+        assert "<sword:error" not in xml, xml
+
+        id = self.folder.workspace.objectIds()[0]
+        module = self.folder.workspace[id]
+        view = module.restrictedTraverse('@@statement')
+        xml = view()
+        assert "<sword:error" not in xml, xml
 
 
 def test_suite():

@@ -19,6 +19,14 @@
         permission="zope2.View"
         />
 
+    <browser:page
+        for="Products.RhaptosModuleEditor.interfaces.IModule"
+        name="statement"
+        class=".views.RhaptosSWORDStatement"
+        template="statement.pt"
+        permission="zope2.View"
+        />
+
     <adapter
         for="Products.RhaptosSword.interfaces.IRhaptosSwordCollection
              zope.publisher.interfaces.http.IHTTPRequest"
