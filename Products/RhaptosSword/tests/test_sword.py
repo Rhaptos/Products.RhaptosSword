@@ -281,6 +281,16 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         orig_deposit = dom.getElementsByTagNameNS(
             'http://purl.org/net/sword/', 'originalDeposit')
         self.failUnless(len(orig_deposit) > 0) 
+        href = str(orig_deposit[0].attributes['href'].value)
+        self.assertEqual(href, module.absolute_url(),
+            'Original deposit IRI is incorrect.')
+
+        packaging = orig_deposit[0].getElementsByTagNameNS(
+            'http://purl.org/net/sword/', 'packaging')
+        self.failUnless(len(packaging) > 0) 
+        value = str(packaging[0].firstChild.nodeValue)
+        self.assertEqual(value, 'application/xhtml+xml',
+            'Packinging incorrect.')
 
 
 def test_suite():
