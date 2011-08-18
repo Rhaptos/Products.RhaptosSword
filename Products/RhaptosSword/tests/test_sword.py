@@ -144,7 +144,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.assertTrue(IFolderish.providedBy(self.folder), "Folders are not Folderish")
 
 
-    def createUploadRequest(self, filename):
+    def createUploadRequest(self, filename, **kwargs):
         # XXX: This method needs to move to afterSetup, but afterSetup is not
         # being called for some reason.
         self.addProduct('RhaptosSword')
@@ -166,6 +166,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
             'SERVER_NAME': 'nohost',
             'SERVER_PORT': '80'
         }
+        env.update(kwargs)
         uploadresponse = HTTPResponse(stdout=StringIO())
         uploadrequest = clone_request(self.app.REQUEST, uploadresponse, env)
         uploadrequest.set('BODYFILE', StringIO(content))
@@ -204,9 +205,9 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         # cause an abort.
         self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
 
-        uploadrequest = self.createUploadRequest('m11868_1.6.zip')
-        uploadrequest['CONTENT_TYPE'] = 'application/zip'
-        uploadrequest['CONTENT_DISPOSITION'] = 'attachment; filename=perry.zip'
+        uploadrequest = self.createUploadRequest('m11868_1.6.zip',
+            CONTENT_TYPE='application/zip',
+            CONTENT_DISPOSITION='attachment; filename=perry.zip')
 
         # Call the sword view on this request to perform the upload
         self.setRoles(('Manager',))
