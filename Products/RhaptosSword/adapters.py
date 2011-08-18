@@ -34,6 +34,7 @@ METADATA_MAPPING =\
          'language': 'language',
          'subject' : 'subject',
          'license' : 'license',
+         'descriptionOfChanges' : 'descriptionOfChanges',
          'googleAnalyticsTrackingCode': 'GoogleAnalyticsTrackingCode',
         }
 
@@ -81,6 +82,12 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         def updateMetadata(obj, fp):
             dom = parse(fp)
             metadata = self.getMetadata(dom, METADATA_MAPPING)
+            # we remove descriptionOfChanges because the update_metadata
+            # script cannot cope with it.
+            descriptionOfChanges = metadata.pop(
+                'descriptionOfChanges', '')
+            if descriptionOfChanges:
+                obj.logAction('create', descriptionOfChanges)
             obj.update_metadata(**metadata)
             # IB: Always add? Or replace when modifying existing content?
             self.addRoles(obj, dom)
