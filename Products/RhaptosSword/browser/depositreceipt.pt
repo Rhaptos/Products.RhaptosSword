@@ -54,7 +54,32 @@
                             oerdc:email python:view.email(rightsholder)">
         Rights holder full name  
     </dcterms:rightsHolder>
+    <dcterms:translator oerdc:id="translator id" oerdc:email="translator email"
+            tal:repeat="translator view/translators"
+            tal:content="python:view.fullname(translator)"
+            tal:attributes="oerdc:id translator;
+                            oerdc:email python:view.email(translator)">
+        Translator full name  
+    </dcterms:translator>
+    <dcterms:editor oerdc:id="editor id" oerdc:email="editor email"
+            tal:repeat="editor view/editors"
+            tal:content="python:view.fullname(editor)"
+            tal:attributes="oerdc:id editor;
+                            oerdc:email python:view.email(editor)">
+        Editor full name  
+    </dcterms:editor>
 
+    <oerdc:oer-subject tal:content="context/subject">
+        Mathematics and Statistics
+    </oerdc:oer-subject>
+
+    <dcterms:subject xsi:type="oerdc:Subject" tal:content="context/subject">
+        Mathematics and Statistics
+    </dcterms:subject>
+    
+    <dcterms:subject tal:repeat="keyword context/keywords" tal:content="keyword">
+        box
+    </dcterms:subject>
 
     <link rel="edit" href="edit-iri"
           tal:attributes="href string:${context/absolute_url}/sword/edit" />

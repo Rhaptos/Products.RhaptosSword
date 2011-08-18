@@ -89,6 +89,11 @@ class DepositReceipt(BrowserView):
         return obj.translators
 
     
+    def editors(self):
+        obj = self.context.aq_inner
+        return obj.editors
+
+    
     def fullname(self, user_id):
         user = self.pmt.getMemberById(user_id)
         return user.getProperty('fullname')
