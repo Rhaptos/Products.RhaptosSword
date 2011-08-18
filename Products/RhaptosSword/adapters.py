@@ -77,51 +77,49 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
 
 
     def updateObject(self, obj, filename, request, response, content_type):
+
+        def updateMetadata(obj, fp):
+            dom = parse(fp)
+            metadata = self.getMetadata(dom, METADATA_MAPPING)
+            obj.update_metadata(**metadata)
+            # IB: Always add? Or replace when modifying existing content?
+            self.addRoles(obj, dom)
+            obj.reindexObject(idxs=metadata.keys())
+
+        def updateContent(obj, fp):
+            kwargs = {
+                'original_file_name': 'sword-import-file',
+                'user_name': getSecurityManager().getUser().getUserName()
+            }
+            text, subobjs, meta = doTransform(obj, "zip_to_folder",
+                fp.read(), meta=1, **kwargs)
+            # For a new document, it will contain a blank index.cnxml. For
+            # existing documents, we want to replace all of it anyway. Either
+            # way, we want to  delete the contents of the module and replace
+            # it. Unless we have no text, then leave the default empty
+            # document alone
+            obj.manage_delObjects(
+                filter(lambda x: x!=obj.default_file, obj.objectIds()))
+            if text:
+                obj.manage_delObjects([obj.default_file,])
+                obj.invokeFactory('CNXML Document', obj.default_file,
+                    file=text, idprefix='zip-')
+            makeContent(obj, subobjs)
+
         obj = obj.__of__(self.context)
         if content_type in self.ATOMPUB_CONTENT_TYPES:
             body = request.get('BODYFILE')
             body.seek(0)
-            dom = parse(body)
-            metadata = self.getMetadata(dom, METADATA_MAPPING)
-            obj.update_metadata(**metadata)
-            self.addRoles(obj, dom)
-            obj.reindexObject(idxs=metadata.keys())
+            updateMetadata(body)
         elif content_type == 'application/zip':
             body = request.get('BODYFILE')
             body.seek(0)
-            kwargs = {
-                'original_file_name': 'sword-import-file',
-                'user_name': getSecurityManager().getUser().getUserName()
-            }
-            text, subobjs, meta = doTransform(obj, "zip_to_folder",
-                body.read(), meta=1, **kwargs)
-            if text:
-                obj.manage_delObjects([obj.default_file,])
-                obj.invokeFactory('CNXML Document', obj.default_file,
-                    file=text, idprefix='zip-')
-            makeContent(obj, subobjs)
+            updateContent(obj, body)
         elif content_type.startswith('multipart/'):
             atom, payload = self._splitRequest(request)
+            updateMetadata(obj, StringIO(atom))
+            updateContent(obj, StringIO(payload))
 
-            # Update object metadata
-            dom = parse(StringIO(atom))
-            metadata = self.getMetadata(dom, METADATA_MAPPING)
-            obj.update_metadata(**metadata)
-            obj.reindexObject(idxs=metadata.keys())
-
-            # Update object content
-            kwargs = {
-                'original_file_name': 'sword-import-file',
-                'user_name': getSecurityManager().getUser().getUserName()
-            }
-            text, subobjs, meta = doTransform(obj, "zip_to_folder",
-                payload, meta=1, **kwargs)
-            if text:
-                obj.manage_delObjects([obj.default_file,])
-                obj.invokeFactory('CNXML Document', obj.default_file,
-                    file=text, idprefix='zip-')
-            makeContent(obj, subobjs)
-                
         return obj
 
 
