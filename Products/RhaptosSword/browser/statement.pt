@@ -63,6 +63,9 @@
         <sword:depositedOn tal:content="view/deposited_on">
             2011-01-01T00:00:00Z
         </sword:depositedOn>
+        <sword:depositedBy tal:content="view/deposited_by">
+            jbloggs
+        </sword:depositedBy>     
     </sword:originalDeposit>
 
     <sword:treatment tal:content="view/treatment">Stored</sword:treatment>

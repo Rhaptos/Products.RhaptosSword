@@ -4,7 +4,57 @@
        xmlns:dcterms="http://purl.org/dc/terms/"
        xmlns:md="http://cnx.rice.edu/mdml"
        xmlns:tal="http://xml.zope.org/namespaces/tal"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:oerdc="http://cnx.org/aboutus/technology/schemas/oerdc"
        tal:define="pending_collaborations view/pending_collaborations">
+
+    <title tal:content="context/title">My Deposit</title>
+    <id tal:content="context/Identifier">1234</id>
+    <updated tal:content="context/created">2008-08-18T14:27:08Z</updated>
+    <summary type="text">The summary</summary>
+    <generator uri="rhaptos.swordservice.plone" version="1.0"/>
+
+    <!-- The metadata begins -->
+    <dcterms:identifier xsi:type="dcterms:URI" tal:content="context/absolute_url">
+        http://cnx.org/content/m10000/1.1/
+    </dcterms:identifier> 
+    <dcterms:identifier xsi:type="oerdc:Version" tal:content="context/version">
+        1.1
+    </dcterms:identifier> 
+    <dcterms:identifier xsi:type="oerdc:ContentId" tal:content="context/Identifier">
+        m10000
+    </dcterms:identifier> 
+    <dcterms:title tal:content="context/title">
+        Biology for Math Majors
+    </dcterms:title>
+    <dcterms:created tal:content="context/created">
+        2010/08/10 11:41:00.383 GMT-5
+    </dcterms:created> 
+    <dcterms:modified tal:content="context/revised">
+        2011-06-22T14:27:08Z
+    </dcterms:modified> 
+    <dcterms:creator oerdc:id="creator id" oerdc:email="owner email"
+            tal:repeat="creator view/creators"
+            tal:content="python:view.fullname(creator)"
+            tal:attributes="oerdc:id creator;
+                            oerdc:email python:view.email(creator)">
+        Creator full name  
+    </dcterms:creator>
+    <dcterms:maintainer oerdc:id="maintainer id" oerdc:email="owner email"
+            tal:repeat="maintainer view/maintainers"
+            tal:content="python:view.fullname(maintainer)"
+            tal:attributes="oerdc:id maintainer;
+                            oerdc:email python:view.email(maintainer)">
+        Maintainer full name  
+    </dcterms:maintainer>
+    <dcterms:rightsHolder oerdc:id="rightsholder id" oerdc:email="rightsholder email"
+            tal:repeat="rightsholder view/rightsholders"
+            tal:content="python:view.fullname(rightsholder)"
+            tal:attributes="oerdc:id rightsholder;
+                            oerdc:email python:view.email(rightsholder)">
+        Rights holder full name  
+    </dcterms:rightsHolder>
+
 
     <link rel="edit" href="edit-iri"
           tal:attributes="href string:${context/absolute_url}/sword/edit" />
@@ -24,9 +74,6 @@
           tal:attributes="href item/absolute_url" />
 
     <sword:treatment tal:content="string:Stored as ${context/id}">Stored</sword:treatment>
-    <title tal:content="context/title">My Deposit</title>
-    <id tal:content="context/absolute_url">1234</id>
-    <updated tal:content="context/created">2008-08-18T14:27:08Z</updated>
     <author><name tal:content="context/authors">jbloggs</name></author>
     <dcterms:available tal:content="context/revised">Date Available</dcterms:available>
     <dcterms:description tal:content="context/abstract">Description</dcterms:description>

@@ -29,11 +29,18 @@ class DepositReceipt(BrowserView):
     implements(ISWORDDepositReceipt)
 
     depositreceipt = ViewPageTemplateFile('depositreceipt.pt')
+   
     
+    def __init__(self, context, request):
+        super(DepositReceipt, self).__init__(context, request)
+        self.pmt = getToolByName(self.context, 'portal_membership')
+
+
     def __call__(self, upload=True):
         self.request.response.setHeader(
                 'Location', self.context.absolute_url() + '/sword/edit')
         return self.depositreceipt()
+
 
     def pending_collaborations(self):
         return self.context.getPendingCollaborations()
@@ -54,11 +61,42 @@ class DepositReceipt(BrowserView):
                 roles_and_users[role] = userids
         return roles_and_users
 
+
     def has_required_metadata(self):
         obj = self.context.aq_inner
         for key, value in METADATA_MAPPING.items():
             if not getattr(obj, key, None): return False
         return True
+
+    
+    def creators(self):
+        obj = self.context.aq_inner
+        return obj.creators
+
+
+    def maintainers(self):
+        obj = self.context.aq_inner
+        return obj.maintainers
+
+
+    def rightsholders(self):
+        obj = self.context.aq_inner
+        return obj.licensors
+
+
+    def translators(self):
+        obj = self.context.aq_inner
+        return obj.translators
+
+    
+    def fullname(self, user_id):
+        user = self.pmt.getMemberById(user_id)
+        return user.getProperty('fullname')
+
+
+    def email(self, user_id):
+        user = self.pmt.getMemberById(user_id)
+        return user.getProperty('email')
 
 
 class AtomFeed(BrowserView):
@@ -121,3 +159,9 @@ class RhaptosSWORDStatement(SWORDStatement):
     def state(self):
         obj = self.context.aq_inner
         return obj.state
+
+    
+    def deposited_by(self):
+        obj = self.context.aq_inner
+        return obj.authors
+
