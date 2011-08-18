@@ -33,6 +33,7 @@
         <sword:stateDescription>
         <div id="current_state"> 
             <p>Current state:</p>
+            <p tal:content="view/state">Created</p>
         </div> 
 
         <div id="metadata"> 

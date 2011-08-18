@@ -284,6 +284,13 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         href = str(state[0].attributes['href'].value)
         self.assertEqual(href, module.absolute_url(), 'State IRI is incorrect.')
 
+        state_description = dom.getElementsByTagNameNS(
+            'http://purl.org/net/sword/', 'stateDescription')
+        self.failUnless(len(state_description) > 0)
+        paragraphs = state_description[0].getElementsByTagName('p')
+        value = str(paragraphs[1].firstChild.nodeValue)
+        self.assertEqual(value, 'created', 'State mismatch.')
+
         orig_deposit = dom.getElementsByTagNameNS(
             'http://purl.org/net/sword/', 'originalDeposit')
         self.failUnless(len(orig_deposit) > 0) 
@@ -303,12 +310,12 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.failUnless(len(deposited_on) > 0) 
         value = str(deposited_on[0].firstChild.nodeValue)
         created = DateTime(value)
-        self.assertEqual(created.year(), now.year())
-        self.assertEqual(created.month(), now.month())
-        self.assertEqual(created.day(), now.day())
-        self.assertEqual(created.hour(), now.hour())
-        self.assertEqual(created.minute(), now.minute())
-        self.assertEqual(created.second(), now.second())
+        self.assertEqual(created.year(), now.year(), 'Year mismatch.')
+        self.assertEqual(created.month(), now.month(), 'Month mismatch.')
+        self.assertEqual(created.day(), now.day(), 'Day mismatch.')
+        self.assertEqual(created.hour(), now.hour(), 'Hour mismatch.')
+        self.assertEqual(created.minute(), now.minute(), 'Minute mismatch.')
+        self.assertEqual(created.second(), now.second(), 'Second mismatch.')
 
 
 def test_suite():

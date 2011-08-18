@@ -116,3 +116,8 @@ class RhaptosSWORDStatement(SWORDStatement):
     def deposited_on(self):
         obj = self.context.aq_inner
         return obj.created
+
+    
+    def state(self):
+        obj = self.context.aq_inner
+        return obj.state
