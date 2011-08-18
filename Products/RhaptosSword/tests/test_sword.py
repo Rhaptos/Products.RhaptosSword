@@ -277,7 +277,10 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.failUnless(len(state) > 0)
         href = str(state[0].attributes['href'].value)
         self.assertEqual(href, module.absolute_url(), 'State IRI is incorrect.')
-        
+
+        orig_deposit = dom.getElementsByTagNameNS(
+            'http://purl.org/net/sword/', 'originalDeposit')
+        self.failUnless(len(orig_deposit) > 0) 
 
 
 def test_suite():
