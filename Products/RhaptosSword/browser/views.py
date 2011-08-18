@@ -117,7 +117,7 @@ class DepositReceipt(BrowserView):
         message = """Module '%s' was imported via the SWORD API.
         * You can preview your module here to see what it will look like once it is published.
         * The current description of the changes you have made for this version of the module: "%s"
-        """ %(module_name, description_of_changes, requirements)
+        """ %(module_name, description_of_changes)
         if publication_requirements:
             message += 'Publication Requirements:'
             message += publication_requirements
