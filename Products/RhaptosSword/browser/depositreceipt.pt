@@ -69,17 +69,31 @@
         Editor full name  
     </dcterms:editor>
 
-    <oerdc:oer-subject tal:content="context/subject">
+    <oerdc:oer-subject tal:content="view/subject">
         Mathematics and Statistics
     </oerdc:oer-subject>
 
-    <dcterms:subject xsi:type="oerdc:Subject" tal:content="context/subject">
+    <dcterms:subject xsi:type="oerdc:Subject" tal:content="view/subject">
         Mathematics and Statistics
     </dcterms:subject>
     
     <dcterms:subject tal:repeat="keyword context/keywords" tal:content="keyword">
         box
     </dcterms:subject>
+
+    <dcterms:source xsi:type="dcterms:URI"
+        tal:repeat="child view/derived_modules"
+        tal:content="child/absolute_url">
+        http://cnx.org/content/m16296/1.8/
+    </dcterms:source>
+
+    <dcterms:abstract tal:content="context/abstract">
+        The abstract
+    </dcterms:abstract>
+
+    <dcterms:language xsi:type="ISO639-1" tal:content="context/language">en</dcterms:language> 
+
+    <dcterms:license xsi:type="dcterms:URI" tal:content="context/license">http://creativecommons.org/licenses/by/3.0/</dcterms:license>
 
     <link rel="edit" href="edit-iri"
           tal:attributes="href string:${context/absolute_url}/sword/edit" />

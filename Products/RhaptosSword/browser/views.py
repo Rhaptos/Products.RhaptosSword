@@ -92,7 +92,16 @@ class DepositReceipt(BrowserView):
     def editors(self):
         obj = self.context.aq_inner
         return obj.editors
+    
 
+    def subject(self):
+        obj = self.context.aq_inner
+        return ', '.join(obj.subject) 
+
+
+    def derived_modules(self):
+        obj = self.context.aq_inner
+        return obj.objectValues(spec='Module')
     
     def fullname(self, user_id):
         user = self.pmt.getMemberById(user_id)
