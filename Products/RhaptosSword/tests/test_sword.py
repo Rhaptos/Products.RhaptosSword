@@ -28,6 +28,7 @@ ZopeTestCase.installProduct('RhaptosSword')
 ZopeTestCase.installProduct('RhaptosModuleEditor')
 ZopeTestCase.installProduct('RhaptosRepository')
 ZopeTestCase.installProduct('CNXMLDocument')
+ZopeTestCase.installProduct('UniFile')
 
 PloneTestCase.setupPloneSite()
 
@@ -150,6 +151,8 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.addProduct('RhaptosSword')
         self.addProfile('Products.RhaptosModuleEditor:default')
         self.addProfile('Products.CNXMLDocument:default')
+        self.addProfile('Products.CNXMLTransforms:default')
+        self.addProfile('Products.UniFile:default')
         self.portal.manage_addProduct['RhaptosRepository'].manage_addRepository('content') 
         self.portal._setObject('portal_moduledb', StubModuleDB())
         self.portal._setObject('portal_languages', StubLanuageTool())
@@ -223,15 +226,14 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         getresponse = HTTPResponse(stdout=StringIO())
         getrequest = clone_request(self.app.REQUEST, getresponse, env)
         
-        ids = self.portal.objectIds(),
-        assert 'workspace' in ids, 'No workspace found!'
+        ids = self.portal.objectIds()
+        self.assertTrue('workspace' in ids, 'No workspace found!')
 
-        ids = self.portal.workspace.objectIds(),
-        assert 'perry.zip' in ids, 'Resource create failed.'
+        # We should have at least one module now, this will fail if we don't
+        module = self.portal.workspace.objectValues()[0]
 
-        content_file = self.portal.workspace['perry.zip']
         adapter = getMultiAdapter(
-            (content_file, getrequest), Interface, 'sword')
+            (module, getrequest), Interface, 'sword')
         zipfile = adapter()
         print zipfile 
 
@@ -245,8 +247,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         xml = adapter()
         assert "<sword:error" not in xml, xml
 
-        id = self.folder.workspace.objectIds()[0]
-        module = self.folder.workspace[id]
+        module = self.folder.workspace.objectValues()[0]
         # get the exact current date time then set the module's date time.
         # we do this because later on we test that we got the correct 
         # date and time back.
