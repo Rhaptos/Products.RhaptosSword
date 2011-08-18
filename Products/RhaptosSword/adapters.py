@@ -56,9 +56,10 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
     adapts(IFolderish, IHTTPRequest)
     
     def generateFilename(self, name):
-        """ Override this method to ignore the name passed in
-            content-disposition. """
-        return self.context.generateUniqueId('Module')
+        """ Override this method to provide a more sensible name in the
+            absence of content-disposition. """
+        return super(RhaptosWorkspaceSwordAdapter, self).generateFilename(
+            name, type_name='Module')
 
     def _splitRequest(self, request):
         """ This is only to be used for multipart uploads. The first
