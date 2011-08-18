@@ -108,6 +108,40 @@ class DepositReceipt(BrowserView):
         return user.getProperty('fullname')
 
 
+    def treatment(self):
+        obj = self.context.aq_inner
+        module_name = obj.title
+        description_of_changes = obj.message
+        requirements = self.publication_requirements()
+        publication_requirements = self.publication_requirements()
+        message = """Module '%s' was imported via the SWORD API.
+        * You can preview your module here to see what it will look like once it is published.
+        * The current description of the changes you have made for this version of the module: "%s"
+        """ %(module_name, description_of_changes, requirements)
+        if publication_requirements:
+            message += 'Publication Requirements:'
+            message += publication_requirements
+        return message
+    
+
+    def publication_requirements(self):
+        obj = self.context.aq_inner
+        requirements = ""
+        if not obj.license:
+            for author in obj.authors:
+                requirements += '%s (account:%s), will need to sign the license.\n'\
+                                 %(self.fullname(author), author)
+
+        pending_collaborations = obj.getPendingCollaborations()
+        if pending_collaborations:
+            requirements += 'The following contributors must agree to be listing on the module and sign the license agreement here.'
+        for user, collab in pending_collaborations:
+            requirements += '%s (account:%s)' %(self.fullname(user), user)
+        if not obj.message:
+            requirements += 'You must describe the changes that you have made to this version before publishing.'
+        return requirements
+
+
     def email(self, user_id):
         user = self.pmt.getMemberById(user_id)
         return user.getProperty('email')

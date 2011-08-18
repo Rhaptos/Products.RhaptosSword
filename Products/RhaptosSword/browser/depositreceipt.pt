@@ -95,50 +95,46 @@
 
     <dcterms:license xsi:type="dcterms:URI" tal:content="context/license">http://creativecommons.org/licenses/by/3.0/</dcterms:license>
 
+    <sword:treatment tal:content="view/treatment" />
+
+    <link rel="alternate" href="http://cnx.org/Members/kef/m10000/module_view?format=html"
+        tal:attributes="href python:context.absolute_url() + '/module_view?format=html'" />
+
+    <content type="application/zip" src="http://cnx.org/Members/kef/m10000/sword/editmedia"
+        tal:attributes="src python:context.absolute_url() + '/sword/edit'" />
+    
+    <link rel="edit-media" href="edit-media-iri"
+        tal:attributes="href context/absolute_url" />
+
     <link rel="edit" href="edit-iri"
           tal:attributes="href string:${context/absolute_url}/sword/edit" />
-    <link rel="edit-media" href="edit-media-iri"
-          tal:attributes="href context/absolute_url" />
+          
     <link rel="http://purl.org/net/sword/terms/add"
           href="http://www.swordserver.ac.uk/col1/mydeposit.atom"
           tal:attributes="href string:${context/absolute_url}/sword/edit" />
-    <link tal:condition="options/upload|nothing"
-          rel="http://purl.org/net/sword/terms/originalDeposit"
-          href="iri"
-          tal:attributes="href context/absolute_url" />
 
-    <link tal:repeat="item options/derived|nothing"
-          rel="http://purl.org.net/sword/terms/derivedResource"
-          href="" 
-          tal:attributes="href item/absolute_url" />
+    <sword:packaging>http://purl.org/net/sword/package/SimpleZip</sword:packaging>
 
-    <sword:treatment tal:content="string:Stored as ${context/id}">Stored</sword:treatment>
-    <author><name tal:content="context/authors">jbloggs</name></author>
-    <dcterms:available tal:content="context/revised">Date Available</dcterms:available>
-    <dcterms:description tal:content="context/abstract">Description</dcterms:description>
-    <dcterms:title tal:content="context/title">Title</dcterms:title>
-    
-    <sword:requested-roles>
-        <md:actors>
-        <tal:pending_collaborations repeat="userid pending_collaborations/keys">
-            <md:person userid="user id"
-                tal:define="user python:view.get_user(userid)"
-                tal:attributes="userid userid">
-                <md:firstname tal:content="user/firstname">first name</md:firstname>
-                <md:surname tal:content="user/surname">surname</md:surname>
-                <md:fullname tal:content="user/fullname">full name</md:fullname>
-                <md:email tal:content="user/email">email</md:email>
-            </md:person>
-        </tal:pending_collaborations>
-        </md:actors>
+    <link rel="http://purl.org/net/sword/terms/derivedResource" 
+            type="application/pdf" 
+            href="http://cnx.org/Members/kef/m10000/module_view?format=pdf"
+            tal:attributes="href python:context.absolute_url() + '/module_view?format=pdf'"/>
+            
+    <link rel="http://purl.org/net/sword/terms/derivedResource" 
+            href="http://cnx.org/Members/kef/m10000/module_view?format=html"
+            tal:attributes="href python:context.absolute_url() + '/module_view?format=html'"/>
+            
+    <link rel="http://purl.org/net/sword/terms/derivedResource" 
+            type="application/zip" href="http://cnx.org/Members/kef/m10000/module_export?format=zip"
+            tal:attributes="href python:context.absolute_url() + '/module_export?format=zip'"/>
+            
 
-        <md:roles>
-        <tal:pending_roles define="roles_and_users python:view.get_roles(pending_collaborations)">
-            <md:role tal:repeat="role python:roles_and_users.keys()"
-                type="type" tal:attributes="type role"><tal:userids replace="python:roles_and_users[role].strip(' ')">userids</tal:userids></md:role>
-        </tal:pending_roles>
-        </md:roles>
-    </sword:requested-roles>
-    
-    <sword:has_metadata><span tal:replace="view/has_required_metadata">true</span></sword:has_metadata>
+    <link rel="http://purl.org/net/sword/terms/derivedResource" 
+            type="application/xml" href="http://cnx.org/Members/kef/m10000/module_export?format=plain"
+            tal:attributes="href python:context.absolute_url() + 'module_export?format=plain'"/>
+
+    <link rel="http://purl.org/net/sword/terms/statement" 
+                type="application/atom+xml;type=feed" 
+                href="http://cnx.org/Members/kef/m10000/sword/statement"/>
+
 </entry>
