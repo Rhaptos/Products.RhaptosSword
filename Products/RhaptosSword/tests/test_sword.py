@@ -172,7 +172,9 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         env.update(kwargs)
         uploadresponse = HTTPResponse(stdout=StringIO())
         uploadrequest = clone_request(self.app.REQUEST, uploadresponse, env)
-        uploadrequest.set('BODYFILE', StringIO(content))
+        bodyfile = StringIO(content)
+        uploadrequest.set('BODYFILE', bodyfile)
+        uploadrequest.stdin = bodyfile
         # Fake PARENTS
         uploadrequest.set('PARENTS', [self.portal.workspace])
         return uploadrequest
@@ -201,6 +203,20 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         adapter = getMultiAdapter(
                 (self.portal.workspace, uploadrequest), Interface, 'sword')
         xml = adapter()
+
+
+    def testMultipart(self):
+        self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        uploadrequest = self.createUploadRequest('multipart.txt',
+            CONTENT_TYPE='multipart/related; boundary="===============1338623209=="',
+            SLUG='multipart')
+        # Call the sword view on this request to perform the upload
+        adapter = getMultiAdapter(
+                (self.portal.workspace, uploadrequest), Interface, 'sword')
+        xml = adapter()
+        self.assertTrue("<sword:error" not in xml, xml)
+        self.assertTrue("<entry" in xml, "Not a valid deposit receipt")
+        self.assertTrue("multipart" in self.portal.workspace.objectIds())
 
 
     def testSwordServiceRetrieveContent(self):
