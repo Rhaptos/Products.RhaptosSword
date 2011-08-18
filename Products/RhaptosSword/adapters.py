@@ -1,5 +1,7 @@
 from xml.dom.minidom import parse
 from zipfile import BadZipfile
+from email import message_from_file
+from StringIO import StringIO
 
 from zope.interface import Interface, implements
 from zope.publisher.interfaces.http import IHTTPRequest
@@ -58,23 +60,61 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             content-disposition. """
         return self.context.generateUniqueId('Module')
 
+    def _splitRequest(self, request):
+        """ This is only to be used for multipart uploads. The first
+            part is the atompub bit, the second part is the payload. """
+        request.stdin.seek(0)
+        message = message_from_file(request.stdin)
+        atom, payload = message.get_payload()
+
+        # Call get_payload with decode=True, so it can handle the transfer
+        # encoding for us, if any.
+        atom = atom.get_payload(decode=True)
+        payload = payload.get_payload(decode=True)
+
+        return atom, payload
+
+
     def updateObject(self, obj, filename, request, response, content_type):
-        body = request.get('BODYFILE')
-        body.seek(0)
         obj = obj.__of__(self.context)
         if content_type in self.ATOMPUB_CONTENT_TYPES:
+            body = request.get('BODYFILE')
+            body.seek(0)
             dom = parse(body)
             metadata = self.getMetadata(dom, METADATA_MAPPING)
             obj.update_metadata(**metadata)
             self.addRoles(obj, dom)
             obj.reindexObject(idxs=metadata.keys())
         elif content_type == 'application/zip':
+            body = request.get('BODYFILE')
+            body.seek(0)
             kwargs = {
                 'original_file_name': 'sword-import-file',
                 'user_name': getSecurityManager().getUser().getUserName()
             }
             text, subobjs, meta = doTransform(obj, "zip_to_folder",
                 body.read(), meta=1, **kwargs)
+            if text:
+                obj.manage_delObjects([obj.default_file,])
+                obj.invokeFactory('CNXML Document', obj.default_file,
+                    file=text, idprefix='zip-')
+            makeContent(obj, subobjs)
+        elif content_type.startswith('multipart/'):
+            atom, payload = self._splitRequest(request)
+
+            # Update object metadata
+            dom = parse(StringIO(atom))
+            metadata = self.getMetadata(dom, METADATA_MAPPING)
+            obj.update_metadata(**metadata)
+            obj.reindexObject(idxs=metadata.keys())
+
+            # Update object content
+            kwargs = {
+                'original_file_name': 'sword-import-file',
+                'user_name': getSecurityManager().getUser().getUserName()
+            }
+            text, subobjs, meta = doTransform(obj, "zip_to_folder",
+                payload, meta=1, **kwargs)
             if text:
                 obj.manage_delObjects([obj.default_file,])
                 obj.invokeFactory('CNXML Document', obj.default_file,
