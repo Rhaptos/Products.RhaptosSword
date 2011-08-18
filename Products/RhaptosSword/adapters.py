@@ -117,7 +117,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         if content_type in self.ATOMPUB_CONTENT_TYPES:
             body = request.get('BODYFILE')
             body.seek(0)
-            updateMetadata(body)
+            updateMetadata(obj, body)
         elif content_type == 'application/zip':
             body = request.get('BODYFILE')
             body.seek(0)
