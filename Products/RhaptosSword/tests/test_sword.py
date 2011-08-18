@@ -4,6 +4,7 @@ if __name__ == '__main__':
 
 from StringIO import StringIO
 from base64 import decodestring
+from DateTime import DateTime
 
 from xml.dom.minidom import parseString
 
@@ -245,6 +246,11 @@ class TestSwordService(PloneTestCase.PloneTestCase):
 
         id = self.folder.workspace.objectIds()[0]
         module = self.folder.workspace[id]
+        # get the exact current date time then set the module's date time.
+        # we do this because later on we test that we got the correct 
+        # date and time back.
+        now = DateTime()
+        module.created = now
         view = module.restrictedTraverse('@@statement')
         xml = view()
         assert "<sword:error" not in xml, xml
@@ -291,6 +297,18 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         value = str(packaging[0].firstChild.nodeValue)
         self.assertEqual(value, 'application/xhtml+xml',
             'Packinging incorrect.')
+
+        deposited_on = orig_deposit[0].getElementsByTagNameNS(
+            'http://purl.org/net/sword/', 'depositedOn')
+        self.failUnless(len(deposited_on) > 0) 
+        value = str(deposited_on[0].firstChild.nodeValue)
+        created = DateTime(value)
+        self.assertEqual(created.year(), now.year())
+        self.assertEqual(created.month(), now.month())
+        self.assertEqual(created.day(), now.day())
+        self.assertEqual(created.hour(), now.hour())
+        self.assertEqual(created.minute(), now.minute())
+        self.assertEqual(created.second(), now.second())
 
 
 def test_suite():

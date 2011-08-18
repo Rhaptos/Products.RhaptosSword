@@ -111,3 +111,8 @@ class RhaptosSWORDStatement(SWORDStatement):
     
     def current_collabs(self):
         return {} 
+
+    
+    def deposited_on(self):
+        obj = self.context.aq_inner
+        return obj.created

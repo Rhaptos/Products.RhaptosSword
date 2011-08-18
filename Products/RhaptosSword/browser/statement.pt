@@ -59,6 +59,9 @@
         <sword:packaging tal:content="view/packaging">
             application/xhtml+xml
         </sword:packaging>
+        <sword:depositedOn tal:content="view/deposited_on">
+            2011-01-01T00:00:00Z
+        </sword:depositedOn>
     </sword:originalDeposit>
 
     <sword:treatment tal:content="view/treatment">Stored</sword:treatment>
