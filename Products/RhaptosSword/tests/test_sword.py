@@ -220,13 +220,13 @@ class TestSwordService(PloneTestCase.PloneTestCase):
 
 
     def testSwordServiceRetrieveContent(self):
-        # getting a transaction to commit, just in case later steps fail and
-        # cause an abort.
         self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
 
-        uploadrequest = self.createUploadRequest('m11868_1.6.zip',
-            CONTENT_TYPE='application/zip',
-            CONTENT_DISPOSITION='attachment; filename=perry.zip')
+        uploadrequest = self.createUploadRequest(
+            'multipart.txt',
+            CONTENT_TYPE='multipart/related; boundary="===============1338623209=="',
+            SLUG='multipart',
+            CONTENT_DISPOSITION='attachment; filename=multipart.txt')
 
         # Call the sword view on this request to perform the upload
         self.setRoles(('Manager',))
@@ -251,7 +251,6 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         adapter = getMultiAdapter(
             (module, getrequest), Interface, 'sword')
         zipfile = adapter()
-        print zipfile 
 
     
     def testSwordServiceStatement(self):
