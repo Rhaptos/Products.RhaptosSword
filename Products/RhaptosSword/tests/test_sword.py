@@ -153,9 +153,13 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.addProfile('Products.CNXMLDocument:default')
         self.addProfile('Products.CNXMLTransforms:default')
         self.addProfile('Products.UniFile:default')
-        self.portal.manage_addProduct['RhaptosRepository'].manage_addRepository('content') 
-        self.portal._setObject('portal_moduledb', StubModuleDB())
-        self.portal._setObject('portal_languages', StubLanuageTool())
+        objectIds = self.portal.objectIds()
+        if not 'content' in objectIds:
+            self.portal.manage_addProduct['RhaptosRepository'].manage_addRepository('content') 
+        if not 'portal_moduledb' in objectIds:
+            self.portal._setObject('portal_moduledb', StubModuleDB())
+        if not 'portal_languages' in objectIds:
+            self.portal._setObject('portal_languages', StubLanuageTool())
 
         xml = os.path.join(DIRNAME, 'data', filename)
         file = open(xml, 'rb')
@@ -333,6 +337,28 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.assertEqual(created.hour(), now.hour(), 'Hour mismatch.')
         self.assertEqual(created.minute(), now.minute(), 'Minute mismatch.')
         self.assertEqual(created.second(), now.second(), 'Second mismatch.')
+
+
+    def testAtomPubDeriveModule(self):
+        self.setRoles(('Manager',))
+        self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+
+        uploadrequest = self.createUploadRequest(
+            'multipart.txt',
+            CONTENT_TYPE='multipart/related; boundary="===============1338623209=="',
+            SLUG='multipart',
+            CONTENT_DISPOSITION='attachment; filename=multipart')
+        adapter = getMultiAdapter(
+                (self.portal.workspace, uploadrequest), Interface, 'sword')
+        xml = adapter()
+        assert "<sword:error" not in xml, xml
+
+        uploadrequest = self.createUploadRequest('derive_module.xml')
+        adapter = getMultiAdapter(
+                (self.portal.workspace, uploadrequest), Interface, 'sword')
+        xml = adapter()
+        assert "<sword:error" not in xml, xml
+    
 
 
 def test_suite():
