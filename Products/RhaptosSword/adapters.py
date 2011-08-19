@@ -77,11 +77,68 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         return atom, payload
 
 
+    def createObject(self, context, name, content_type, request):
+        # see if the request has a atompub payload that specifies,
+        # module id in "source" or "mdml:derived_from" in ATOM entry.
+        if content_type in self.ATOMPUB_CONTENT_TYPES:
+            # find our marker elements
+            body = request.get('BODYFILE')
+            body.seek(0)
+            dom = parse(body)
+            body.seek(0)
+            elements = dom.getElementsByTagNameNS(
+                "http://purl.org/dc/terms/", 'source')
+            if len(elements) > 0:
+                # now we can fork / derive the module
+                obj = self.deriveModule(
+                    str(elements[0].firstChild.nodeValue))
+                return obj
+
+        return super(RhaptosWorkspaceSwordAdapter, self).createObject(
+            context, name, content_type, request)
+
+
+    def deriveModule(self, url):
+        """ We checkout the object, fork it, remove the temp one and 
+            return the forked copy.
+        """
+        module_id = url.split('/')[-1]
+        # Fetch content and area
+        version = 'latest'
+        portal = getToolByName(self.context, 'portal_url').getPortalObject()
+        content = portal.restrictedTraverse(
+             'content/%s/%s' % (module_id, version)
+        )
+        area = self.context
+        # We create a copy that we want to clean up later, let's track the id
+        to_delete_id = area.generateUniqueId()
+        area.invokeFactory(id=to_delete_id, type_name=content.portal_type)
+        obj = area._getOb(to_delete_id)
+
+        # Content must be checked out to area before a fork is possible
+        obj.setState('published')
+        obj.checkout(content.objectId)
+
+        # Do the fork
+        forked_obj = obj.forkContent(
+            license=content.getDefaultLicense(), return_context=True,
+        )
+        forked_obj.setState('created')
+        forked_obj.setGoogleAnalyticsTrackingCode(None)
+
+        # Delete temporary copy
+        if to_delete_id:
+            area.manage_delObjects(ids=[to_delete_id])
+        return forked_obj
+
+
     def updateObject(self, obj, filename, request, response, content_type):
 
         def updateMetadata(obj, fp):
             dom = parse(fp)
             metadata = self.getMetadata(dom, METADATA_MAPPING)
+            # better make sure we have a title while deriving content
+            metadata.setdefault('title', obj.title)
             # we remove descriptionOfChanges because the update_metadata
             # script cannot cope with it.
             descriptionOfChanges = metadata.pop(
