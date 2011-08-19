@@ -69,39 +69,12 @@ class DepositReceipt(BrowserView):
         return True
 
     
-    def creators(self):
-        obj = self.context.aq_inner
-        return obj.creators
-
-
-    def maintainers(self):
-        obj = self.context.aq_inner
-        return obj.maintainers
-
-
-    def rightsholders(self):
-        obj = self.context.aq_inner
-        return obj.licensors
-
-
-    def translators(self):
-        obj = self.context.aq_inner
-        return obj.translators
-
-    
-    def editors(self):
-        obj = self.context.aq_inner
-        return obj.editors
-    
-
     def subject(self):
-        obj = self.context.aq_inner
-        return ', '.join(obj.subject) 
+        return ', '.join(self.context.subject) 
 
 
     def derived_modules(self):
-        obj = self.context.aq_inner
-        return obj.objectValues(spec='Module')
+        return self.context.objectValues(spec='Module')
     
     def fullname(self, user_id):
         user = self.pmt.getMemberById(user_id)
@@ -112,7 +85,6 @@ class DepositReceipt(BrowserView):
         obj = self.context.aq_inner
         module_name = obj.title
         description_of_changes = obj.message
-        requirements = self.publication_requirements()
         publication_requirements = self.publication_requirements()
         message = """Module '%s' was imported via the SWORD API.
         * You can preview your module here to see what it will look like once it is published.

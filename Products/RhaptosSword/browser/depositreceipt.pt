@@ -34,35 +34,35 @@
         2011-06-22T14:27:08Z
     </dcterms:modified> 
     <dcterms:creator oerdc:id="creator id" oerdc:email="owner email"
-            tal:repeat="creator view/creators"
+            tal:repeat="creator context/creators"
             tal:content="python:view.fullname(creator)"
             tal:attributes="oerdc:id creator;
                             oerdc:email python:view.email(creator)">
         Creator full name  
     </dcterms:creator>
     <dcterms:maintainer oerdc:id="maintainer id" oerdc:email="owner email"
-            tal:repeat="maintainer view/maintainers"
+            tal:repeat="maintainer context/maintainers"
             tal:content="python:view.fullname(maintainer)"
             tal:attributes="oerdc:id maintainer;
                             oerdc:email python:view.email(maintainer)">
         Maintainer full name  
     </dcterms:maintainer>
     <dcterms:rightsHolder oerdc:id="rightsholder id" oerdc:email="rightsholder email"
-            tal:repeat="rightsholder view/rightsholders"
+            tal:repeat="rightsholder context/licensors"
             tal:content="python:view.fullname(rightsholder)"
             tal:attributes="oerdc:id rightsholder;
                             oerdc:email python:view.email(rightsholder)">
         Rights holder full name  
     </dcterms:rightsHolder>
     <dcterms:translator oerdc:id="translator id" oerdc:email="translator email"
-            tal:repeat="translator view/translators"
+            tal:repeat="translator context/translators"
             tal:content="python:view.fullname(translator)"
             tal:attributes="oerdc:id translator;
                             oerdc:email python:view.email(translator)">
         Translator full name  
     </dcterms:translator>
     <dcterms:editor oerdc:id="editor id" oerdc:email="editor email"
-            tal:repeat="editor view/editors"
+            tal:repeat="editor context/editors"
             tal:content="python:view.fullname(editor)"
             tal:attributes="oerdc:id editor;
                             oerdc:email python:view.email(editor)">
