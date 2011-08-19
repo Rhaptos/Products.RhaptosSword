@@ -339,7 +339,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.assertEqual(created.second(), now.second(), 'Second mismatch.')
 
 
-    def testAtomPubDeriveModule(self):
+    def testDeriveModule(self):
         self.setRoles(('Manager',))
         self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
 
