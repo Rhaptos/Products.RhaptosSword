@@ -14,7 +14,7 @@
           tal:attributes="href string:${context/absolute_url}/sword/edit" />
     <link rel="http://purl.org/net/sword/terms/statement"
           href="statement_IRI"
-          tal:attributes="href string:${context/absolute_url}/sword/@@statement"
+          tal:attributes="href string:${context/absolute_url}/sword/statement"
           type="application/atom+xml" />
 
     <link tal:condition="options/upload|nothing"
@@ -33,7 +33,7 @@
         <sword:stateDescription>
         <div id="current_state"> 
             <p>Current state:</p>
-            <p tal:content="view/state">Created</p>
+            <p tal:content="context/state">Created</p>
         </div> 
 
         <div id="metadata"> 
@@ -60,7 +60,7 @@
         <sword:packaging tal:content="view/packaging">
             application/xhtml+xml
         </sword:packaging>
-        <sword:depositedOn tal:content="view/deposited_on">
+        <sword:depositedOn tal:content="context/created">
             2011-01-01T00:00:00Z
         </sword:depositedOn>
         <sword:depositedBy tal:content="view/deposited_by">

@@ -157,9 +157,7 @@ class RhaptosSWORDStatement(SWORDStatement):
 
     def collaborators(self):
         pending_collabs = self.pending_collabs()
-        current_collabs = self.current_collabs()
-        collaborators = {'pending_collabs': pending_collabs,
-                        }
+        collaborators = {'pending_collabs': pending_collabs, }
         return collaborators
     
 
@@ -171,17 +169,6 @@ class RhaptosSWORDStatement(SWORDStatement):
         return {} 
 
     
-    def deposited_on(self):
-        obj = self.context.aq_inner
-        return obj.created
-
-    
-    def state(self):
-        obj = self.context.aq_inner
-        return obj.state
-
-    
     def deposited_by(self):
-        obj = self.context.aq_inner
-        return obj.authors
+        return ', '.join(self.context.authors)
 

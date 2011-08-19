@@ -275,7 +275,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         dom = parseString(xml)
         edit_iri = module.absolute_url() + '/sword/edit'
         edit_media_iri = module.absolute_url()
-        statement_iri = module.absolute_url() + '/sword/@@statement'
+        statement_iri = module.absolute_url() + '/sword/statement'
         links = dom.getElementsByTagName('link')
         for link in links:
             rel = str(link.attributes['rel'].value)
