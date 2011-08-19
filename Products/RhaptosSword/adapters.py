@@ -103,25 +103,23 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             return the forked copy.
         """
         module_id = url.split('/')[-1]
-        # Fetch content and area
+        # Fetch module and area
         version = 'latest'
-        portal = getToolByName(self.context, 'portal_url').getPortalObject()
-        content = portal.restrictedTraverse(
-             'content/%s/%s' % (module_id, version)
-        )
+        content_tool = getToolByName(self.context, 'content')
+        module = content_tool.getRhaptosObject(module_id, version)
         area = self.context
         # We create a copy that we want to clean up later, let's track the id
         to_delete_id = area.generateUniqueId()
-        area.invokeFactory(id=to_delete_id, type_name=content.portal_type)
+        area.invokeFactory(id=to_delete_id, type_name=module.portal_type)
         obj = area._getOb(to_delete_id)
 
-        # Content must be checked out to area before a fork is possible
+        # module must be checked out to area before a fork is possible
         obj.setState('published')
-        obj.checkout(content.objectId)
+        obj.checkout(module.objectId)
 
         # Do the fork
         forked_obj = obj.forkContent(
-            license=content.getDefaultLicense(), return_context=True,
+            license=module.getDefaultLicense(), return_context=True,
         )
         forked_obj.setState('created')
         forked_obj.setGoogleAnalyticsTrackingCode(None)
