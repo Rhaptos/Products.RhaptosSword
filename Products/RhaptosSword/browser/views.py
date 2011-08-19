@@ -82,36 +82,7 @@ class DepositReceipt(BrowserView):
 
 
     def treatment(self):
-        obj = self.context.aq_inner
-        module_name = obj.title
-        description_of_changes = obj.message
-        publication_requirements = self.publication_requirements()
-        message = """Module '%s' was imported via the SWORD API.
-        * You can preview your module here to see what it will look like once it is published.
-        * The current description of the changes you have made for this version of the module: "%s"
-        """ %(module_name, description_of_changes)
-        if publication_requirements:
-            message += 'Publication Requirements:'
-            message += publication_requirements
-        return message
-    
-
-    def publication_requirements(self):
-        obj = self.context.aq_inner
-        requirements = ""
-        if not obj.license:
-            for author in obj.authors:
-                requirements += '%s (account:%s), will need to sign the license.\n'\
-                                 %(self.fullname(author), author)
-
-        pending_collaborations = obj.getPendingCollaborations()
-        if pending_collaborations:
-            requirements += 'The following contributors must agree to be listing on the module and sign the license agreement here.'
-        for user, collab in pending_collaborations:
-            requirements += '%s (account:%s)' %(self.fullname(user), user)
-        if not obj.message:
-            requirements += 'You must describe the changes that you have made to this version before publishing.'
-        return requirements
+        return get_treatment(self.context)
 
 
     def email(self, user_id):
@@ -141,6 +112,7 @@ class RhaptosSWORDStatement(SWORDStatement):
    
     def __init__(self, context, request):
         super(RhaptosSWORDStatement, self).__init__(context, request)
+        self.pmt = getToolByName(self.context, 'portal_membership')
         self.missing_metadata = self.check_metadata()
         self.has_required_metadata = True
         if self.missing_metadata: self.has_required_metadata = False
@@ -172,3 +144,41 @@ class RhaptosSWORDStatement(SWORDStatement):
     def deposited_by(self):
         return ', '.join(self.context.authors)
 
+    
+    def treatment(self):
+        return get_treatment(self.context)
+
+
+def get_treatment(context):
+    module_name = context.title
+    description_of_changes = context.message
+    message = """Module '%s' was imported via the SWORD API.
+    * You can preview your module here to see what it will look like once it is published.
+    * The current description of the changes you have made for this version of the module: "%s"
+    """ %(module_name, description_of_changes)
+    publication_requirements = get_publication_requirements(context)
+    if publication_requirements:
+        message += 'Publication Requirements:'
+        message += publication_requirements
+    return message
+
+
+def get_publication_requirements(context):
+    requirements = ""
+    if not context.license:
+        for user_id in context.authors:
+            user = context.pmt.getMemberById(user_id)
+            fullname = user.getProperty('fullname')
+            requirements += '%s (account:%s), will need to sign the license.\n'\
+                             %(fullname, user_id)
+
+    pending_collaborations = context.getPendingCollaborations()
+    if pending_collaborations:
+        requirements += 'The following contributors must agree to be listing on the module and sign the license agreement here.'
+    for user_id, collab in pending_collaborations:
+        user = context.pmt.getMemberById(user_id)
+        fullname = user.getProperty('fullname')
+        requirements += '%s (account:%s)' %(fullname, user_id)
+    if not context.message:
+        requirements += 'You must describe the changes that you have made to this version before publishing.'
+    return requirements
