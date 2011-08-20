@@ -7,6 +7,7 @@ from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 
 from rhaptos.swordservice.plone.interfaces import ISWORDEditIRI
 from rhaptos.swordservice.plone.browser.sword import SWORDStatement 
+from rhaptos.swordservice.plone.browser.sword import show_error_document
 from rhaptos.atompub.plone.browser.atompub import IAtomFeed
 
 from Products.RhaptosSword.adapters import METADATA_MAPPING
@@ -37,10 +38,17 @@ class EditIRI(BrowserView):
         self.pmt = getToolByName(self.context, 'portal_membership')
 
 
-    def __call__(self, upload=True):
-        self.request.response.setHeader(
-                'Location', self.context.absolute_url() + '/sword/edit')
-        return self.depositreceipt()
+    @show_error_document
+    def __call__(self):
+        method = self.request.get('REQUEST_METHOD')
+        if method == 'GET':
+            return self.depositreceipt()
+        elif method == 'POST':
+            raise NotImplementedError, "TODO"
+        elif method == 'PUT':
+            raise NotImplementedError, "TODO"
+        else:
+            raise MethodNotAllowed("Method %s not supported" % method)
 
 
     def pending_collaborations(self):
