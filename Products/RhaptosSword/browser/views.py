@@ -5,7 +5,7 @@ from Products.CMFCore.utils import getToolByName
 from Products.Five import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 
-from rhaptos.swordservice.plone.interfaces import ISWORDDepositReceipt
+from rhaptos.swordservice.plone.interfaces import ISWORDEditIRI
 from rhaptos.swordservice.plone.browser.sword import SWORDStatement 
 from rhaptos.atompub.plone.browser.atompub import IAtomFeed
 
@@ -26,7 +26,7 @@ class DepositReceipt(BrowserView):
         Decide how to handle differences between "In-Progress: true" and
         "In-Progress: false" HTTP headers.
     """
-    implements(ISWORDDepositReceipt)
+    implements(ISWORDEditIRI)
 
     depositreceipt = ViewPageTemplateFile('depositreceipt.pt')
    

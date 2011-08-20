@@ -30,7 +30,7 @@
     <adapter
         for="Products.RhaptosSword.interfaces.IRhaptosSwordCollection
              zope.publisher.interfaces.http.IHTTPRequest"
-        provides="rhaptos.swordservice.plone.interfaces.ISWORDDepositReceipt"
+        provides="rhaptos.swordservice.plone.interfaces.ISWORDEditIRI"
         factory=".views.DepositReceipt" />
 
 </configure>

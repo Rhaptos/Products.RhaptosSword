@@ -14,7 +14,7 @@ from Products.CMFCore.interfaces import IFolderish
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from Products.CNXMLTransforms.helpers import OOoImportError, doTransform, makeContent
 
-from rhaptos.swordservice.plone.interfaces import ISWORDDepositReceipt
+from rhaptos.swordservice.plone.interfaces import ISWORDEditIRI
 from rhaptos.swordservice.plone.browser.sword import PloneFolderSwordAdapter
 from rhaptos.swordservice.plone.browser.sword import RetrieveContent
 from rhaptos.swordservice.plone.browser.sword import ISWORDContentUploadAdapter 
@@ -267,7 +267,7 @@ class DepositReceiptAdapter(object):
     """ Adapts a context and renders an edit document for it. This should
         only be possible for uploaded content.
     """
-    implements(ISWORDDepositReceipt)
+    implements(ISWORDEditIRI)
     
     depositreceipt = ViewPageTemplateFile('browser/depositreceipt.pt')
 
@@ -276,21 +276,6 @@ class DepositReceiptAdapter(object):
 
     def __call__(self, swordview):
         return self.depositreceipt
-
-    def information(self, ob=None):
-        """ Return additional or overriding information about our context. By
-            default there is no extra information, but if you register an
-            adapter for your context that provides us with a
-            ISWORDContentAdapter, you can generate or override that extra
-            information by implementing a method named information that
-            returns a dictionary.  Valid keys are author and updated. """
-        if ob is None:
-            ob = self.context
-        adapter = queryAdapter(ob, ISWORDContentAdapter)
-        if adapter is not None:
-            return adapter.information()
-        return {}
-
 
 class RhaptosContentRetrieveAdapter(RetrieveContent):
 
