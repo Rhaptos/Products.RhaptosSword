@@ -11,7 +11,7 @@ from rhaptos.atompub.plone.browser.atompub import IAtomFeed
 
 from Products.RhaptosSword.adapters import METADATA_MAPPING
 
-class DepositReceipt(BrowserView):
+class EditIRI(BrowserView):
     """ This extends the SWORD v 2.0 Deposit Receipt to:
         - List role requests.
         - Show whether the license has been signed by the author and all

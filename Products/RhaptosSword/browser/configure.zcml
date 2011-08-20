@@ -7,7 +7,7 @@
     <browser:page
         for="Products.RhaptosSword.interfaces.IRhaptosSwordCollection"
         name="rhaptos-deposit-receipt"
-        class=".views.DepositReceipt"
+        class=".views.EditIRI"
         permission="zope2.View"
         />
 
@@ -31,6 +31,6 @@
         for="Products.RhaptosSword.interfaces.IRhaptosSwordCollection
              zope.publisher.interfaces.http.IHTTPRequest"
         provides="rhaptos.swordservice.plone.interfaces.ISWORDEditIRI"
-        factory=".views.DepositReceipt" />
+        factory=".views.EditIRI" />
 
 </configure>
