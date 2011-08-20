@@ -32,7 +32,7 @@ class EditIRI(BrowserView):
    
     
     def __init__(self, context, request):
-        super(DepositReceipt, self).__init__(context, request)
+        super(EditIRI, self).__init__(context, request)
         self.pmt = getToolByName(self.context, 'portal_membership')
 
 
