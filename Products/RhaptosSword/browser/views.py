@@ -26,6 +26,7 @@ class EditIRI(BrowserView):
         Decide how to handle differences between "In-Progress: true" and
         "In-Progress: false" HTTP headers.
     """
+    __name__ = "edit"
     implements(ISWORDEditIRI)
 
     depositreceipt = ViewPageTemplateFile('depositreceipt.pt')
