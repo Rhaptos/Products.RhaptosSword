@@ -13,6 +13,7 @@ Content-Disposition: attachment; name=atom
     <updated>2005-10-07T17:17:08Z</updated>
     <author><name>user1</name></author>
     <summary type="text">The abstract</summary>
+    <license>http://creativecommons.org/licenses/by/3.0/</license>
 </entry>
 
 --===============1338623209==
