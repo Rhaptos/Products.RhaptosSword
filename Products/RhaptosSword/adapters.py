@@ -263,20 +263,6 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                          cancelRoles = cancelRoles)
 
 
-class DepositReceiptAdapter(object):
-    """ Adapts a context and renders an edit document for it. This should
-        only be possible for uploaded content.
-    """
-    implements(ISWORDEditIRI)
-    
-    depositreceipt = ViewPageTemplateFile('browser/depositreceipt.pt')
-
-    def __init__(self, context):
-        self.context = context
-
-    def __call__(self, swordview):
-        return self.depositreceipt
-
 class RhaptosContentRetrieveAdapter(RetrieveContent):
 
     def __call__(self):
