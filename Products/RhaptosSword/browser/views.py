@@ -1,4 +1,5 @@
 from zope.interface import Interface, implements
+from Acquisition import aq_inner
 
 from Products.CMFCore.utils import getToolByName
 
@@ -6,13 +7,13 @@ from Products.Five import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 
 from rhaptos.swordservice.plone.interfaces import ISWORDEditIRI
-from rhaptos.swordservice.plone.browser.sword import SWORDStatement 
-from rhaptos.swordservice.plone.browser.sword import show_error_document
+from rhaptos.swordservice.plone.browser.sword import SWORDStatement
+from rhaptos.swordservice.plone.browser.sword import EditIRI as BaseEditIRI
 from rhaptos.atompub.plone.browser.atompub import IAtomFeed
 
 from Products.RhaptosSword.adapters import METADATA_MAPPING
 
-class EditIRI(BrowserView):
+class EditIRI(BaseEditIRI):
     """ This extends the SWORD v 2.0 Deposit Receipt to:
         - List role requests.
         - Show whether the license has been signed by the author and all
@@ -31,24 +32,16 @@ class EditIRI(BrowserView):
     implements(ISWORDEditIRI)
 
     depositreceipt = ViewPageTemplateFile('depositreceipt.pt')
-   
     
     def __init__(self, context, request):
         super(EditIRI, self).__init__(context, request)
         self.pmt = getToolByName(self.context, 'portal_membership')
 
 
-    @show_error_document
-    def __call__(self):
-        method = self.request.get('REQUEST_METHOD')
-        if method == 'GET':
-            return self.depositreceipt()
-        elif method == 'POST':
-            raise NotImplementedError, "TODO"
-        elif method == 'PUT':
-            raise NotImplementedError, "TODO"
-        else:
-            raise MethodNotAllowed("Method %s not supported" % method)
+    def _handlePublish(self):
+        context = aq_inner(self.context)
+        description_of_changes = context.message
+        context.publishContent(message=description_of_changes)
 
 
     def pending_collaborations(self):
