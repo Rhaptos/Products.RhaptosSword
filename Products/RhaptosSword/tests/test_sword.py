@@ -145,7 +145,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.assertTrue(IFolderish.providedBy(self.folder), "Folders are not Folderish")
 
 
-    def createUploadRequest(self, filename, **kwargs):
+    def createUploadRequest(self, filename, context, **kwargs):
         # XXX: This method needs to move to afterSetup, but afterSetup is not
         # being called for some reason.
         self.addProduct('RhaptosSword')
@@ -180,7 +180,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         uploadrequest.set('BODYFILE', bodyfile)
         uploadrequest.stdin = bodyfile
         # Fake PARENTS
-        uploadrequest.set('PARENTS', [self.portal.workspace])
+        uploadrequest.set('PARENTS', [context])
         return uploadrequest
 
 
@@ -189,7 +189,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
          See what happens when we throw bad xml at the import funtionality.
         """
         self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
-        uploadrequest = self.createUploadRequest('bad_entry.xml')
+        uploadrequest = self.createUploadRequest('bad_entry.xml', self.portal.workspace)
 
         # Call the sword view on this request to perform the upload
         adapter = getMultiAdapter(
@@ -201,7 +201,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
     def _testMetadata(self):
         """ See if the metadata is added correctly. """
         self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
-        uploadrequest = self.createUploadRequest('entry.xml')
+        uploadrequest = self.createUploadRequest('entry.xml', self.portal.workspace)
 
         # Call the sword view on this request to perform the upload
         adapter = getMultiAdapter(
@@ -211,9 +211,12 @@ class TestSwordService(PloneTestCase.PloneTestCase):
 
     def testMultipart(self):
         self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
-        uploadrequest = self.createUploadRequest('multipart.txt',
+        uploadrequest = self.createUploadRequest(
+            'multipart.txt',
+            context=self.portal.workspace,
             CONTENT_TYPE='multipart/related; boundary="===============1338623209=="',
-            SLUG='multipart')
+            SLUG='multipart'
+        )
         # Call the sword view on this request to perform the upload
         adapter = getMultiAdapter(
                 (self.portal.workspace, uploadrequest), Interface, 'sword')
@@ -228,9 +231,11 @@ class TestSwordService(PloneTestCase.PloneTestCase):
 
         uploadrequest = self.createUploadRequest(
             'multipart.txt',
+            context=self.portal.workspace,
             CONTENT_TYPE='multipart/related; boundary="===============1338623209=="',
             SLUG='multipart',
-            CONTENT_DISPOSITION='attachment; filename=multipart.txt')
+            CONTENT_DISPOSITION='attachment; filename=multipart.txt'
+        )
 
         # Call the sword view on this request to perform the upload
         self.setRoles(('Manager',))
@@ -260,7 +265,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
     def testSwordServiceStatement(self):
         self.setRoles(('Manager',))
         self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
-        uploadrequest = self.createUploadRequest('entry.xml')
+        uploadrequest = self.createUploadRequest('entry.xml', self.portal.workspace)
         adapter = getMultiAdapter(
                 (self.portal.workspace, uploadrequest), Interface, 'sword')
         xml = adapter()
@@ -341,21 +346,22 @@ class TestSwordService(PloneTestCase.PloneTestCase):
 
     def testDeriveModule(self):
         self.setRoles(('Manager',))
-        self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
 
         uploadrequest = self.createUploadRequest(
             'multipart.txt',
+            context=self.folder.workspace,
             CONTENT_TYPE='multipart/related; boundary="===============1338623209=="',
             SLUG='multipart',
             CONTENT_DISPOSITION='attachment; filename=multipart')
         adapter = getMultiAdapter(
-                (self.portal.workspace, uploadrequest), Interface, 'sword')
+                (self.folder.workspace, uploadrequest), Interface, 'sword')
         xml = adapter()
         assert "<sword:error" not in xml, xml
 
-        uploadrequest = self.createUploadRequest('derive_module.xml')
+        uploadrequest = self.createUploadRequest('derive_module.xml', self.folder.workspace)
         adapter = getMultiAdapter(
-                (self.portal.workspace, uploadrequest), Interface, 'sword')
+                (self.folder.workspace, uploadrequest), Interface, 'sword')
         xml = adapter()
         assert "<sword:error" not in xml, xml
     
