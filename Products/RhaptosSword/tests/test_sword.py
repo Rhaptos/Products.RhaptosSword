@@ -218,7 +218,6 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
         uploadrequest = self.createUploadRequest('entry.xml', self.portal.workspace)
 
-        import pdb;pdb.set_trace()
         # Call the sword view on this request to perform the upload
         adapter = getMultiAdapter(
                 (self.portal.workspace, uploadrequest), Interface, 'sword')
