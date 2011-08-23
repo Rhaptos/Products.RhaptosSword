@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <entry xmlns="http://www.w3.org/2005/Atom"
        xmlns:sword="http://purl.org/net/sword/"
        xmlns:dcterms="http://purl.org/dc/terms/"
@@ -8,6 +8,7 @@
        xmlns:oerdc="http://cnx.org/aboutus/technology/schemas/oerdc"
        tal:define="pending_collaborations view/pending_collaborations">
 
+    <!-- SWORD deposit receipt -->
     <title tal:content="context/title">My Deposit</title>
     <id tal:content="context/Identifier">1234</id>
     <updated tal:content="context/revised">2008-08-18T14:27:08Z</updated>
