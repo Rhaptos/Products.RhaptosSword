@@ -216,19 +216,26 @@ class TestSwordService(PloneTestCase.PloneTestCase):
     def testMetadata(self):
         """ See if the metadata is added correctly. """
         self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
-        uploadrequest = self.createUploadRequest('entry.xml', self.portal.workspace)
+        uploadrequest = self.createUploadRequest(
+            'entry.xml',
+            self.portal.workspace,
+            CONTENT_DISPOSITION='attachment; filename=entry.xml',
+        )
 
         # Call the sword view on this request to perform the upload
         adapter = getMultiAdapter(
                 (self.portal.workspace, uploadrequest), Interface, 'sword')
         xml = adapter()
-
-        module = self.portal.workspace.objectValues()[0]
         dom = parseString(xml)
+        returned_depositreceipt = dom.toxml()
+
+        file = open(os.path.join(DIRNAME, 'data', 'entry_depositreceipt.xml'), 'r')
+        dom = parse(file)
+        file.close()
         dates = dom.getElementsByTagName('updated')
+        module = self.portal.workspace.objectValues()[0]
         dates[0].firstChild.nodeValue = module.revised
         reference_depositreceipt = dom.toxml()
-        returned_depositreceipt = parseString(xml).toxml()
 
         assert bool(xml), "Upload view does not return a result"
         assert "<sword:error" not in xml, xml
@@ -248,9 +255,20 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         adapter = getMultiAdapter(
                 (self.portal.workspace, uploadrequest), Interface, 'sword')
         xml = adapter()
-        self.assertTrue("<sword:error" not in xml, xml)
-        self.assertTrue("<entry" in xml, "Not a valid deposit receipt")
         self.assertTrue("multipart" in self.portal.workspace.objectIds())
+        self.assertTrue("<entry" in xml, "Not a valid deposit receipt")
+
+        module = self.portal.workspace.objectValues()[0]
+        dom = parseString(xml)
+        dates = dom.getElementsByTagName('updated')
+        dates[0].firstChild.nodeValue = module.revised
+        reference_depositreceipt = dom.toxml()
+        returned_depositreceipt = parseString(xml).toxml()
+
+        assert bool(xml), "Upload view does not return a result"
+        assert "<sword:error" not in xml, xml
+        self.assertEqual(returned_depositreceipt, reference_depositreceipt,
+            'Result does not match reference doc')
 
 
     def testSwordServiceRetrieveContent(self):
@@ -396,7 +414,6 @@ class TestSwordService(PloneTestCase.PloneTestCase):
     def writecontents(self, contents, filename):
         file = open(os.path.join(DIRNAME, 'data', filename), 'w')
         file.write(contents)
-        file.flush()
         file.close()
 
 
