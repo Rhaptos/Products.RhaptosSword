@@ -6,7 +6,7 @@ from StringIO import StringIO
 from base64 import decodestring
 from DateTime import DateTime
 
-from xml.dom.minidom import parseString
+from xml.dom.minidom import parse, parseString
 
 from zope.publisher.interfaces.http import IHTTPRequest
 from zope.component import getAdapter, getMultiAdapter
@@ -100,8 +100,11 @@ class TestSwordService(PloneTestCase.PloneTestCase):
 
 
     def testSwordService(self):
-        request = self.portal.REQUEST
+        file = open(os.path.join(DIRNAME, 'data', 'servicedocument.xml'), 'r')
+        reference_servicedoc = file.read()
+        file.close()
 
+        request = self.portal.REQUEST
         # Check that 'sword' ends up at a browser view
         view = self.portal.restrictedTraverse('sword')
         assert isinstance(view, BrowserView)
@@ -109,7 +112,9 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         # Test service-document
         view = self.portal.restrictedTraverse('sword/servicedocument')
         assert isinstance(view, ServiceDocument)
-        assert "<sword:error" not in view()
+        xml = view()
+        assert "<sword:error" not in xml
+        assert xml == reference_servicedoc, 'Result does not match reference doc,'
 
         # Upload a zip file
         zipfilename = os.path.join(DIRNAME, 'data', 'm11868_1.6.zip')
@@ -117,7 +122,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         env = {
             'CONTENT_TYPE': 'application/zip',
             'CONTENT_LENGTH': os.path.getsize(zipfilename),
-            'CONTENT_DISPOSITION': 'attachment; filename=perry.zip',
+            'CONTENT_DISPOSITION': 'attachment; filename=m11868_1.6.zip',
             'REQUEST_METHOD': 'POST',
             'SERVER_NAME': 'nohost',
             'SERVER_PORT': '80'
@@ -134,11 +139,21 @@ class TestSwordService(PloneTestCase.PloneTestCase):
             (self.folder, uploadrequest), Interface, 'sword')
         xml = adapter()
         zipfile.close()
+        # Test that we can still reach the edit-iri
+        assert self.folder.restrictedTraverse('m11868_1-6.zip/sword/edit')
+        zipfile = self.folder._getOb('m11868_1-6.zip')
+
+        file = open(os.path.join(DIRNAME, 'data', 'depositreceipt_plain_zipfile.xml'), 'r')
+        dom = parse(file)
+        file.close()
+        dates = dom.getElementsByTagName('updated')
+        dates[0].firstChild.nodeValue = zipfile.modified()
+        reference_depositreceipt = dom.toxml()
+        returned_depositreceipt = parseString(xml).toxml()
         assert bool(xml), "Upload view does not return a result"
         assert "<sword:error" not in xml, xml
-
-        # Test that we can still reach the edit-iri
-        assert self.folder.restrictedTraverse('perry.zip/sword/edit')
+        self.assertEqual(returned_depositreceipt, reference_depositreceipt,
+            'Result does not match reference doc')
 
 
     def testFoldersAreFolderish(self):
@@ -365,6 +380,12 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         xml = adapter()
         assert "<sword:error" not in xml, xml
     
+
+    def writecontents(self, contents, filename):
+        file = open(os.path.join(DIRNAME, 'data', filename), 'w')
+        file.write(contents)
+        file.flush()
+        file.close()
 
 
 def test_suite():
