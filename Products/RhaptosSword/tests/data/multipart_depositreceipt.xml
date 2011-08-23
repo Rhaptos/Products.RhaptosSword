@@ -3,7 +3,7 @@
     <!-- SWORD deposit receipt -->
     <title>My Title</title>
     <id>http://nohost/plone/workspace/multipart</id>
-    <updated>2011/08/23 13:51:56.484 GMT+2</updated>
+    <updated>2011/08/23 23:01:06.152 GMT+2</updated>
     <summary type="text">The summary</summary>
     <generator uri="rhaptos.swordservice.plone" version="1.0"/>
 
@@ -12,8 +12,8 @@
     <dcterms:identifier xsi:type="oerdc:Version">**new**</dcterms:identifier> 
     <dcterms:identifier xsi:type="oerdc:ContentId">http://nohost/plone/workspace/multipart</dcterms:identifier> 
     <dcterms:title>My Title</dcterms:title>
-    <dcterms:created>2011/08/23 13:51:56.172 GMT+2</dcterms:created> 
-    <dcterms:modified>2011/08/23 13:51:56.484 GMT+2</dcterms:modified> 
+    <dcterms:created>2011/08/23 23:01:05.844 GMT+2</dcterms:created> 
+    <dcterms:modified>2011/08/23 23:01:06.152 GMT+2</dcterms:modified> 
     <dcterms:creator oerdc:email="" oerdc:id="test_user_1_"/>
     <dcterms:maintainer oerdc:email="" oerdc:id="test_user_1_"/>
     <dcterms:rightsHolder oerdc:email="" oerdc:id="test_user_1_"/>
@@ -31,9 +31,9 @@
     <dcterms:license xsi:type="dcterms:URI">http://creativecommons.org/licenses/by/3.0/</dcterms:license>
 
     <sword:treatment>Module 'My Title' was imported via the SWORD API.
-    * You can preview your module here to see what it will look like once it is published.
-    * The current description of the changes you have made for this version of the module: &quot;&quot;
-    Publication Requirements:You must describe the changes that you have made to this version before publishing.</sword:treatment>
+        * You can preview your module here to see what it will look like once it is published.
+        * The current description of the changes you have made for this version of the module: &quot;&quot;
+        Publication Requirements:You must describe the changes that you have made to this version before publishing.</sword:treatment>
 
     <link href="http://nohost/plone/workspace/multipart/module_view?format=html" rel="alternate"/>
 
