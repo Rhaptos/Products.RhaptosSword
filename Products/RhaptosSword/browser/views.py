@@ -8,13 +8,50 @@ from Products.Five import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 
 from rhaptos.swordservice.plone.interfaces import ISWORDEditIRI
-from rhaptos.swordservice.plone.browser.sword import SWORDStatement
+from rhaptos.swordservice.plone.browser.sword import SWORDStatementAdapter
 from rhaptos.swordservice.plone.browser.sword import EditIRI as BaseEditIRI
 from rhaptos.atompub.plone.browser.atompub import IAtomFeed
 
 from Products.RhaptosSword.adapters import METADATA_MAPPING
 
-class EditIRI(BaseEditIRI):
+
+class UtilsMixin(object):
+    def get_treatment(self, context):
+        module_name = context.title
+        description_of_changes = context.message
+        message = """Module '%s' was imported via the SWORD API.
+        * You can preview your module here to see what it will look like once it is published.
+        * The current description of the changes you have made for this version of the module: "%s"
+        """ %(module_name, description_of_changes)
+        publication_requirements = self.get_publication_requirements(context)
+        if publication_requirements:
+            message += 'Publication Requirements:'
+            message += publication_requirements
+        return message
+
+
+    def get_publication_requirements(self, context):
+        requirements = ""
+        if not context.license:
+            for user_id in context.authors:
+                user = context.pmt.getMemberById(user_id)
+                fullname = user.getProperty('fullname')
+                requirements += '%s (account:%s), will need to sign the license.\n'\
+                                 %(fullname, user_id)
+
+        pending_collaborations = context.getPendingCollaborations()
+        if pending_collaborations:
+            requirements += 'The following contributors must agree to be listing on the module and sign the license agreement here.'
+        for user_id, collab in pending_collaborations:
+            user = context.pmt.getMemberById(user_id)
+            fullname = user.getProperty('fullname')
+            requirements += '%s (account:%s)' %(fullname, user_id)
+        if not context.message:
+            requirements += 'You must describe the changes that you have made to this version before publishing.'
+        return requirements
+
+
+class EditIRI(BaseEditIRI, UtilsMixin):
     """ This extends the SWORD v 2.0 Deposit Receipt to:
         - List role requests.
         - Show whether the license has been signed by the author and all
@@ -89,7 +126,7 @@ class EditIRI(BaseEditIRI):
 
 
     def treatment(self):
-        return get_treatment(self.context)
+        return self.get_treatment(self.context)
 
 
     def email(self, user_id):
@@ -115,14 +152,15 @@ class AtomFeed(BrowserView):
         return self.context.objectValues(spec=meta_types)
 
 
-class RhaptosSWORDStatement(SWORDStatement):
-   
+class RhaptosSWORDStatement(SWORDStatementAdapter, UtilsMixin):
+
+    statement = ViewPageTemplateFile('statement.pt')
+
     def __init__(self, context, request):
-        super(RhaptosSWORDStatement, self).__init__(context, request)
-        self.pmt = getToolByName(self.context, 'portal_membership')
+        super(SWORDStatementAdapter, self).__init__(context, request)
         self.missing_metadata = self.check_metadata()
         self.has_required_metadata = True
-        if self.missing_metadata: self.has_required_metadata = False
+        if not self.missing_metadata: self.has_required_metadata = False
 
 
     def check_metadata(self):
@@ -143,49 +181,10 @@ class RhaptosSWORDStatement(SWORDStatement):
     def pending_collabs(self):
         return self.context.getPendingCollaborations()
 
-    
-    def current_collabs(self):
-        return {} 
 
-    
+    def treatment(self):
+        return self.get_treatment(self.context)
+
+
     def deposited_by(self):
         return ', '.join(self.context.authors)
-
-    
-    def treatment(self):
-        return get_treatment(self.context)
-
-
-def get_treatment(context):
-    module_name = context.title
-    description_of_changes = context.message
-    message = """Module '%s' was imported via the SWORD API.
-    * You can preview your module here to see what it will look like once it is published.
-    * The current description of the changes you have made for this version of the module: "%s"
-    """ %(module_name, description_of_changes)
-    publication_requirements = get_publication_requirements(context)
-    if publication_requirements:
-        message += 'Publication Requirements:'
-        message += publication_requirements
-    return message
-
-
-def get_publication_requirements(context):
-    requirements = ""
-    if not context.license:
-        for user_id in context.authors:
-            user = context.pmt.getMemberById(user_id)
-            fullname = user.getProperty('fullname')
-            requirements += '%s (account:%s), will need to sign the license.\n'\
-                             %(fullname, user_id)
-
-    pending_collaborations = context.getPendingCollaborations()
-    if pending_collaborations:
-        requirements += 'The following contributors must agree to be listing on the module and sign the license agreement here.'
-    for user_id, collab in pending_collaborations:
-        user = context.pmt.getMemberById(user_id)
-        fullname = user.getProperty('fullname')
-        requirements += '%s (account:%s)' %(fullname, user_id)
-    if not context.message:
-        requirements += 'You must describe the changes that you have made to this version before publishing.'
-    return requirements
