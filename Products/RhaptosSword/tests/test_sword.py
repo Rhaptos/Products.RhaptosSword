@@ -255,15 +255,23 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         adapter = getMultiAdapter(
                 (self.portal.workspace, uploadrequest), Interface, 'sword')
         xml = adapter()
+        returned_depositreceipt = parseString(xml).toxml()
         self.assertTrue("multipart" in self.portal.workspace.objectIds())
         self.assertTrue("<entry" in xml, "Not a valid deposit receipt")
 
         module = self.portal.workspace.objectValues()[0]
-        dom = parseString(xml)
+        file = open(os.path.join(DIRNAME, 'data', 'multipart_depositreceipt.xml'), 'r')
+        dom = parse(file)
+        file.close()
         dates = dom.getElementsByTagName('updated')
         dates[0].firstChild.nodeValue = module.revised
+        created = dom.getElementsByTagName('dcterms:created')
+        for element in created:
+            element.firstChild.nodeValue = module.created
+        modified = dom.getElementsByTagName('dcterms:modified')
+        for element in modified:
+            element.firstChild.nodeValue = module.revised
         reference_depositreceipt = dom.toxml()
-        returned_depositreceipt = parseString(xml).toxml()
 
         assert bool(xml), "Upload view does not return a result"
         assert "<sword:error" not in xml, xml
