@@ -1,5 +1,6 @@
 from zope.interface import Interface, implements
 from Acquisition import aq_inner
+import transaction
 
 from Products.CMFCore.utils import getToolByName
 
@@ -39,6 +40,10 @@ class EditIRI(BaseEditIRI):
 
 
     def _handlePublish(self):
+        # We have to commit the transaction, otherwise the object has a blank
+        # _p_jar and cannot be moved. And if it cannot be moved it cannot be
+        # published.
+        transaction.commit()
         context = aq_inner(self.context)
         description_of_changes = context.message
         context.publishContent(message=description_of_changes)

@@ -116,7 +116,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         assert "<sword:error" not in xml
         assert xml == reference_servicedoc, 'Result does not match reference doc,'
 
-        # Upload a zip file
+        # Upload a zip file, but don't publish
         zipfilename = os.path.join(DIRNAME, 'data', 'm11868_1.6.zip')
         zipfile = open(zipfilename, 'r')
         env = {
@@ -125,7 +125,8 @@ class TestSwordService(PloneTestCase.PloneTestCase):
             'CONTENT_DISPOSITION': 'attachment; filename=m11868_1.6.zip',
             'REQUEST_METHOD': 'POST',
             'SERVER_NAME': 'nohost',
-            'SERVER_PORT': '80'
+            'SERVER_PORT': '80',
+            'IN_PROGRESS': 'true',
         }
         uploadresponse = HTTPResponse(stdout=StringIO())
         uploadrequest = clone_request(self.app.REQUEST, uploadresponse, env)
@@ -183,7 +184,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         env = {
             'CONTENT_TYPE': 'application/atom+xml;type=entry',
             'CONTENT_LENGTH': len(content),
-            'IN-PROGRESS': 'True',
+            'IN_PROGRESS': 'true',
             'REQUEST_METHOD': 'POST',
             'SERVER_NAME': 'nohost',
             'SERVER_PORT': '80'
