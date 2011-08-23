@@ -19,18 +19,17 @@
         permission="zope2.View"
         />
 
-    <browser:page
-        for="Products.RhaptosModuleEditor.interfaces.IModule"
-        name="statement"
-        class=".views.RhaptosSWORDStatement"
-        template="statement.pt"
-        permission="zope2.View"
-        />
-
     <adapter
         for="Products.RhaptosSword.interfaces.IRhaptosSwordCollection
              zope.publisher.interfaces.http.IHTTPRequest"
         provides="rhaptos.swordservice.plone.interfaces.ISWORDEditIRI"
         factory=".views.EditIRI" />
+
+    <adapter
+        for="Products.RhaptosSword.interfaces.IRhaptosSwordCollection
+             zope.publisher.interfaces.http.IHTTPRequest"
+        provides="rhaptos.swordservice.plone.interfaces.ISWORDStatement"
+        factory=".views.RhaptosSWORDStatement"
+        />
 
 </configure>

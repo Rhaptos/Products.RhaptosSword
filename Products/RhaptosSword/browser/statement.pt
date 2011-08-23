@@ -5,6 +5,7 @@
        xmlns:tal="http://xml.zope.org/namespaces/tal"
        tal:define="context nocall:view/context">
 
+    <!-- SWORD statement -->
     <link rel="edit" href="edit-iri"
           tal:attributes="href string:${context/absolute_url}/sword/edit" />
     <link rel="edit-media" href="edit-media-iri"
