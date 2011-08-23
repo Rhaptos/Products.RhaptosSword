@@ -7,6 +7,7 @@ from zope.interface import Interface, implements
 from zope.publisher.interfaces.http import IHTTPRequest
 from zope.component import adapts, queryAdapter
 from AccessControl import getSecurityManager
+from Acquisition import aq_inner
 
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.interfaces import IFolderish
@@ -86,6 +87,8 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             body.seek(0)
             dom = parse(body)
             body.seek(0)
+
+            # Check if this is a request to derive a module
             elements = dom.getElementsByTagNameNS(
                 "http://purl.org/dc/terms/", 'source')
             if len(elements) > 0:
@@ -93,6 +96,14 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                 obj = self.deriveModule(
                     str(elements[0].firstChild.nodeValue))
                 return obj
+
+            # Check if it is a request to create a new version of an existing
+            # module
+            elements = dom.getElementsByTagNameNS(
+                "http://purl.org/dc/terms/", 'isVersionOf')
+            if len(elements) > 0:
+                return self.checkoutModule(
+                    str(elements[0].firstChild.nodeValue))
 
         return super(RhaptosWorkspaceSwordAdapter, self).createObject(
             context, name, content_type, request)
@@ -128,6 +139,21 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         if to_delete_id:
             area.manage_delObjects(ids=[to_delete_id])
         return forked_obj
+
+
+    def checkoutModule(self, url):
+        context = aq_inner(self.context)
+        module_id = url.split('/')[-1]
+        # Fetch module
+        content_tool = getToolByName(self.context, 'content')
+        module = content_tool.getRhaptosObject(module_id, 'latest')
+
+        checkout_id = context.generateUniqueId()
+        context.invokeFactory(id=checkout_id, type_name=module.portal_type)
+        obj = context._getOb(checkout_id)
+        obj.setState('published')
+        obj.checkout(module.objectId)
+        return obj
 
 
     def updateObject(self, obj, filename, request, response, content_type):
