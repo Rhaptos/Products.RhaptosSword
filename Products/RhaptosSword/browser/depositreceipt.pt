@@ -10,7 +10,7 @@
 
     <title tal:content="context/title">My Deposit</title>
     <id tal:content="context/Identifier">1234</id>
-    <updated tal:content="context/created">2008-08-18T14:27:08Z</updated>
+    <updated tal:content="context/revised">2008-08-18T14:27:08Z</updated>
     <summary type="text">The summary</summary>
     <generator uri="rhaptos.swordservice.plone" version="1.0"/>
 
