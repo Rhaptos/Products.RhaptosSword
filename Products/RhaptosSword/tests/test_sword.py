@@ -2,9 +2,12 @@ import os, sys
 if __name__ == '__main__':
     execfile(os.path.join(sys.path[0], 'framework.py'))
 
+import zipfile as zf
+import tempfile
 from StringIO import StringIO
 from base64 import decodestring
 from DateTime import DateTime
+from md5 import md5
 
 from xml.dom.minidom import parse, parseString
 
@@ -236,6 +239,12 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         dates = dom.getElementsByTagName('updated')
         module = self.portal.workspace.objectValues()[0]
         dates[0].firstChild.nodeValue = module.revised
+        created = dom.getElementsByTagName('dcterms:created')
+        for element in created:
+            element.firstChild.nodeValue = module.created
+        modified = dom.getElementsByTagName('dcterms:modified')
+        for element in modified:
+            element.firstChild.nodeValue = module.revised
         reference_depositreceipt = dom.toxml()
 
         assert bool(xml), "Upload view does not return a result"
@@ -313,7 +322,16 @@ class TestSwordService(PloneTestCase.PloneTestCase):
 
         adapter = getMultiAdapter(
             (module, getrequest), Interface, 'sword')
-        zipfile = adapter()
+        retrieved_content = adapter()
+        file = tempfile.NamedTemporaryFile()
+        file.write(retrieved_content)
+        file.flush()
+        retrieved_file = zf.ZipFile(file.name)
+        file.close()
+        reference_file = zf.ZipFile(
+            os.path.join(DIRNAME, 'data', 'retrievedcontent.zip'))
+        self.assertEqual(retrieved_file.namelist(), reference_file.namelist(),
+            'The files are not the same.')
 
     
     def testSwordServiceStatement(self):
@@ -331,7 +349,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         # date and time back.
         now = DateTime()
         module.created = now
-        view = module.restrictedTraverse('@@statement')
+        view = module.restrictedTraverse('sword/statement')
         xml = view()
         assert "<sword:error" not in xml, xml
 
