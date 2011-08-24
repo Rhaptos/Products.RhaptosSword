@@ -1,4 +1,4 @@
-from zope.interface import Interface, implements
+from zope.interface import implements
 from Acquisition import aq_inner
 import transaction
 
@@ -9,13 +9,13 @@ from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 
 from rhaptos.swordservice.plone.interfaces import ISWORDEditIRI
 from rhaptos.swordservice.plone.browser.sword import SWORDStatementAdapter
+from rhaptos.swordservice.plone.browser.sword import SWORDStatementAtomAdapter
 from rhaptos.swordservice.plone.browser.sword import EditIRI as BaseEditIRI
-from rhaptos.atompub.plone.browser.atompub import IAtomFeed
 
 from Products.RhaptosSword.adapters import METADATA_MAPPING
 
 
-class UtilsMixin(object):
+class SWORDTreatmentMixin(object):
     def get_treatment(self, context):
         module_name = context.title
         description_of_changes = context.message
@@ -51,7 +51,7 @@ class UtilsMixin(object):
         return requirements
 
 
-class EditIRI(BaseEditIRI, UtilsMixin):
+class EditIRI(BaseEditIRI, SWORDTreatmentMixin):
     """ This extends the SWORD v 2.0 Deposit Receipt to:
         - List role requests.
         - Show whether the license has been signed by the author and all
@@ -152,7 +152,7 @@ class AtomFeed(BrowserView):
         return self.context.objectValues(spec=meta_types)
 
 
-class RhaptosSWORDStatement(SWORDStatementAdapter, UtilsMixin):
+class RhaptosSWORDStatement(SWORDStatementAdapter, SWORDTreatmentMixin):
 
     statement = ViewPageTemplateFile('statement.pt')
 
@@ -188,3 +188,28 @@ class RhaptosSWORDStatement(SWORDStatementAdapter, UtilsMixin):
 
     def deposited_by(self):
         return ', '.join(self.context.authors)
+
+
+class RhaptosSWORDStatementAtom(SWORDStatementAtomAdapter):
+    """
+    """
+    
+    # we override the atom page template, since the Rhaptos SWORD atom content
+    # is quite distinct from the plain SWORD atom feed content.
+    atom = ViewPageTemplateFile('atom.pt')
+
+    def getAuthors(self):
+        authors = getattr(self.context, 'authors', '')
+        return ' '.join(authors)
+
+    
+    def getLicense(self):
+        license = getattr(self.context, 'license', None)
+        return license
+
+
+    def entries(self):
+        meta_types = ['CMF CNXML File', 'UnifiedFile',]
+        return self.context.objectValues(spec=meta_types)
+
+

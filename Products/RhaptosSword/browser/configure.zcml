@@ -32,4 +32,11 @@
         factory=".views.RhaptosSWORDStatement"
         />
 
+    <adapter
+        for="Products.RhaptosSword.interfaces.IRhaptosSwordCollection
+             zope.publisher.interfaces.http.IHTTPRequest"
+        provides="rhaptos.swordservice.plone.interfaces.ISWORDStatementAtomAdapter"
+        factory=".views.RhaptosSWORDStatementAtom"
+        />
+
 </configure>
