@@ -20,11 +20,13 @@ from ZPublisher.HTTPRequest import HTTPRequest
 from ZPublisher.HTTPResponse import HTTPResponse
 from Products.Five import BrowserView
 from Products.CMFCore.interfaces import IFolderish
+from Products.CMFCore.PortalFolder import PortalFolder
 
 from Products.PloneTestCase import PloneTestCase
 
 from rhaptos.swordservice.plone.browser.sword import ISWORDService
 from rhaptos.swordservice.plone.browser.sword import ServiceDocument
+from Products.RhaptosRepository.interfaces.IVersionStorage import IVersionStorage
 
 from Testing import ZopeTestCase
 ZopeTestCase.installProduct('RhaptosSword')
@@ -78,6 +80,50 @@ class StubLanuageTool(SimpleItem):
 
     def getLanguageBindings(self):
         return ('en', 'en', [])
+
+class StubStorage(SimpleItem):
+    __implements__ = (IVersionStorage)
+
+    def __init__(self, id):
+        self.id = id
+        self.latest = {}
+
+    def getId(self):
+        return self.id
+
+    def isUnderVersionControl(self, object):
+        return getattr(object.aq_base, 'objectId', None) is not None
+
+    def applyVersionControl(self, object):
+        if self.isUnderVersionControl(object):
+            raise ValueError, "Already under version control"
+        repo = self.aq_parent
+        count = len(repo.objectIds())-2 # ignore storage and cache
+        object.objectId = 'm%d' % (10001+count)
+        return object.objectId
+
+    def createVersionFolder(self, object):
+        folder = PortalFolder(object.objectId)
+        self.aq_parent._setObject(object.objectId, folder)
+
+    def checkinResource(self, object, message='', user=None):
+        vf = self.aq_parent._getOb(object.objectId)
+        minor = len(vf.objectIds())
+        object.version = "1.%d" % minor
+        object.revised = DateTime()
+        object.submitter = user
+        object.submitlog = message
+        vf._setObject(object.objectId, object)
+        self.latest[object.objectId] = object
+
+    def getObject(self, id, version=None, **kw):
+        if version is None or version == 'latest':
+            return self.latest[id]
+        vf = self.aq_parent._getOb(id)
+        return vf._getOb(version)
+
+    def notifyObjectRevised(self, object, origobj=None):
+        pass
 
 
 def clone_request(req, response=None, env=None):
@@ -175,6 +221,10 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         objectIds = self.portal.objectIds()
         if not 'content' in objectIds:
             self.portal.manage_addProduct['RhaptosRepository'].manage_addRepository('content') 
+            # We need storage for our published modules. This is as good a place as
+            # any.
+            self.portal.content.registerStorage(StubStorage('bar'))
+            self.portal.content.setDefaultStorage('bar')
         if not 'portal_moduledb' in objectIds:
             self.portal._setObject('portal_moduledb', StubModuleDB())
         if not 'portal_languages' in objectIds:
@@ -287,6 +337,44 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         assert "<sword:error" not in xml, xml
         self.assertEqual(returned_depositreceipt, reference_depositreceipt,
             'Result does not match reference doc')
+
+    def testUploadAndPublish(self):
+        self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+
+        uploadrequest = self.createUploadRequest(
+            'multipart.txt',
+            context=self.portal.workspace,
+            CONTENT_TYPE='multipart/related; boundary="===============1338623209=="',
+            IN_PROGRESS='false',
+            SLUG='multipart',
+        )
+        # Call the sword view on this request to perform the upload
+        adapter = getMultiAdapter(
+                (self.portal.workspace, uploadrequest), Interface, 'sword')
+        xml = adapter()
+        # Unfortunately none of this works because we are unauthorised to
+        # publish from a unit test. publishContent.cpy hates us.
+        self.assertTrue("<sword:error" not in xml, xml)
+        self.assertTrue("multipart" in self.portal.workspace.objectIds())
+        self.assertTrue(
+            self.portal.workspace._getOb('multipart').state == 'published',
+            "Did not publish")
+        self.assertTrue("<entry" in xml, "Not a valid deposit receipt")
+        
+
+    def testCheckoutAndUpdate(self):
+        # This test does not work because we are unable to create published
+        # modules in unit tests, and so we have nothing to check out.
+        uploadrequest = self.createUploadRequest(
+            'checkout_and_update.xml',
+            context=self.portal.workspace,
+            CONTENT_TYPE='multipart/related; boundary="===============1338623209=="',
+            SLUG='multipart'
+        )
+        # Call the sword view on this request to perform the upload
+        adapter = getMultiAdapter(
+                (self.portal.workspace, uploadrequest), Interface, 'sword')
+        xml = adapter()
 
 
     def testSwordServiceRetrieveContent(self):

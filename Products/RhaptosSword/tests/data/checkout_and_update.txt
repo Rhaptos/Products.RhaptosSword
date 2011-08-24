@@ -9,13 +9,7 @@ Content-Disposition: attachment; name=atom
 <?xml version="1.0"?>
 <entry xmlns="http://www.w3.org/2005/Atom"
        xmlns:dcterms="http://purl.org/dc/terms/">
-    <title>My Title</title>
-    <id>urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a</id>
-    <updated>2005-10-07T17:17:08Z</updated>
-    <author><name>user1</name></author>
-    <summary type="text">The abstract</summary>
-    <license>http://creativecommons.org/licenses/by/3.0/</license>
-    <descriptionOfChanges>Frobnicate the Bar</descriptionOfChanges>
+    <dcterms:isVersionOf>http://cnx.org/content/m10001</dcterms:isVersionOf>
 </entry>
 
 --===============1338623209==
