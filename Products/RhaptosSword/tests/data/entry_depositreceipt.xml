@@ -1,9 +1,9 @@
 <?xml version="1.0" ?><entry xmlns="http://www.w3.org/2005/Atom" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:md="http://cnx.rice.edu/mdml" xmlns:oerdc="http://cnx.org/aboutus/technology/schemas/oerdc" xmlns:sword="http://purl.org/net/sword/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
     <!-- SWORD deposit receipt -->
-    <title>Atom-Powered Robots Run Amok</title>
+    <title>Box Plots Statistics for Non Majors</title>
     <id>http://nohost/plone/workspace/entry.xml</id>
-    <updated>2011/08/23 22:55:28.564 GMT+2</updated>
+    <updated>2011/08/25 03:42:25.016 GMT+2</updated>
     <summary type="text">The summary</summary>
     <generator uri="rhaptos.swordservice.plone" version="1.0"/>
 
@@ -11,28 +11,30 @@
     <dcterms:identifier xsi:type="dcterms:URI">http://nohost/plone/workspace/entry.xml</dcterms:identifier> 
     <dcterms:identifier xsi:type="oerdc:Version">**new**</dcterms:identifier> 
     <dcterms:identifier xsi:type="oerdc:ContentId">http://nohost/plone/workspace/entry.xml</dcterms:identifier> 
-    <dcterms:title>Atom-Powered Robots Run Amok</dcterms:title>
-    <dcterms:created>2011/08/23 22:55:28.176 GMT+2</dcterms:created> 
-    <dcterms:modified>2011/08/23 22:55:28.564 GMT+2</dcterms:modified> 
+    <dcterms:title>Box Plots Statistics for Non Majors</dcterms:title>
+    <dcterms:created>2011/08/25 03:42:24.956 GMT+2</dcterms:created> 
+    <dcterms:modified>2011/08/25 03:42:25.016 GMT+2</dcterms:modified> 
     <dcterms:creator oerdc:email="" oerdc:id="test_user_1_"/>
     <dcterms:maintainer oerdc:email="" oerdc:id="test_user_1_"/>
     <dcterms:rightsHolder oerdc:email="" oerdc:id="test_user_1_"/>
 
-    <oerdc:oer-subject>Science and Technology, Social Sciences</oerdc:oer-subject>
+    <oerdc:oer-subject/>
 
-    <dcterms:subject xsi:type="oerdc:Subject">Science and Technology, Social Sciences</dcterms:subject>
+    <dcterms:subject xsi:type="oerdc:Subject"/>
     
-    <dcterms:subject>kw1</dcterms:subject>
-    <dcterms:subject>kw2</dcterms:subject>
+    <dcterms:subject>box</dcterms:subject>
+    <dcterms:subject>Mathematics and Statistics</dcterms:subject>
+    <dcterms:subject>median</dcterms:subject>
+    <dcterms:subject>quartiles</dcterms:subject>
 
 
-    <dcterms:abstract>the summary</dcterms:abstract>
+    <dcterms:abstract>All you wanted to know about Box Plots and more.</dcterms:abstract>
 
     <dcterms:language xsi:type="ISO639-1">en</dcterms:language> 
 
-    <dcterms:license xsi:type="dcterms:URI">http://creativecommons.org/licenses/by/1.0</dcterms:license>
+    <dcterms:license xsi:type="dcterms:URI">http://creativecommons.org/licenses/by/3.0/</dcterms:license>
 
-    <sword:treatment>Module 'Atom-Powered Robots Run Amok' was imported via the SWORD API.
+    <sword:treatment>Module 'Box Plots Statistics for Non Majors' was imported via the SWORD API.
         * You can preview your module here to see what it will look like once it is published.
         * The current description of the changes you have made for this version of the module: &quot;&quot;
         Publication Requirements:You must describe the changes that you have made to this version before publishing.</sword:treatment>

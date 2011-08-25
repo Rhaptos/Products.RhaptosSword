@@ -1,62 +1,61 @@
 <?xml version="1.0"?>
 <entry xmlns="http://www.w3.org/2005/Atom"
        xmlns:cnxml="http://cnx.rice.edu/cnxml"
-       xmlns:md="http://cnx.rice.edu/mdml"
-       xmlns:dcterms="http://purl.org/dc/terms">
-  <title>Atom-Powered Robots Run Amok</title>
-  <id>urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a</id>
-  <updated>2003-12-13T18:30:02Z</updated>
+       xmlns:dcterms="http://purl.org/dc/terms"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:oerdc="http://purl.org/dc/oer">
+
+  <!-- <md:title> -->
+  <dcterms:title>Box Plots Statistics for Non Majors</dcterms:title>
+
+  <!-- <md:created> -->
+  <dcterms:created>2010/08/10 11:41:00.383 GMT-5</dcterms:created>
+
+  <!-- <md:revised> -->
+  <dcterms:modified>2010/08/10 12:47:45.522 GMT-5</dcterms:modified>
+
   <author><name>John Doe</name></author>
   <!-- some embedded metadata -->
-  <dcterms:sub>The abstract</dcterms:sub>
-  <dcterms:publisher>Publisher</dcterms:publisher>
-  <dcterms:description>Description</dcterms:description>
-  <dcterms:contributors>The contributurs</dcterms:contributors>
-  <dcterms:creators>The creators</dcterms:creators>
-  <dcterms:effective_date>03/08/2011</dcterms:effective_date>
-  <dcterms:expiration_date>03/08/2011</dcterms:expiration_date>
-  <dcterms:type>Type</dcterms:type>
-  <dcterms:format></dcterms:format>
-  <dcterms:language>en</dcterms:language>
-  <dcterms:accessRights>Access Rights</dcterms:accessRights>
-  <dcterms:rightsHolder>Rights Holder</dcterms:rightsHolder>
-  <dcterms:rights>Rights Holder</dcterms:rights>
-  <dcterms:abstract>The abstract</dcterms:abstract>
-  <dcterms:alternative>Alternative Title</dcterms:alternative>
-  <dcterms:available>Date Available</dcterms:available>
-  <dcterms:bibliographicCitation>Bibliographic Citation</dcterms:bibliographicCitation>
-  <dcterms:contributor>Contributor</dcterms:contributor>
-  <dcterms:hasPart>Has Part</dcterms:hasPart>
-  <dcterms:hasVersion>Has Version</dcterms:hasVersion>
-  <dcterms:identifier>Identifier</dcterms:identifier>
-  <dcterms:isPartOf>Is Part Of</dcterms:isPartOf>
-  <dcterms:references>References</dcterms:references>
-  <dcterms:source>Source</dcterms:source>
-  <dcterms:license>http://creativecommons.org/licenses/by/1.0</dcterms:license>
-  <cnxml:googleAnalyticsTrackingCode>UA-xxxxxxx-x</cnxml:googleAnalyticsTrackingCode>
-  <md:keywordlist>
-    <md:keyword>kw1</md:keyword>
-    <md:keyword>kw2</md:keyword>
-  </md:keywordlist>
-  <md:subjectlist>
-    <md:subject>Science and Technology</md:subject>
-    <md:subject>Social Sciences</md:subject>
-  </md:subjectlist>
-  <md:abstract>the summary</md:abstract>
-  <md:actors>
-    <md:person userid="test_user_1_">
-      <md:firstname>Lester</md:firstname>
-      <md:surname>Tester</md:surname>
-      <md:fullname>Lester the Tester</md:fullname>
-      <md:email>l33t@example.com</md:email>
-    </md:person>
-  </md:actors>
-  <md:roles>
-    <md:role type="author">test_user_1_</md:role>
-    <md:role type="maintainer">test_user_1_</md:role>
-    <md:role type="licensor">test_user_1_</md:role>
-  </md:roles>
-  <md:description_of_changes>
-      Some text description of what changed.
-  </md:description_of_changes>
+
+  <!-- <md:role type="author"> -->
+  <dcterms:creator oerdc:id="mrdwab" oerdc:email="ananda@mahto.info">Ananda Mahto</dcterms:creator>
+
+  <!-- <md:role type="maintainer"> -->
+  <oerdc:maintainer oerdc:id="mrdwab" oerdc:email="ananda@mahto.info">Ananda Mahto</oerdc:maintainer>
+
+  <!-- <md:role type="licensor"> -->
+  <dcterms:rightsHolder oerdc:id="mrdwab" oerdc:email="ananda@mahto.info">Ananda Mahto</dcterms:rightsHolder>
+
+  <!-- <md:role type="translator"> -->
+  <oerdc:translator oerdc:id="mrdwab" oerdc:email="ananda@mahto.info">Ananda Mahto</oerdc:translator>
+
+  <!-- <md:role type="editor"> -->
+  <oerdc:editor oerdc:pending="true" oerdc:id="mrdwab" oerdc:email="ananda@mahto.info">Ananda Mahto</oerdc:editor>
+
+  <!-- Translator editor, & illustrator would appear also as dcterms:contributor if the person were different from the creator which is a supported dc element. Illustrator isn't a supported dcterms element and so the illustrator is listed both as a contributor and as an oerdc refinement of contributor called 'illustrator' -->
+  <dcterms:contributor oerdc:role="illustrator" oerdc:id="aduerer" oerdc:email="albrecht@duerer.info">Albrecht Drer</dcterms:contributor>
+
+  <!-- <md:subject> -->
+  <oerdc:oer-subject>Mathematics and Statistics</oerdc:oer-subject>
+
+  <!-- include in general keywords as well as in our special element -->
+  <!-- <md:subject> -->
+  <dcterms:subject xsi:type="oerdc:Subject">Mathematics and Statistics</dcterms:subject>
+
+  <!-- <md:keyword> -->
+  <dcterms:subject>box</dcterms:subject>
+  <dcterms:subject>median</dcterms:subject>
+  <dcterms:subject>quartiles</dcterms:subject>
+
+  <!-- <md:abstract> -->
+  <dcterms:abstract>All you wanted to know about Box Plots and more.</dcterms:abstract>
+
+  <!-- <md:language> -->
+  <dcterms:language xsi:type="ISO639-1">en</dcterms:language>
+
+  <!-- <md:license> -->
+  <dcterms:license xsi:type="dcterms:URI">http://creativecommons.org/licenses/by/3.0/</dcterms:license>
+
+  <!-- CNX-Supported but not in MDML -->
+  <oerdc:analyticsCode>UA-4688042-1</oerdc:analyticsCode>
 </entry>
