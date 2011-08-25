@@ -1,81 +1,22 @@
-<?xml version="1.0" encoding='utf-8'?>
-<entry xmlns="http://www.w3.org/2005/Atom"
-       xmlns:sword="http://purl.org/net/sword/"
-       xmlns:dcterms="http://purl.org/dc/terms/"
-       xmlns:tal="http://xml.zope.org/namespaces/tal"
-       tal:define="context nocall:view/context">
+<atom:feed xmlns:sword="http://purl.org/net/sword/terms/" 
+      xmlns:atom="http://www.w3.org/2005/Atom"
+      tal:define="context nocall:view/context">
 
-    <!-- SWORD statement -->
-    <link rel="edit" href="edit-iri"
-          tal:attributes="href string:${context/absolute_url}/sword/edit" />
-    <link rel="edit-media" href="edit-media-iri"
-          tal:attributes="href context/absolute_url" />
-    <link rel="http://purl.org/net/sword/terms/add"
-          href="http://www.swordserver.ac.uk/col1/mydeposit.atom"
-          tal:attributes="href string:${context/absolute_url}/sword/edit" />
-    <link rel="http://purl.org/net/sword/terms/statement"
-          href="statement_IRI"
-          tal:attributes="href string:${context/absolute_url}/sword/statement"
-          type="application/atom+xml" />
-
-    <link tal:condition="options/upload|nothing"
-          rel="http://purl.org/net/sword/terms/originalDeposit"
-          href="iri"
-          tal:attributes="href context/absolute_url" />
-
-    <link tal:repeat="item options/derived|nothing"
-          rel="http://purl.org.net/sword/terms/derivedResource"
-          href="iri" 
-          tal:attributes="href item/absolute_url" />
+    <!-- SWORD statement atom feed representation -->
+    <atom:category scheme="http://purl.org/net/sword/terms/state"
+        term="http://purl.org/net/sword/terms/[created\|published]"
+        tal:attributes="term python:'http://purl.org/net/sword/terms/%s' %context.state"
+        label="State">
+            The work has passed through review and is now in the archive
+    </atom:category>
     
-    <sword:state href="http://sword/state"
-        tal:attributes="href string:${context/absolute_url}"
-        tal:define="collaborators view/collaborators">
-        <sword:stateDescription>
-        <div id="current_state"> 
-            <p>Current state:</p>
-            <p tal:content="context/state">Created</p>
-        </div> 
-
-        <div id="metadata"> 
-        <tal:metadata condition="view/has_required_metadata">
-            <p>All required metadata supplied</p>
-        </tal:metadata>
-        <tal:metadata condition="not:view/has_required_metadata">
-            <p>Metadata:</p>
-            <tal:item repeat="md view/missing_metadata">
-            <p tal:content="md">Missing metadata item</p>
-            </tal:item>
-        </tal:metadata>
-        </div> 
-
-        <div id="collaborators"> 
-            <p>Collaborators:</p>
-        </div> 
-
-        </sword:stateDescription>
-    </sword:state>
-
-    <sword:originalDeposit href="http://location/of/deposit"
-        tal:attributes="href context/absolute_url">
-        <sword:packaging tal:content="view/packaging">
-            application/xhtml+xml
-        </sword:packaging>
-        <sword:depositedOn tal:content="context/created">
-            2011-01-01T00:00:00Z
-        </sword:depositedOn>
-        <sword:depositedBy tal:content="view/deposited_by">
-            jbloggs
-        </sword:depositedBy>     
-    </sword:originalDeposit>
+    <atom:entry tal:repeat="entry view/entries">
+        <link rel="edit-media"
+            href="http://cnx.org/Members/roche/m9000/index.cnxml"
+            tal:attributes="href entry/absolute_url"
+        />
+    </atom:entry>
 
     <sword:treatment tal:content="view/treatment">Stored</sword:treatment>
-    <title tal:content="context/Title">Rhaptos SWORD package title</title>
-    <id tal:content="context/absolute_url">1234</id>
-    <updated tal:content="context/modified">2008-08-18T14:27:08Z</updated>
-    <author><name tal:content="context/Creator">jbloggs</name></author>
-    <dcterms:available tal:content="context/getEffectiveDate">Date Available</dcterms:available>
-    <dcterms:description tal:content="context/Description">Description</dcterms:description>
-    <dcterms:title tal:content="context/Title">Title</dcterms:title>
 
-</entry>
+</atom:feed>
