@@ -29,14 +29,19 @@ class ValidationError(Exception):
 CNX_MD_NAMESPACE = 'http://cnx.rice.edu/mdml'
 
 METADATA_MAPPING =\
-        {'title'   : 'title',
-         'keyword' : 'keywords',
-         'abstract': 'abstract',
-         'language': 'language',
-         'subject' : 'subject',
-         'license' : 'license',
-         'descriptionOfChanges' : 'descriptionOfChanges',
-         'googleAnalyticsTrackingCode': 'GoogleAnalyticsTrackingCode',
+        {'title'               : 'title',
+         'abstract'            : 'abstract',
+         'language'            : 'language',
+         'subject'             : 'keywords',
+         'license'             : 'license',
+         'descriptionOfChanges': 'descriptionOfChanges',
+         'analyticsCode'       : 'GoogleAnalyticsTrackingCode',
+        }
+
+XSI_TYPE_TO_MDML_NAME_MAP =\
+        {'oerdc:Subject': 'subject',
+         'ISO639-1'     : 'language',
+         'dcterms:URI'  : 'license',
         }
 
 
@@ -159,6 +164,10 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
     def updateObject(self, obj, filename, request, response, content_type):
 
         def updateMetadata(obj, fp):
+            """ Metadata as described in:
+                SWORD V2 Spec for Publishing Modules in Connexions
+                Section: Metadata
+            """
             dom = parse(fp)
             metadata = self.getMetadata(dom, METADATA_MAPPING)
             # better make sure we have a title while deriving content
@@ -245,6 +254,30 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
 
             if value: metadata[key] = value
         return metadata
+
+
+    def getHeaders(self, dom, mappings): 
+        headers = []
+        for prefix, uri in dom.documentElement.attributes.items():
+            for name in mappings.keys():
+                temp_dict = {}
+                values = dom.getElementsByTagNameNS(uri, name)
+                # split the simple values from those with xsi types
+                for v in values:
+                    xsi_type = v.getAttribute('xsi:type')
+                    temp_name = XSI_TYPE_TO_MDML_NAME_MAP.get(xsi_type, name)
+                    temp_values = temp_dict.get(temp_name, [])
+                    temp_values.append(v)
+                    temp_dict[temp_name] = temp_values
+                
+                for key, values in temp_dict.items():
+                    value = '\n'.join([str(v.firstChild.nodeValue).strip()\
+                                       for v in values\
+                                       if v.firstChild is not None]
+                                     )
+                    if value: headers.append((mappings[key], str(value)))
+
+        return headers
 
 
     def addRoles(self, obj, dom):
