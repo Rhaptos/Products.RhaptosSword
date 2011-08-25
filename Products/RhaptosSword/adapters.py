@@ -44,6 +44,16 @@ XSI_TYPE_TO_MDML_NAME_MAP =\
          'dcterms:URI'  : 'license',
         }
 
+DESCRIPTION_OF_CHANGES =\
+        {'derive': 'Derived a copy.',
+         'checkout': 'Checked out a copy.'
+        }
+
+DESCRIPTION_OF_TREATMENT =\
+        {'derive': 'Checkout and derive a new copy.',
+         'checkout': 'Checkout to users workspace.',
+        }
+
 
 class IRhaptosWorkspaceSwordAdapter(ISWORDContentUploadAdapter):
     """ Marker interface for SWORD service specific to the Rhaptos 
@@ -61,6 +71,11 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
     """ Rhaptos specific implement of the SWORD folder adapter.
     """
     adapts(IFolderish, IHTTPRequest)
+
+    # keep a handle on what changed during the process
+    descriptionOfChanges = ''
+    # keep a handle on the treatment of the object
+    treatment = ''
     
     def generateFilename(self, name):
         """ Override this method to provide a more sensible name in the
@@ -100,6 +115,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                 # now we can fork / derive the module
                 obj = self.deriveModule(
                     str(elements[0].firstChild.nodeValue))
+                self.setActionMetadata(obj, action='derive')
                 return obj
 
             # Check if it is a request to create a new version of an existing
@@ -107,8 +123,10 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             elements = dom.getElementsByTagNameNS(
                 "http://purl.org/dc/terms/", 'isVersionOf')
             if len(elements) > 0:
-                return self.checkoutModule(
+                obj = self.checkoutModule(
                     str(elements[0].firstChild.nodeValue))
+                self.setActionMetadata(obj, action='checkout')
+                return obj
 
         return super(RhaptosWorkspaceSwordAdapter, self).createObject(
             context, name, content_type, request)
@@ -175,9 +193,11 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             # we remove descriptionOfChanges because the update_metadata
             # script cannot cope with it.
             descriptionOfChanges = metadata.pop(
-                'descriptionOfChanges', '')
+                'descriptionOfChanges', self.descriptionOfChanges)
             if descriptionOfChanges:
                 obj.logAction('create', descriptionOfChanges)
+                setattr(obj, 'description_of_changes', descriptionOfChanges)
+            setattr(obj, 'treatment', self.treatment)
             obj.update_metadata(**metadata)
             # IB: Always add? Or replace when modifying existing content?
             self.addRoles(obj, dom)
@@ -322,6 +342,12 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         obj.update_roles(updateRoles = updateRoles,
                          deleteRoles = deleteRoles,
                          cancelRoles = cancelRoles)
+
+    
+    def setActionMetadata(self, obj, action):
+        self.descriptionOfChanges = DESCRIPTION_OF_CHANGES[action]
+        self.treatment = DESCRIPTION_OF_TREATMENT[action]
+        return obj
 
 
 class RhaptosContentRetrieveAdapter(RetrieveContent):
