@@ -193,6 +193,8 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                 obj.invokeFactory('CNXML Document', obj.default_file,
                     file=text, idprefix='zip-')
             makeContent(obj, subobjs)
+            # make sure that the cnxml is the latest version
+            obj.getDefaultFile().upgrade()
 
         obj = obj.__of__(self.context)
         if content_type in self.ATOMPUB_CONTENT_TYPES:
