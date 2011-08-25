@@ -1,0 +1,57 @@
+<atom:feed xmlns:sword="http://purl.org/net/sword/terms/"
+           xmlns:atom="http://www.w3.org/2005/Atom">
+
+    <!-- SWORD statement atom feed representation -->
+    <atom:category scheme="http://purl.org/net/sword/terms/state"
+                   term="http://purl.org/net/sword/terms/created"
+                   label="State">
+            The work has passed through review and is now in the archive
+    </atom:category>
+    
+    <atom:entry>
+        <link rel="edit-media"
+              href="http://nohost/plone/workspace/multipart/index.cnxml" />
+    </atom:entry>
+    <atom:entry>
+        <link rel="edit-media"
+              href="http://nohost/plone/workspace/multipart/h_allpass.png" />
+    </atom:entry>
+    <atom:entry>
+        <link rel="edit-media"
+              href="http://nohost/plone/workspace/multipart/h_lowpass.png" />
+    </atom:entry>
+    <atom:entry>
+        <link rel="edit-media"
+              href="http://nohost/plone/workspace/multipart/index.cnxml.pre-v07" />
+    </atom:entry>
+    <atom:entry>
+        <link rel="edit-media"
+              href="http://nohost/plone/workspace/multipart/h_bandstop.png" />
+    </atom:entry>
+    <atom:entry>
+        <link rel="edit-media"
+              href="http://nohost/plone/workspace/multipart/h_bandpass.png" />
+    </atom:entry>
+    <atom:entry>
+        <link rel="edit-media"
+              href="http://nohost/plone/workspace/multipart/idealFilters.m" />
+    </atom:entry>
+    <atom:entry>
+        <link rel="edit-media"
+              href="http://nohost/plone/workspace/multipart/h_highpass.png" />
+    </atom:entry>
+    <atom:entry>
+        <link rel="edit-media"
+              href="http://nohost/plone/workspace/multipart/notchFilter.m" />
+    </atom:entry>
+    <atom:entry>
+        <link rel="edit-media"
+              href="http://nohost/plone/workspace/multipart/h_notch.png" />
+    </atom:entry>
+
+    <sword:treatment>Module 'My Title' was imported via the SWORD API.
+        * You can preview your module here to see what it will look like once it is published.
+        * The current description of the changes you have made for this version of the module: ""
+        Publication Requirements:You must describe the changes that you have made to this version before publishing.</sword:treatment>
+
+</atom:feed>
