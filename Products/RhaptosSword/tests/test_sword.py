@@ -365,8 +365,9 @@ class TestSwordService(PloneTestCase.PloneTestCase):
     def testCheckoutAndUpdate(self):
         # This test does not work because we are unable to create published
         # modules in unit tests, and so we have nothing to check out.
+        self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
         uploadrequest = self.createUploadRequest(
-            'checkout_and_update.xml',
+            'checkout_and_update.txt',
             context=self.portal.workspace,
             CONTENT_TYPE='multipart/related; boundary="===============1338623209=="',
             SLUG='multipart'
@@ -425,7 +426,15 @@ class TestSwordService(PloneTestCase.PloneTestCase):
     def testSwordServiceStatement(self):
         self.setRoles(('Manager',))
         self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
-        uploadrequest = self.createUploadRequest('entry.xml', self.portal.workspace)
+
+        uploadrequest = self.createUploadRequest(
+            'multipart.txt',
+            context=self.portal.workspace,
+            CONTENT_TYPE='multipart/related; boundary="===============1338623209=="',
+            SLUG='multipart',
+            CONTENT_DISPOSITION='attachment; filename=multipart.txt'
+        )
+
         adapter = getMultiAdapter(
                 (self.portal.workspace, uploadrequest), Interface, 'sword')
         xml = adapter()
@@ -440,68 +449,15 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         view = module.restrictedTraverse('sword/statement')
         xml = view()
         assert "<sword:error" not in xml, xml
+        returned_statement = parseString(xml).toxml()
 
-        dom = parseString(xml)
-        edit_iri = module.absolute_url() + '/sword/edit'
-        edit_media_iri = module.absolute_url()
-        statement_iri = module.absolute_url() + '/sword/statement'
-        links = dom.getElementsByTagName('link')
-        for link in links:
-            rel = str(link.attributes['rel'].value)
-            href = str(link.attributes['href'].value)
-            if rel == 'edit':
-                self.assertEqual(href,
-                    edit_iri, 'Edit IRI is incorrect.')
-            elif rel == 'edit-media':
-                self.assertEqual(href,
-                    edit_media_iri, 'Media IRI is incorrect.')
-            elif rel == 'http://purl.org/net/sword/terms/add':
-                self.assertEqual(href,
-                    edit_iri, 'Termas add IRI is incorrect.')
-            elif rel == 'http://purl.org/net/sword/terms/statement':
-                self.assertEqual(href,
-                    statement_iri, 'Statement IRI is incorrect.')
-            elif rel == 'http://purl.org/net/sword/terms/originalDeposit':
-                self.assertEqual(href,
-                    module.absolute_url(), 'Original deposit IRI is incorrect.')
+        file = open(os.path.join(DIRNAME, 'data', 'multipart_statement.xml'), 'r')
+        dom = parse(file)
+        file.close()
+        reference_statement = dom.toxml()
+        self.assertEqual(returned_statement, reference_statement,
+            'Returned statement and reference statement are not identical.')
 
-        state = dom.getElementsByTagNameNS('http://purl.org/net/sword/', 'state')
-        self.failUnless(len(state) > 0)
-        href = str(state[0].attributes['href'].value)
-        self.assertEqual(href, module.absolute_url(), 'State IRI is incorrect.')
-
-        state_description = dom.getElementsByTagNameNS(
-            'http://purl.org/net/sword/', 'stateDescription')
-        self.failUnless(len(state_description) > 0)
-        paragraphs = state_description[0].getElementsByTagName('p')
-        value = str(paragraphs[1].firstChild.nodeValue)
-        self.assertEqual(value, 'created', 'State mismatch.')
-
-        orig_deposit = dom.getElementsByTagNameNS(
-            'http://purl.org/net/sword/', 'originalDeposit')
-        self.failUnless(len(orig_deposit) > 0) 
-        href = str(orig_deposit[0].attributes['href'].value)
-        self.assertEqual(href, module.absolute_url(),
-            'Original deposit IRI is incorrect.')
-
-        packaging = orig_deposit[0].getElementsByTagNameNS(
-            'http://purl.org/net/sword/', 'packaging')
-        self.failUnless(len(packaging) > 0) 
-        value = str(packaging[0].firstChild.nodeValue)
-        self.assertEqual(value, 'application/xhtml+xml',
-            'Packinging incorrect.')
-
-        deposited_on = orig_deposit[0].getElementsByTagNameNS(
-            'http://purl.org/net/sword/', 'depositedOn')
-        self.failUnless(len(deposited_on) > 0) 
-        value = str(deposited_on[0].firstChild.nodeValue)
-        created = DateTime(value)
-        self.assertEqual(created.year(), now.year(), 'Year mismatch.')
-        self.assertEqual(created.month(), now.month(), 'Month mismatch.')
-        self.assertEqual(created.day(), now.day(), 'Day mismatch.')
-        self.assertEqual(created.hour(), now.hour(), 'Hour mismatch.')
-        self.assertEqual(created.minute(), now.minute(), 'Minute mismatch.')
-        self.assertEqual(created.second(), now.second(), 'Second mismatch.')
 
 
     def testDeriveModule(self):
