@@ -69,6 +69,12 @@
                             oerdc:email python:view.email(editor)">
         Editor full name  
     </dcterms:editor>
+    
+    <!-- CNX-Supported but not in MDML -->
+    <oerdc:descriptionOfChanges>
+        * The current description of the changes you have made for this version of the module:
+        <span tal:replace="context/description_of_changes">Description of changes</span>
+    </oerdc:descriptionOfChanges> 
 
     <oerdc:oer-subject tal:content="view/subject">
         Mathematics and Statistics
