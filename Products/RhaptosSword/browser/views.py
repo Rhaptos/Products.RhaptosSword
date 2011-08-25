@@ -190,6 +190,11 @@ class RhaptosSWORDStatement(SWORDStatementAdapter, SWORDTreatmentMixin):
         return ', '.join(self.context.authors)
 
 
+    def entries(self):
+        meta_types = ['CMF CNXML File', 'UnifiedFile',]
+        return self.context.objectValues(spec=meta_types)
+
+
 class RhaptosSWORDStatementAtom(SWORDStatementAtomAdapter):
     """
     """
