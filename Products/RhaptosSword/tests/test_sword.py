@@ -30,6 +30,7 @@ from rhaptos.swordservice.plone.browser.sword import ServiceDocument
 from Products.RhaptosRepository.interfaces.IVersionStorage import IVersionStorage
 from Products.RhaptosRepository.VersionFolder import incrementMinor
 from Products.RhaptosModuleStorage.ModuleVersionFolder import ModuleVersionStorage
+from Products.RhaptosModuleStorage.ModuleDBTool import CommitError
 
 from Testing import ZopeTestCase
 ZopeTestCase.installProduct('RhaptosSword')
@@ -431,16 +432,13 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.setRoles(('Member',))
         self.assertTrue("<sword:error" not in xml, xml)
         self.assertTrue("m10001" in self.portal.workspace.objectIds())
-        self.assertTrue(
-            self.portal.workspace._getOb('m10001').state == 'published',
-            "Did not publish")
+        pubmod = self.portal.workspace._getOb('m10001')
+        self.assertTrue(pubmod.state == 'published', "Did not publish")
+        self.assertTrue(pubmod.version == "1.1",
+            "First published is not version 1.1")
         self.assertTrue("<entry" in xml, "Not a valid deposit receipt")
         
-
-    def testCheckoutAndUpdate(self):
-        # This test does not work because we are unable to create published
-        # modules in unit tests, and so we have nothing to check out.
-        self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        # Now check it out again, and replace the content, but don't publish
         uploadrequest = self.createUploadRequest(
             'checkout_and_update.txt',
             context=self.portal.workspace,
@@ -451,6 +449,15 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         adapter = getMultiAdapter(
                 (self.portal.workspace, uploadrequest), Interface, 'sword')
         xml = adapter()
+
+        # Do the usual checks
+        self.assertTrue("<sword:error" not in xml, xml)
+        self.assertTrue("<entry" in xml, "Not a valid deposit receipt")
+
+        # Check that the version has been incremented
+        pubmod = self.portal.workspace._getOb('m10001')
+        self.assertTrue(pubmod.version == "1.2",
+            "Version did not increment")
 
 
     def testSwordServiceRetrieveContent(self):
