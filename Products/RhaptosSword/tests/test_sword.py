@@ -21,12 +21,15 @@ from ZPublisher.HTTPResponse import HTTPResponse
 from Products.Five import BrowserView
 from Products.CMFCore.interfaces import IFolderish
 from Products.CMFCore.PortalFolder import PortalFolder
+from Products.CMFCore.utils import _checkPermission
 
 from Products.PloneTestCase import PloneTestCase
 
 from rhaptos.swordservice.plone.browser.sword import ISWORDService
 from rhaptos.swordservice.plone.browser.sword import ServiceDocument
 from Products.RhaptosRepository.interfaces.IVersionStorage import IVersionStorage
+from Products.RhaptosRepository.VersionFolder import incrementMinor
+from Products.RhaptosModuleStorage.ModuleVersionFolder import ModuleVersionStorage
 
 from Testing import ZopeTestCase
 ZopeTestCase.installProduct('RhaptosSword')
@@ -59,16 +62,57 @@ class StubZRDBResult(object):
                 (6, 'Social Sciences', 'ISKME subject')
                ]
 
+class StubDataObject(object):
+    def __init__(self, **kwargs):
+        for k, v in kwargs.items():
+            setattr(self, k, v)
+
 class StubModuleDB(SimpleItem):
 
     def __init__(self):
         self.id = 'portal_moduledb'
+        self.versions = {}
 
     def getLicenseData(self, url):
         return True
 
     def sqlGetTags(self, scheme):
         return StubZRDBResult()
+
+    def sqlGetKeywords(self, *args, **kwargs):
+        return [
+            StubDataObject(word='Test'),
+            StubDataObject(word='Module')]
+
+    def insertModuleVersion(self, ob):
+        # Just remember the previous version
+        self.versions[ob.objectId] = (
+            ob.version, ob.created, ob.revised, ob.submitter, ob.submitlog,
+            ob.authors)
+
+    def sqlGetLatestModule(self, id):
+        me = self.portal_membership.getAuthenticatedMember()
+        data = self.versions[id]
+        ob = StubDataObject(ident=1,
+            name='Published Module %s' % id,
+            abstract = 'The Abstract',
+            roles = {},
+            authors = data[5],
+            language = 'en',
+            version = data[0],
+            created = data[1],
+            revised = data[2],
+            maintainers = data[5],
+            licensors = data[5],
+            submitter = data[3],
+            portal_type = 'Module',
+            license = 'http://creativecommons.org/licenses/by/3.0/',
+            subject = ('Test', 'Module'),
+            parent_id = None,
+            parent_version = None,
+            parentAuthors = None,
+        )
+        return (ob,)
 
 class StubLanuageTool(SimpleItem):
 
@@ -81,49 +125,73 @@ class StubLanuageTool(SimpleItem):
     def getLanguageBindings(self):
         return ('en', 'en', [])
 
-class StubStorage(SimpleItem):
+class StubModuleStorage(ModuleVersionStorage):
     __implements__ = (IVersionStorage)
 
-    def __init__(self, id):
-        self.id = id
-        self.latest = {}
-
-    def getId(self):
-        return self.id
-
-    def isUnderVersionControl(self, object):
-        return getattr(object.aq_base, 'objectId', None) is not None
-
-    def applyVersionControl(self, object):
-        if self.isUnderVersionControl(object):
-            raise ValueError, "Already under version control"
-        repo = self.aq_parent
-        count = len(repo.objectIds())-2 # ignore storage and cache
-        object.objectId = 'm%d' % (10001+count)
-        return object.objectId
-
-    def createVersionFolder(self, object):
-        folder = PortalFolder(object.objectId)
-        self.aq_parent._setObject(object.objectId, folder)
+    def getHistory(self, id):
+        return self.portal_moduledb.versions.get(id, ())
 
     def checkinResource(self, object, message='', user=None):
-        vf = self.aq_parent._getOb(object.objectId)
-        minor = len(vf.objectIds())
-        object.version = "1.%d" % minor
-        object.revised = DateTime()
+        objectId = object.objectId
+
+        # The module if new if it has no history
+        new = not self.getHistory(objectId)
+        vf = self.getVersionFolder(objectId)
+
+        if new:
+            version = "1.1"
+        else:
+            if (object.version != vf.latest.version):
+                raise CommitError, \
+                     "Version mismatch: version %s checked out, but latest is %s" % (object.version, vf.latest.version)
+            version = incrementMinor(object.version)
+
+            # We don't actually create a persistent object, but the user should 
+            # be able to do so (unless this is a new module...)
+            if not _checkPermission(AddPortalContent, vf):
+                raise Unauthorized, "You are not authorized to revise this module"
+
+        # Explicity set repository/versioning metadata
+        object.version = version
+        revised = DateTime()
+        object.revised = revised
         object.submitter = user
         object.submitlog = message
-        vf._setObject(object.objectId, object)
-        self.latest[object.objectId] = object
 
-    def getObject(self, id, version=None, **kw):
-        if version is None or version == 'latest':
-            return self.latest[id]
-        vf = self.aq_parent._getOb(id)
-        return vf._getOb(version)
+        # Create new metadata from template
+        file = object.getDefaultFile()
+        # SERIOUS VOODOO: refer to parent class if you want to know
+        file.setMetadata(object.getMetadata())
+        file.setTitle(object.Title())
+
+        # Update the database
+        self.portal_moduledb.insertModuleVersion(object)
+
+        # Put it in the catalog 
+        modview = vf.latest
+        modview._cataloging = True
+        self.catalog.catalog_object(modview)
+        del modview._cataloging
+
+
+    def generateId(self):
+        repo = self.aq_parent
+        count = len(repo.objectIds())-2 # ignore storage and cache
+        return 'm%d' % (10001+count)
+
+
+    def hasObject(self, id):
+        return id in self.aq_parent.objectIds()
+
 
     def notifyObjectRevised(self, object, origobj=None):
         pass
+
+
+class DummyModuleVersionStub(PortalFolder):
+    def __init__(self, id, storage):
+        self.id = id
+        self.storage = storage
 
 
 def clone_request(req, response=None, env=None):
@@ -223,8 +291,8 @@ class TestSwordService(PloneTestCase.PloneTestCase):
             self.portal.manage_addProduct['RhaptosRepository'].manage_addRepository('content') 
             # We need storage for our published modules. This is as good a place as
             # any.
-            self.portal.content.registerStorage(StubStorage('bar'))
-            self.portal.content.setDefaultStorage('bar')
+            self.portal.content.registerStorage(StubModuleStorage('storage'))
+            self.portal.content.setDefaultStorage('storage')
         if not 'portal_moduledb' in objectIds:
             self.portal._setObject('portal_moduledb', StubModuleDB())
         if not 'portal_languages' in objectIds:
@@ -351,13 +419,20 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         # Call the sword view on this request to perform the upload
         adapter = getMultiAdapter(
                 (self.portal.workspace, uploadrequest), Interface, 'sword')
+        # We don't really need to be Manager, but I'll be damned if I'm
+        # debugging a permissions issue that only happens when we test. I
+        # already wasted too much time on this. If you know better, please fix
+        # it. The problem is that publishContent.cpy is not allowed to call
+        # manage_renameObjects, although its perfectly fine if you do it
+        # from here, and we even have the Owner role on both the module and the
+        # workspace. Probably something to do with trusted code and what not.
+        self.setRoles(('Member', 'Manager'))
         xml = adapter()
-        # Unfortunately none of this works because we are unauthorised to
-        # publish from a unit test. publishContent.cpy hates us.
+        self.setRoles(('Member',))
         self.assertTrue("<sword:error" not in xml, xml)
-        self.assertTrue("multipart" in self.portal.workspace.objectIds())
+        self.assertTrue("m10001" in self.portal.workspace.objectIds())
         self.assertTrue(
-            self.portal.workspace._getOb('multipart').state == 'published',
+            self.portal.workspace._getOb('m10001').state == 'published',
             "Did not publish")
         self.assertTrue("<entry" in xml, "Not a valid deposit receipt")
         
