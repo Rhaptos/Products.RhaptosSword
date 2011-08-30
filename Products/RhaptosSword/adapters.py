@@ -101,14 +101,9 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
     def createObject(self, context, name, content_type, request):
         # see if the request has a atompub payload that specifies,
         # module id in "source" or "mdml:derived_from" in ATOM entry.
-        if content_type in self.ATOMPUB_CONTENT_TYPES:
-            # find our marker elements
-            body = request.get('BODYFILE')
-            body.seek(0)
-            dom = parse(body)
-            body.seek(0)
 
-            # Check if this is a request to derive a module
+        def _deriveOrCheckout(dom):
+            # Check if this is a request to derive or checkout a module
             elements = dom.getElementsByTagNameNS(
                 "http://purl.org/dc/terms/", 'source')
             if len(elements) > 0:
@@ -117,15 +112,30 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                     str(elements[0].firstChild.nodeValue))
                 self.setActionMetadata(obj, action='derive')
                 return obj
-
-            # Check if it is a request to create a new version of an existing
-            # module
             elements = dom.getElementsByTagNameNS(
                 "http://purl.org/dc/terms/", 'isVersionOf')
             if len(elements) > 0:
                 obj = self.checkoutModule(
                     str(elements[0].firstChild.nodeValue))
                 self.setActionMetadata(obj, action='checkout')
+                return obj
+
+        if content_type in self.ATOMPUB_CONTENT_TYPES:
+            # find our marker elements
+            body = request.get('BODYFILE')
+            body.seek(0)
+            dom = parse(body)
+            body.seek(0)
+
+            # Derive or checkout, if the headers are right
+            obj = _deriveOrCheckout(dom)
+            if obj is not None:
+                return obj
+        elif content_type.startswith('multipart/'):
+            atom, payload = self._splitRequest(request)
+            dom = parse(StringIO(atom))
+            obj = _deriveOrCheckout(dom)
+            if obj is not None:
                 return obj
 
         return super(RhaptosWorkspaceSwordAdapter, self).createObject(
