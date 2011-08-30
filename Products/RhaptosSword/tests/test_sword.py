@@ -68,6 +68,13 @@ class StubDataObject(object):
         for k, v in kwargs.items():
             setattr(self, k, v)
 
+    def __getitem__(self, k):
+        try:
+            return getattr(self, k)
+        except AttributeError:
+            raise KeyError, k
+
+
 class StubModuleDB(SimpleItem):
 
     def __init__(self):
@@ -114,6 +121,13 @@ class StubModuleDB(SimpleItem):
             parentAuthors = None,
         )
         return (ob,)
+
+    def sqlGetModuleFilenames(self, id, version):
+        # These are the hardcoded filesnames used in multipart.txt
+        return [StubDataObject(filename=i) for i in \
+            ('index.cnxml', 'h_allpass.png', 'h_lowpass.png',
+            'h_bandstop.png', 'h_bandpass.png', 'idealFilters.m',
+            'h_highpass.png', 'notchFilter.m', 'h_notch.png')]
 
 class StubLanuageTool(SimpleItem):
 
@@ -443,7 +457,8 @@ class TestSwordService(PloneTestCase.PloneTestCase):
             'checkout_and_update.txt',
             context=self.portal.workspace,
             CONTENT_TYPE='multipart/related; boundary="===============1338623209=="',
-            SLUG='multipart'
+            SLUG='multipart',
+            IN_PROGRESS='true'
         )
         # Call the sword view on this request to perform the upload
         adapter = getMultiAdapter(
