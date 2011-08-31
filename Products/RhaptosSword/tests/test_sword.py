@@ -26,6 +26,7 @@ from Products.CMFCore.utils import _checkPermission
 from Products.PloneTestCase import PloneTestCase
 
 from rhaptos.swordservice.plone.browser.sword import ISWORDService
+from rhaptos.swordservice.plone.interfaces import ISWORDEditIRI
 from rhaptos.swordservice.plone.browser.sword import ServiceDocument
 from Products.RhaptosRepository.interfaces.IVersionStorage import IVersionStorage
 from Products.RhaptosRepository.VersionFolder import incrementMinor
@@ -176,6 +177,13 @@ class StubModuleStorage(ModuleVersionStorage):
     def notifyObjectRevised(self, object, origobj=None):
         pass
 
+class DummyLensTool(SimpleItem):
+    def __init__(self):
+        super(DummyLensTool, self).__init__('lens_tool')
+
+    def notifyLensRevisedObject(self, *args, **kwargs):
+        pass
+
 
 class DummyModuleVersionStub(PortalFolder):
     def __init__(self, id, storage):
@@ -287,10 +295,13 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         if not 'portal_languages' in objectIds:
             self.portal._setObject('portal_languages', StubLanuageTool())
 
-        xml = os.path.join(DIRNAME, 'data', filename)
-        file = open(xml, 'rb')
-        content = file.read()
-        file.close()
+        if filename is None:
+            content = ''
+        else:
+            xml = os.path.join(DIRNAME, 'data', filename)
+            file = open(xml, 'rb')
+            content = file.read()
+            file.close()
         env = {
             'CONTENT_TYPE': 'application/atom+xml;type=entry',
             'CONTENT_LENGTH': len(content),
@@ -397,6 +408,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
 
     def testUploadAndPublish(self):
         self.addProfile('Products.LinkMapTool:default')
+        self.portal._setObject('lens_tool', DummyLensTool())
         self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
 
         uploadrequest = self.createUploadRequest(
@@ -426,7 +438,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.assertTrue(pubmod.version == "1.1",
             "First published is not version 1.1")
         self.assertTrue("<entry" in xml, "Not a valid deposit receipt")
-        
+
         # Now check it out again, and replace the content, but don't publish
         uploadrequest = self.createUploadRequest(
             'checkout_and_update.txt',
@@ -441,6 +453,30 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         xml = adapter()
 
         # Do the usual checks
+        self.assertTrue("<sword:error" not in xml, xml)
+        self.assertTrue("<entry" in xml, "Not a valid deposit receipt")
+
+        dr = parseString(xml)
+        links = dr.getElementsByTagNameNS('http://www.w3.org/2005/Atom', 'link')
+
+        # Get the edit-iri of this item
+        editiri = [l for l in links \
+            if l.getAttribute('rel')=='edit'][0].getAttribute('href')
+        editorid = str(editiri).split('/')[-3]
+        editor = self.portal.workspace.restrictedTraverse(editorid)
+
+        # Now publish it by posting to the edit-iri
+        uploadrequest = self.createUploadRequest(
+            None,
+            context=self.portal.workspace,
+            CONTENT_TYPE='text/plain',
+            IN_PROGRESS='false',
+        )
+        adapter = getMultiAdapter((editor, uploadrequest), ISWORDEditIRI)
+        import pdb; pdb.set_trace()
+        xml = adapter()
+
+        # Same old checks
         self.assertTrue("<sword:error" not in xml, xml)
         self.assertTrue("<entry" in xml, "Not a valid deposit receipt")
 
