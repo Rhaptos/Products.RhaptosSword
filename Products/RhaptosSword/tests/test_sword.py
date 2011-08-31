@@ -99,7 +99,6 @@ class StubModuleDB(SimpleItem):
             ob.authors)
 
     def sqlGetLatestModule(self, id):
-        me = self.portal_membership.getAuthenticatedMember()
         data = self.versions[id]
         ob = StubDataObject(ident=1,
             name='Published Module %s' % id,
