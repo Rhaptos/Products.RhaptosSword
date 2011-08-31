@@ -31,6 +31,7 @@ from Products.RhaptosRepository.interfaces.IVersionStorage import IVersionStorag
 from Products.RhaptosRepository.VersionFolder import incrementMinor
 from Products.RhaptosModuleStorage.ModuleVersionFolder import ModuleVersionStorage
 from Products.RhaptosModuleStorage.ModuleDBTool import CommitError
+from Products.RhaptosModuleStorage.ModuleView import ModuleView
 
 from Testing import ZopeTestCase
 ZopeTestCase.installProduct('RhaptosSword')
@@ -52,6 +53,15 @@ BAD_FILE = 'bad_entry.xml'
 GOOD_FILE = 'entry.xml'
 
 from OFS.SimpleItem import SimpleItem
+
+# Patch in a non-db version of ModuleView.getFile
+def _ModuleView_getFile(self, name):
+    """ This patches ModuleView.getFile to return our own files. """
+    files = self.portal_moduledb.files.get(self.objectId, ())
+    for f in files:
+        if f.filename == name:
+            return f.file
+ModuleView.getFile = _ModuleView_getFile
 
 class StubZRDBResult(object):
     def tuples(self):
@@ -80,6 +90,7 @@ class StubModuleDB(SimpleItem):
     def __init__(self):
         self.id = 'portal_moduledb'
         self.versions = {}
+        self.files = {}
 
     def getLicenseData(self, url):
         return True
@@ -93,10 +104,21 @@ class StubModuleDB(SimpleItem):
             StubDataObject(word='Module')]
 
     def insertModuleVersion(self, ob):
-        # Just remember the previous version
+        # Just remember the most recent version
         self.versions[ob.objectId] = (
             ob.version, ob.created, ob.revised, ob.submitter, ob.submitlog,
             ob.authors)
+
+        # Keep track of the files, we'll need them later
+        self.files[ob.objectId] = []
+        for fob in ob.objectValues():
+            if hasattr(fob, 'data'):  # It's (most likely) a file object
+                self.files[ob.objectId].append(
+                    StubDataObject(
+                        filename=(callable(fob.id) and fob.id() or fob.id),
+                        mimetype=fob.content_type,
+                        file=StringIO(fob.data)))
+
 
     def sqlGetLatestModule(self, id):
         data = self.versions[id]
@@ -122,11 +144,7 @@ class StubModuleDB(SimpleItem):
         return (ob,)
 
     def sqlGetModuleFilenames(self, id, version):
-        # These are the hardcoded filesnames used in multipart.txt
-        return [StubDataObject(filename=i) for i in \
-            ('index.cnxml', 'h_allpass.png', 'h_lowpass.png',
-            'h_bandstop.png', 'h_bandpass.png', 'idealFilters.m',
-            'h_highpass.png', 'notchFilter.m', 'h_notch.png')]
+        return self.files[id]
 
 class StubLanuageTool(SimpleItem):
 
@@ -144,49 +162,6 @@ class StubModuleStorage(ModuleVersionStorage):
 
     def getHistory(self, id):
         return self.portal_moduledb.versions.get(id, ())
-
-    def checkinResource(self, object, message='', user=None):
-        objectId = object.objectId
-
-        # The module if new if it has no history
-        new = not self.getHistory(objectId)
-        vf = self.getVersionFolder(objectId)
-
-        if new:
-            version = "1.1"
-        else:
-            if (object.version != vf.latest.version):
-                raise CommitError, \
-                     "Version mismatch: version %s checked out, but latest is %s" % (object.version, vf.latest.version)
-            version = incrementMinor(object.version)
-
-            # We don't actually create a persistent object, but the user should 
-            # be able to do so (unless this is a new module...)
-            if not _checkPermission(AddPortalContent, vf):
-                raise Unauthorized, "You are not authorized to revise this module"
-
-        # Explicity set repository/versioning metadata
-        object.version = version
-        revised = DateTime()
-        object.revised = revised
-        object.submitter = user
-        object.submitlog = message
-
-        # Create new metadata from template
-        file = object.getDefaultFile()
-        # SERIOUS VOODOO: refer to parent class if you want to know
-        file.setMetadata(object.getMetadata())
-        file.setTitle(object.Title())
-
-        # Update the database
-        self.portal_moduledb.insertModuleVersion(object)
-
-        # Put it in the catalog 
-        modview = vf.latest
-        modview._cataloging = True
-        self.catalog.catalog_object(modview)
-        del modview._cataloging
-
 
     def generateId(self):
         repo = self.aq_parent
@@ -421,6 +396,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
             'Result does not match reference doc')
 
     def testUploadAndPublish(self):
+        self.addProfile('Products.LinkMapTool:default')
         self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
 
         uploadrequest = self.createUploadRequest(
