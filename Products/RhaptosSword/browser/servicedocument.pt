@@ -17,7 +17,7 @@
                 <atom:title tal:content="collection/title"> Folder Title </atom:title>
                 <accept>application/zip</accept>
                 <sword:mediation>false</sword:mediation>
-                <sword:treatment>Upload a zip package to a Plone folder .</sword:treatment>
+                <sword:treatment>Upload a MS Word document or CNXML zip package to this workspace.</sword:treatment>
 
                 <dcterms:abstract tal:content="collection/description"> </dcterms:abstract>
             </collection>
