@@ -8,6 +8,7 @@ from Products.Five import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 
 from rhaptos.swordservice.plone.interfaces import ISWORDEditIRI
+from rhaptos.swordservice.plone.interfaces import ISWORDServiceDocument
 from rhaptos.swordservice.plone.browser.sword import SWORDStatementAdapter
 from rhaptos.swordservice.plone.browser.sword import SWORDStatementAtomAdapter
 from rhaptos.swordservice.plone.browser.sword import EditIRI as BaseEditIRI
@@ -216,5 +217,43 @@ class RhaptosSWORDStatementAtom(SWORDStatementAtomAdapter):
     def entries(self):
         meta_types = ['CMF CNXML File', 'UnifiedFile',]
         return self.context.objectValues(spec=meta_types)
+
+
+class ServiceDocument(BrowserView):
+    """ Rhaptos Service Document """
+
+    __name__ = "servicedocument"
+    implements(ISWORDServiceDocument)
+
+    servicedocument = ViewPageTemplateFile('servicedocument.pt')
+
+    def __call__(self):
+        return self.servicedocument()
+
+    def collections(self):
+        """ Return home folder and workgroups we have access too """
+        result = []
+        pmt = getToolByName(self.context, 'portal_membership')
+        member = pmt.getAuthenticatedMember()
+        homefolder = pmt.getHomeFolder(member.getId())
+        result.append({
+            'url': homefolder.absolute_url(),
+            'title': homefolder.Title(),
+            'description': homefolder.Description()
+            }
+        )
+        for wg in self.context.getWorkspaces():
+            wgurl = '%s/%s/sword' % (self.context.portal_url(), wg['link'])
+            result.append({
+                'url': wg['link'],
+                'title': wg['title'],
+                'description': wg['description']
+                }
+            )
+        return result
+
+    def portal_title(self):
+        """ Return the portal title. """
+        return getToolByName(self.context, 'portal_url').getPortalObject().Title()
 
 
