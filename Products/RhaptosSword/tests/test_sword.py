@@ -119,6 +119,7 @@ class StubModuleDB(SimpleItem):
                         filename=(callable(fob.id) and fob.id() or fob.id),
                         mimetype=fob.content_type,
                         file=StringIO(fob.data)))
+        self._p_changed = 1
 
 
     def sqlGetLatestModule(self, id):
@@ -275,7 +276,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.assertTrue(IFolderish.providedBy(self.folder), "Folders are not Folderish")
 
 
-    def createUploadRequest(self, filename, context, **kwargs):
+    def _setupRhaptos(self):
         # XXX: This method needs to move to afterSetup, but afterSetup is not
         # being called for some reason.
         self.addProduct('RhaptosSword')
@@ -283,6 +284,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.addProfile('Products.CNXMLDocument:default')
         self.addProfile('Products.CNXMLTransforms:default')
         self.addProfile('Products.UniFile:default')
+        self.addProfile('Products.LinkMapTool:default')
         objectIds = self.portal.objectIds()
         if not 'content' in objectIds:
             self.portal.manage_addProduct['RhaptosRepository'].manage_addRepository('content') 
@@ -294,7 +296,9 @@ class TestSwordService(PloneTestCase.PloneTestCase):
             self.portal._setObject('portal_moduledb', StubModuleDB())
         if not 'portal_languages' in objectIds:
             self.portal._setObject('portal_languages', StubLanuageTool())
+        self.portal._setObject('lens_tool', DummyLensTool())
 
+    def createUploadRequest(self, filename, context, **kwargs):
         if filename is None:
             content = ''
         else:
@@ -325,6 +329,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         """
          See what happens when we throw bad xml at the import funtionality.
         """
+        self._setupRhaptos()
         self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
         uploadrequest = self.createUploadRequest('bad_entry.xml', self.portal.workspace)
 
@@ -337,6 +342,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
 
     def testMetadata(self):
         """ See if the metadata is added correctly. """
+        self._setupRhaptos()
         self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
         uploadrequest = self.createUploadRequest(
             'entry.xml',
@@ -372,6 +378,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
 
 
     def testMultipart(self):
+        self._setupRhaptos()
         self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
         uploadrequest = self.createUploadRequest(
             'multipart.txt',
@@ -407,10 +414,8 @@ class TestSwordService(PloneTestCase.PloneTestCase):
             'Result does not match reference doc')
 
     def testUploadAndPublish(self):
-        self.addProfile('Products.LinkMapTool:default')
-        self.portal._setObject('lens_tool', DummyLensTool())
+        self._setupRhaptos()
         self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
-
         uploadrequest = self.createUploadRequest(
             'multipart.txt',
             context=self.portal.workspace,
@@ -473,7 +478,6 @@ class TestSwordService(PloneTestCase.PloneTestCase):
             IN_PROGRESS='false',
         )
         adapter = getMultiAdapter((editor, uploadrequest), ISWORDEditIRI)
-        import pdb; pdb.set_trace()
         xml = adapter()
 
         # Same old checks
@@ -481,14 +485,14 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.assertTrue("<entry" in xml, "Not a valid deposit receipt")
 
         # Check that the version has been incremented
-        pubmod = self.portal.workspace._getOb('m10001')
+        pubmod = self.portal.workspace._getOb(editorid)
         self.assertTrue(pubmod.version == "1.2",
             "Version did not increment")
 
 
     def testSwordServiceRetrieveContent(self):
+        self._setupRhaptos()
         self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
-
         uploadrequest = self.createUploadRequest(
             'multipart.txt',
             context=self.portal.workspace,
@@ -532,6 +536,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
 
     
     def testSwordServiceStatement(self):
+        self._setupRhaptos()
         self.setRoles(('Manager',))
         self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
 
@@ -569,6 +574,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
 
 
     def testDeriveModule(self):
+        self._setupRhaptos()
         self.setRoles(('Manager',))
         self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
 
