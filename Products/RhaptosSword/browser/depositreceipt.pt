@@ -56,14 +56,14 @@
         Rights holder full name  
     </dcterms:rightsHolder>
     <dcterms:translator oerdc:id="translator id" oerdc:email="translator email"
-            tal:repeat="translator context/translators"
+            tal:repeat="translator context/translators|python:()"
             tal:content="python:view.fullname(translator)"
             tal:attributes="oerdc:id translator;
                             oerdc:email python:view.email(translator)">
         Translator full name  
     </dcterms:translator>
     <dcterms:editor oerdc:id="editor id" oerdc:email="editor email"
-            tal:repeat="editor context/editors"
+            tal:repeat="editor context/editors|python:()"
             tal:content="python:view.fullname(editor)"
             tal:attributes="oerdc:id editor;
                             oerdc:email python:view.email(editor)">
