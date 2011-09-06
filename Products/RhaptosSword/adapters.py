@@ -90,8 +90,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
     def generateFilename(self, name):
         """ Override this method to provide a more sensible name in the
             absence of content-disposition. """
-        return super(RhaptosWorkspaceSwordAdapter, self).generateFilename(
-            name, type_name='Module')
+        return self.context.generateUniqueId(type_name='Module')
 
     def _splitRequest(self, request):
         """ This is only to be used for multipart uploads. The first

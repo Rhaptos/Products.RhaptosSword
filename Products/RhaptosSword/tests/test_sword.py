@@ -240,6 +240,11 @@ def clone_request(req, response=None, env=None):
     directlyProvides(clone, *directlyProvidedBy(req))
     return clone
 
+def getEditIRI(dom):
+    links = dom.getElementsByTagNameNS('http://www.w3.org/2005/Atom', 'link')
+    return [l for l in links if l.getAttribute('rel')=='edit'][0].getAttribute(
+        'href')
+
 class TestSwordService(PloneTestCase.PloneTestCase):
     def afterSetup(self):
         pass
@@ -302,6 +307,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
 
     def testSwordService(self):
         self._setupRhaptos()
+        self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
         file = open(os.path.join(DIRNAME, 'data', 'servicedocument.xml'), 'r')
         reference_servicedoc = file.read()
         file.close()
@@ -334,17 +340,26 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         uploadrequest = clone_request(self.app.REQUEST, uploadresponse, env)
         uploadrequest.set('BODYFILE', zipfile)
         # Fake PARENTS
-        uploadrequest.set('PARENTS', [self.folder])
+        uploadrequest.set('PARENTS', [self.portal.workspace])
 
         # Call the sword view on this request to perform the upload
         self.setRoles(('Manager',))
         adapter = getMultiAdapter(
-            (self.folder, uploadrequest), Interface, 'sword')
+            (self.portal.workspace, uploadrequest), Interface, 'sword')
         xml = adapter()
         zipfile.close()
+
+        # There should be no errors
+        self.assertTrue("<sword:error" not in xml, xml)
+
         # Test that we can still reach the edit-iri
-        assert self.folder.restrictedTraverse('m11868_1-6.zip/sword/edit')
-        zipfile = self.folder._getOb('m11868_1-6.zip')
+        drdom = parseString(xml)
+        editiri = str(getEditIRI(drdom))
+        moduleid = editiri.split('/')[-3]
+        self.assertTrue(bool(
+            self.portal.workspace.restrictedTraverse('%s/sword/edit' % moduleid)),
+            "Cannot access deposit receipt")
+        zipfile = self.portal.workspace._getOb(moduleid)
 
         file = open(os.path.join(DIRNAME, 'data', 'depositreceipt_plain_zipfile.xml'), 'r')
         dom = parse(file)
@@ -353,8 +368,10 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         dates[0].firstChild.nodeValue = zipfile.modified()
         reference_depositreceipt = dom.toxml()
         returned_depositreceipt = parseString(xml).toxml()
-        assert bool(xml), "Upload view does not return a result"
-        assert "<sword:error" not in xml, xml
+        self.assertTrue(bool(xml), "Upload view does not return a result")
+        # FIXME: This is probably the wrong way to check the deposit receipt.
+        # rather check programatically that everything that must be there is
+        # there.
         self.assertEqual(returned_depositreceipt, reference_depositreceipt,
             'Result does not match reference doc')
 
@@ -421,15 +438,17 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         uploadrequest = self.createUploadRequest(
             'multipart.txt',
             context=self.portal.workspace,
-            CONTENT_TYPE='multipart/related; boundary="===============1338623209=="',
-            SLUG='multipart'
+            CONTENT_TYPE='multipart/related; boundary="===============1338623209=="'
         )
         # Call the sword view on this request to perform the upload
         adapter = getMultiAdapter(
                 (self.portal.workspace, uploadrequest), Interface, 'sword')
         xml = adapter()
-        returned_depositreceipt = parseString(xml).toxml()
-        self.assertTrue("multipart" in self.portal.workspace.objectIds())
+        drdom = parseString(xml)
+        editiri = getEditIRI(drdom)
+        moduleid = editiri.split('/')[-3]
+        returned_depositreceipt = drdom.toxml()
+        self.assertTrue(moduleid in self.portal.workspace.objectIds())
         self.assertTrue("<entry" in xml, "Not a valid deposit receipt")
 
         module = self.portal.workspace.objectValues()[0]
@@ -459,7 +478,6 @@ class TestSwordService(PloneTestCase.PloneTestCase):
             context=self.portal.workspace,
             CONTENT_TYPE='multipart/related; boundary="===============1338623209=="',
             IN_PROGRESS='false',
-            SLUG='multipart',
         )
         # Call the sword view on this request to perform the upload
         adapter = getMultiAdapter(
@@ -487,7 +505,6 @@ class TestSwordService(PloneTestCase.PloneTestCase):
             'checkout_and_update.txt',
             context=self.portal.workspace,
             CONTENT_TYPE='multipart/related; boundary="===============1338623209=="',
-            SLUG='multipart',
             IN_PROGRESS='true'
         )
         # Call the sword view on this request to perform the upload
@@ -499,12 +516,9 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.assertTrue("<sword:error" not in xml, xml)
         self.assertTrue("<entry" in xml, "Not a valid deposit receipt")
 
-        dr = parseString(xml)
-        links = dr.getElementsByTagNameNS('http://www.w3.org/2005/Atom', 'link')
-
         # Get the edit-iri of this item
-        editiri = [l for l in links \
-            if l.getAttribute('rel')=='edit'][0].getAttribute('href')
+        dr = parseString(xml)
+        editiri = getEditIRI(dr)
         editorid = str(editiri).split('/')[-3]
         editor = self.portal.workspace.restrictedTraverse(editorid)
 
@@ -535,7 +549,6 @@ class TestSwordService(PloneTestCase.PloneTestCase):
             'multipart.txt',
             context=self.portal.workspace,
             CONTENT_TYPE='multipart/related; boundary="===============1338623209=="',
-            SLUG='multipart',
             CONTENT_DISPOSITION='attachment; filename=multipart.txt'
         )
 
@@ -582,7 +595,6 @@ class TestSwordService(PloneTestCase.PloneTestCase):
             'multipart.txt',
             context=self.portal.workspace,
             CONTENT_TYPE='multipart/related; boundary="===============1338623209=="',
-            SLUG='multipart',
             CONTENT_DISPOSITION='attachment; filename=multipart.txt'
         )
 
@@ -619,7 +631,6 @@ class TestSwordService(PloneTestCase.PloneTestCase):
             'multipart.txt',
             context=self.folder.workspace,
             CONTENT_TYPE='multipart/related; boundary="===============1338623209=="',
-            SLUG='multipart',
             CONTENT_DISPOSITION='attachment; filename=multipart')
         adapter = getMultiAdapter(
                 (self.folder.workspace, uploadrequest), Interface, 'sword')
@@ -642,7 +653,6 @@ class TestSwordService(PloneTestCase.PloneTestCase):
             'multipart.txt',
             context=self.folder.workspace,
             CONTENT_TYPE='multipart/related; boundary="===============1338623209=="',
-            SLUG='multipart',
             CONTENT_DISPOSITION='attachment; filename=multipart')
         adapter = getMultiAdapter(
                 (self.folder.workspace, uploadrequest), Interface, 'sword')
