@@ -2,6 +2,8 @@ from zope.interface import implements
 from Acquisition import aq_inner
 import transaction
 
+from zope.component import getMultiAdapter
+
 from Products.CMFCore.utils import getToolByName
 
 from Products.Five import BrowserView
@@ -13,6 +15,7 @@ from rhaptos.swordservice.plone.browser.sword import SWORDStatementAdapter
 from rhaptos.swordservice.plone.browser.sword import SWORDStatementAtomAdapter
 from rhaptos.swordservice.plone.browser.sword import EditIRI as BaseEditIRI
 
+from Products.RhaptosSword.adapters import IRhaptosWorkspaceSwordAdapter
 from Products.RhaptosSword.adapters import METADATA_MAPPING
 
 
@@ -36,17 +39,19 @@ class SWORDTreatmentMixin(object):
         if not context.license:
             for user_id in context.authors:
                 user = context.pmt.getMemberById(user_id)
-                fullname = user.getProperty('fullname')
-                requirements += '%s (account:%s), will need to sign the license.\n'\
-                                 %(fullname, user_id)
+                if user:
+                    fullname = user.getProperty('fullname')
+                    requirements += '%s (account:%s), will need to sign the license.\n'\
+                                     %(fullname, user_id)
 
         pending_collaborations = context.getPendingCollaborations()
         if pending_collaborations:
             requirements += 'The following contributors must agree to be listing on the module and sign the license agreement here.'
-        for user_id, collab in pending_collaborations:
+        for user_id, collab in pending_collaborations.items():
             user = context.pmt.getMemberById(user_id)
-            fullname = user.getProperty('fullname')
-            requirements += '%s (account:%s)' %(fullname, user_id)
+            if user:
+                fullname = user.getProperty('fullname')
+                requirements += '%s (account:%s)' %(fullname, user_id)
         if not context.message:
             requirements += 'You must describe the changes that you have made to this version before publishing.'
         return requirements
@@ -87,6 +92,23 @@ class EditIRI(BaseEditIRI, SWORDTreatmentMixin):
         context.publishContent(message=description_of_changes)
 
 
+    def _handlePut(self):
+        """ PUT against an existing item should update it.
+        """
+        # get the item
+        content_tool = getToolByName(self.context, 'content')
+        module = content_tool.getRhaptosObject(self.context.id, 'latest')
+
+        filename = self.request.get_header(
+            'Content-Disposition', self.context.title)
+        content_type = self.request.get_header('Content-Type')
+
+        parent = self.context.aq_inner.aq_parent
+        adapter = getMultiAdapter(
+            (parent, self.request), IRhaptosWorkspaceSwordAdapter)
+        adapter.updateObject(module, filename, self.request, self.request.response, content_type)
+
+
     def pending_collaborations(self):
         return self.context.getPendingCollaborations()
 
@@ -123,7 +145,9 @@ class EditIRI(BaseEditIRI, SWORDTreatmentMixin):
     
     def fullname(self, user_id):
         user = self.pmt.getMemberById(user_id)
-        return user.getProperty('fullname')
+        if user:
+            return user.getProperty('fullname')
+        return None
 
 
     def treatment(self):
@@ -132,7 +156,9 @@ class EditIRI(BaseEditIRI, SWORDTreatmentMixin):
 
     def email(self, user_id):
         user = self.pmt.getMemberById(user_id)
-        return user.getProperty('email')
+        if user:
+            return user.getProperty('email')
+        return None
 
 
 class AtomFeed(BrowserView):
