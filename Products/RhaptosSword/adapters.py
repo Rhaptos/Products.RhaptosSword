@@ -28,6 +28,10 @@ class ValidationError(Exception):
 
 CNX_MD_NAMESPACE = 'http://cnx.rice.edu/mdml'
 
+DCTERMS_NAMESPACE = "http://purl.org/dc/terms/"
+
+OERDC_NAMESPACE = "http://cnx.org/aboutus/technology/schemas/oerdc"
+
 METADATA_MAPPING =\
         {'title'               : 'title',
          'abstract'            : 'abstract',
@@ -54,6 +58,12 @@ DESCRIPTION_OF_TREATMENT =\
          'checkout': 'Checkout to users workspace.',
         }
 
+ROLE_NAMES = ['creator',
+              'maintainer',
+              'rightsHolder',
+              'editor',
+              'translator',
+             ]
 
 class IRhaptosWorkspaceSwordAdapter(ISWORDContentUploadAdapter):
     """ Marker interface for SWORD service specific to the Rhaptos 
@@ -312,18 +322,21 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
 
     def addRoles(self, obj, dom):
         newRoles = {}
-        for element in dom.getElementsByTagNameNS(CNX_MD_NAMESPACE, 'role'):
-            role = element.getAttribute('type').capitalize()
-            newRoles[role] =\
-                    [str(id) for id in element.firstChild.nodeValue.split(' ')]
+        for role in ROLE_NAMES:
+            for namespace in [DCTERMS_NAMESPACE, OERDC_NAMESPACE]:
+                for element in dom.getElementsByTagNameNS(namespace, role):
+                    tmp_role = role.capitalize()
+                    ids = newRoles.get(tmp_role, [])
+                    ids.append(element.getAttribute('oerdc:id'))
+                    newRoles[tmp_role] = ids
 
-        user_role_delta = obj.generateCollaborationRequests(
-                newUser=True, newRoles=newRoles)
-        for p in user_role_delta.keys():
-            collabs = list(obj.getCollaborators())
-            if p not in collabs:
-                obj.addCollaborator(p)
-                obj.requestCollaboration(p, user_role_delta[p])
+                user_role_delta = obj.generateCollaborationRequests(
+                        newUser=True, newRoles=newRoles)
+                for p in user_role_delta.keys():
+                    collabs = list(obj.getCollaborators())
+                    if p not in collabs:
+                        obj.addCollaborator(p)
+                        obj.requestCollaboration(p, user_role_delta[p])
 
 
     def updateRoles(self, obj, dom):
