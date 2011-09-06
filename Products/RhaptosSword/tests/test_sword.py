@@ -365,8 +365,25 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         dom = parse(file)
         file.close()
         dates = dom.getElementsByTagName('updated')
-        dates[0].firstChild.nodeValue = zipfile.modified()
+        dates[0].firstChild.nodeValue = zipfile.revised
+        created = dom.getElementsByTagName('dcterms:created')
+        for element in created:
+            element.firstChild.nodeValue = zipfile.created
+        modified = dom.getElementsByTagName('dcterms:modified')
+        for element in modified:
+            element.firstChild.nodeValue = zipfile.revised
+
+        id = dom.getElementsByTagName('id')[0]
+        id.firstChild.nodeValue = zipfile.absolute_url()
+        identifiers = dom.getElementsByTagName('dcterms:identifier')
+        for identifier in identifiers:
+            if identifier.getAttribute('xsi:type') == "dcterms:URI":
+                identifier.firstChild.nodeValue = zipfile.absolute_url()
+            if identifier.getAttribute('xsi:type') == 'oerdc:ContentId':
+                identifier.firstChild.nodeValue = zipfile.absolute_url()
         reference_depositreceipt = dom.toxml()
+        reference_depositreceipt = reference_depositreceipt.replace('zipfile', zipfile.id)
+
         returned_depositreceipt = parseString(xml).toxml()
         self.assertTrue(bool(xml), "Upload view does not return a result")
         # FIXME: This is probably the wrong way to check the deposit receipt.
@@ -424,7 +441,17 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         modified = dom.getElementsByTagName('dcterms:modified')
         for element in modified:
             element.firstChild.nodeValue = module.revised
+        id = dom.getElementsByTagName('id')[0]
+        id.firstChild.nodeValue = module.absolute_url()
+        identifiers = dom.getElementsByTagName('dcterms:identifier')
+        for identifier in identifiers:
+            if identifier.getAttribute('xsi:type') == "dcterms:URI":
+                identifier.firstChild.nodeValue = module.absolute_url()
+            if identifier.getAttribute('xsi:type') == 'oerdc:ContentId':
+                identifier.firstChild.nodeValue = module.absolute_url()
+
         reference_depositreceipt = dom.toxml()
+        reference_depositreceipt = reference_depositreceipt.replace('entry.xml', module.id)
 
         assert bool(xml), "Upload view does not return a result"
         assert "<sword:error" not in xml, xml
@@ -463,7 +490,17 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         modified = dom.getElementsByTagName('dcterms:modified')
         for element in modified:
             element.firstChild.nodeValue = module.revised
+
+        id = dom.getElementsByTagName('id')[0]
+        id.firstChild.nodeValue = module.absolute_url()
+        identifiers = dom.getElementsByTagName('dcterms:identifier')
+        for identifier in identifiers:
+            if identifier.getAttribute('xsi:type') == "dcterms:URI":
+                identifier.firstChild.nodeValue = module.absolute_url()
+            if identifier.getAttribute('xsi:type') == 'oerdc:ContentId':
+                identifier.firstChild.nodeValue = module.absolute_url()
         reference_depositreceipt = dom.toxml()
+        reference_depositreceipt = reference_depositreceipt.replace('multipart', module.id)
 
         assert bool(xml), "Upload view does not return a result"
         assert "<sword:error" not in xml, xml
@@ -582,8 +619,16 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         file.close()
         reference_file = zf.ZipFile(
             os.path.join(DIRNAME, 'data', 'retrievedcontent.zip'))
-        self.assertEqual(retrieved_file.namelist(), reference_file.namelist(),
+        self.assertEqual(len(retrieved_file.namelist()), len(reference_file.namelist()),
             'The files are not the same.')
+        retrieved_fl = retrieved_file.filelist
+        reference_fl = retrieved_file.filelist
+        for count in range(0, len(retrieved_file.filelist)):
+            retrieved = retrieved_fl[count]
+            reference = reference_fl[count]
+            msg = 'File:%s and File:%s are not the same' %\
+                (retrieved.filename, reference.filename)
+            self.assertEqual(retrieved.CRC, reference.CRC, msg)
 
     
     def testSwordServiceStatement(self):
@@ -618,6 +663,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         dom = parse(file)
         file.close()
         reference_statement = dom.toxml()
+        reference_statement = reference_statement.replace('multipart', module.id)
         self.assertEqual(returned_statement, reference_statement,
             'Returned statement and reference statement are not identical.')
 

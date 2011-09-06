@@ -2,22 +2,24 @@
 
     <!-- SWORD deposit receipt -->
     <title>Box Plots Statistics for Non Majors</title>
-    <id>http://nohost/plone/workspace/entry.xml</id>
-    <updated>2011/09/06 11:07:37.746 GMT+2</updated>
+    <id>http://nohost/plone/workspace/module.2011-09-06.0665142012</id>
+    <updated>2011/09/06 19:11:06.681 GMT+2</updated>
     <summary type="text">The summary</summary>
     <generator uri="rhaptos.swordservice.plone" version="1.0"/>
 
     <!-- The metadata begins -->
-    <dcterms:identifier xsi:type="dcterms:URI">http://nohost/plone/workspace/entry.xml</dcterms:identifier> 
+    <dcterms:identifier xsi:type="dcterms:URI">http://nohost/plone/workspace/module.2011-09-06.0665142012</dcterms:identifier> 
     <dcterms:identifier xsi:type="oerdc:Version">**new**</dcterms:identifier> 
-    <dcterms:identifier xsi:type="oerdc:ContentId">http://nohost/plone/workspace/entry.xml</dcterms:identifier> 
+    <dcterms:identifier xsi:type="oerdc:ContentId">http://nohost/plone/workspace/module.2011-09-06.0665142012</dcterms:identifier> 
     <dcterms:title>Box Plots Statistics for Non Majors</dcterms:title>
-    <dcterms:created>2011/09/06 11:07:37.689 GMT+2</dcterms:created> 
-    <dcterms:modified>2011/09/06 11:07:37.746 GMT+2</dcterms:modified> 
+    <dcterms:created>2011/09/06 19:11:06.520 GMT+2</dcterms:created> 
+    <dcterms:modified>2011/09/06 19:11:06.681 GMT+2</dcterms:modified> 
     <dcterms:creator oerdc:email="" oerdc:id="test_user_1_"/>
     <dcterms:maintainer oerdc:email="" oerdc:id="test_user_1_"/>
     <dcterms:maintainer oerdc:id="mrdwab"/>
     <dcterms:rightsHolder oerdc:email="" oerdc:id="test_user_1_"/>
+    <dcterms:translator oerdc:id="mrdwab"/>
+    <dcterms:editor oerdc:id="mrdwab"/>
     
     <!-- CNX-Supported but not in MDML -->
     <oerdc:descriptionOfChanges>

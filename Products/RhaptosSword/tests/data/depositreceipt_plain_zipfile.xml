@@ -1,25 +1,67 @@
-<?xml version="1.0" encoding='utf-8'?>
-<entry xmlns="http://www.w3.org/2005/Atom"
-       xmlns:sword="http://purl.org/net/sword/"
-       xmlns:dcterms="http://purl.org/dc/terms/">
+<?xml version="1.0" ?><entry xmlns="http://www.w3.org/2005/Atom" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:md="http://cnx.rice.edu/mdml" xmlns:oerdc="http://cnx.org/aboutus/technology/schemas/oerdc" xmlns:sword="http://purl.org/net/sword/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
-    <link rel="edit"
-          href="http://nohost/plone/Members/test_user_1_/m11868_1-6.zip/sword/edit"/>
-    <link rel="edit-media"
-          href="http://nohost/plone/Members/test_user_1_/m11868_1-6.zip"/>
-    <link rel="http://purl.org/net/sword/terms/add"
-          href="http://nohost/plone/Members/test_user_1_/m11868_1-6.zip/sword/edit"/>
-    <link rel="http://purl.org/net/sword/terms/originalDeposit"
-          href="http://nohost/plone/Members/test_user_1_/m11868_1-6.zip"/>
+    <!-- SWORD deposit receipt -->
+    <title>(Untitled)</title>
+    <id>http://nohost/plone/workspace/module.2011-09-06.1698380849</id>
+    <updated>2011/09/06 20:02:49.840 GMT+2</updated>
+    <summary type="text">The summary</summary>
+    <generator uri="rhaptos.swordservice.plone" version="1.0"/>
+
+    <!-- The metadata begins -->
+    <dcterms:identifier xsi:type="dcterms:URI">http://nohost/plone/workspace/module.2011-09-06.1698380849</dcterms:identifier> 
+    <dcterms:identifier xsi:type="oerdc:Version">**new**</dcterms:identifier> 
+    <dcterms:identifier xsi:type="oerdc:ContentId">http://nohost/plone/workspace/module.2011-09-06.1698380849</dcterms:identifier> 
+    <dcterms:title>(Untitled)</dcterms:title>
+    <dcterms:created>2011/09/06 20:02:49.840 GMT+2</dcterms:created> 
+    <dcterms:modified>2011/09/06 20:02:49.840 GMT+2</dcterms:modified> 
+    <dcterms:creator oerdc:email="" oerdc:id="test_user_1_"/>
+    <dcterms:maintainer oerdc:email="" oerdc:id="test_user_1_"/>
+    <dcterms:rightsHolder oerdc:email="" oerdc:id="test_user_1_"/>
+    
+    <!-- CNX-Supported but not in MDML -->
+    <oerdc:descriptionOfChanges>
+        * The current description of the changes you have made for this version of the module:
+        
+    </oerdc:descriptionOfChanges> 
+
+    <oerdc:oer-subject/>
+
+    <dcterms:subject xsi:type="oerdc:Subject"/>
+    
 
 
-    <sword:treatment>Stored as m11868_1-6.zip</sword:treatment>
-    <title>m11868_1-6.zip</title>
-    <id>http://nohost/plone/Members/test_user_1_/m11868_1-6.zip</id>
-    <updated>2011/08/22 17:13:33.027 GMT+2</updated>
-    <author><name>test_user_1_</name></author>
-    <dcterms:available></dcterms:available>
-    <dcterms:description></dcterms:description>
-    <dcterms:title>m11868_1-6.zip</dcterms:title>
+    <dcterms:abstract/>
+
+    <dcterms:language xsi:type="ISO639-1">en</dcterms:language> 
+
+    <dcterms:license xsi:type="dcterms:URI"/>
+
+    <sword:treatment>Module '(Untitled)' was imported via the SWORD API.
+        * You can preview your module here to see what it will look like once it is published.
+        * The current description of the changes you have made for this version of the module: &quot;Created module&quot;
+        Publication Requirements: (account:test_user_1_), will need to sign the license.
+</sword:treatment>
+
+    <link href="http://nohost/plone/workspace/zipfile/module_view?format=html" rel="alternate"/>
+
+    <content src="http://nohost/plone/workspace/zipfile/sword/edit" type="application/zip"/>
+    
+    <link href="http://nohost/plone/workspace/zipfile" rel="edit-media"/>
+
+    <link href="http://nohost/plone/workspace/zipfile/sword/edit" rel="edit"/>
+          
+    <link href="http://nohost/plone/workspace/zipfile/sword/edit" rel="http://purl.org/net/sword/terms/add"/>
+
+    <sword:packaging>http://purl.org/net/sword/package/SimpleZip</sword:packaging>
+
+    <link href="http://nohost/plone/workspace/zipfile/module_view?format=pdf" rel="http://purl.org/net/sword/terms/derivedResource" type="application/pdf"/>
+            
+    <link href="http://nohost/plone/workspace/zipfile/module_view?format=html" rel="http://purl.org/net/sword/terms/derivedResource"/>
+            
+    <link href="http://nohost/plone/workspace/zipfile/module_export?format=zip" rel="http://purl.org/net/sword/terms/derivedResource" type="application/zip"/>
+
+    <link href="http://nohost/plone/workspace/zipfile/module_export?format=plain" rel="http://purl.org/net/sword/terms/derivedResource" type="application/xml"/>
+
+    <link href="http://cnx.org/Members/kef/m10000/sword/statement" rel="http://purl.org/net/sword/terms/statement" type="application/atom+xml;type=feed"/>
 
 </entry>
