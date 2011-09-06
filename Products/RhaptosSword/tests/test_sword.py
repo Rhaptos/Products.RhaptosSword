@@ -27,12 +27,13 @@ from Products.PloneTestCase import PloneTestCase
 
 from rhaptos.swordservice.plone.browser.sword import ISWORDService
 from rhaptos.swordservice.plone.interfaces import ISWORDEditIRI
-from rhaptos.swordservice.plone.browser.sword import ServiceDocument
+from Products.RhaptosSword.browser.views import ServiceDocument
 from Products.RhaptosRepository.interfaces.IVersionStorage import IVersionStorage
 from Products.RhaptosRepository.VersionFolder import incrementMinor
 from Products.RhaptosModuleStorage.ModuleVersionFolder import ModuleVersionStorage
 from Products.RhaptosModuleStorage.ModuleDBTool import CommitError
 from Products.RhaptosModuleStorage.ModuleView import ModuleView
+from Products.RhaptosCollaborationTool.interfaces.portal_collaboration import portal_collaboration as ICollaborationTool
 
 from Testing import ZopeTestCase
 ZopeTestCase.installProduct('RhaptosSword')
@@ -40,6 +41,7 @@ ZopeTestCase.installProduct('RhaptosModuleEditor')
 ZopeTestCase.installProduct('RhaptosRepository')
 ZopeTestCase.installProduct('CNXMLDocument')
 ZopeTestCase.installProduct('UniFile')
+ZopeTestCase.installProduct('RhaptosCollaborationTool')
 
 PloneTestCase.setupPloneSite()
 
@@ -192,6 +194,35 @@ class DummyModuleVersionStub(PortalFolder):
         self.storage = storage
 
 
+class StubCollaborationTool(SimpleItem):
+    __implements__ = ICollaborationTool
+
+    def __init__(self):
+        self.id = 'portal_collaboration'
+
+    def searchCollaborations(self, **kw):
+        return []
+    
+    def catalog_object(self, object, id):
+        pass
+
+    def uncatalog_object(self, id):
+        pass
+
+
+class StubWorkspaces(SimpleItem):
+    def __init__(self):
+        self.id = 'getWorkspaces'
+        self.wgs = [{'link': 'http://link.example.com',
+                     'title': 'Workgroup1',
+                     'description': 'Workgroup1',
+                    }
+                   ]
+    
+    def __call__(self):
+        return self.wgs
+
+
 def clone_request(req, response=None, env=None):
     # Return a clone of the current request object.
     environ = req.environ.copy()
@@ -214,7 +245,63 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         pass
 
 
+    def _setupRhaptos(self):
+        # XXX: This method needs to move to afterSetup, but afterSetup is not
+        # being called for some reason.
+        self.addProduct('RhaptosSword')
+        self.addProfile('Products.RhaptosModuleEditor:default')
+        self.addProfile('Products.CNXMLDocument:default')
+        self.addProfile('Products.CNXMLTransforms:default')
+        self.addProfile('Products.UniFile:default')
+        self.addProfile('Products.LinkMapTool:default')
+        objectIds = self.portal.objectIds()
+        if not 'content' in objectIds:
+            self.portal.manage_addProduct['RhaptosRepository'].manage_addRepository('content') 
+            # We need storage for our published modules. This is as good a place as
+            # any.
+            self.portal.content.registerStorage(StubModuleStorage('storage'))
+            self.portal.content.setDefaultStorage('storage')
+        if not 'portal_moduledb' in objectIds:
+            self.portal._setObject('portal_moduledb', StubModuleDB())
+        if not 'portal_languages' in objectIds:
+            self.portal._setObject('portal_languages', StubLanuageTool())
+        if not 'lens_tool' in objectIds:
+            self.portal._setObject('lens_tool', DummyLensTool())
+        if not 'portal_collaboration' in objectIds:
+            self.portal._setObject('portal_collaboration', StubCollaborationTool())
+        if not 'getWorkspaces' in objectIds:
+            self.portal._setObject('getWorkspaces', StubWorkspaces())
+
+
+    def createUploadRequest(self, filename, context, **kwargs):
+        if filename is None:
+            content = ''
+        else:
+            xml = os.path.join(DIRNAME, 'data', filename)
+            file = open(xml, 'rb')
+            content = file.read()
+            file.close()
+        env = {
+            'CONTENT_TYPE': 'application/atom+xml;type=entry',
+            'CONTENT_LENGTH': len(content),
+            'IN_PROGRESS': 'true',
+            'REQUEST_METHOD': 'POST',
+            'SERVER_NAME': 'nohost',
+            'SERVER_PORT': '80'
+        }
+        env.update(kwargs)
+        uploadresponse = HTTPResponse(stdout=StringIO())
+        uploadrequest = clone_request(self.app.REQUEST, uploadresponse, env)
+        bodyfile = StringIO(content)
+        uploadrequest.set('BODYFILE', bodyfile)
+        uploadrequest.stdin = bodyfile
+        # Fake PARENTS
+        uploadrequest.set('PARENTS', [context])
+        return uploadrequest
+
+
     def testSwordService(self):
+        self._setupRhaptos()
         file = open(os.path.join(DIRNAME, 'data', 'servicedocument.xml'), 'r')
         reference_servicedoc = file.read()
         file.close()
@@ -276,56 +363,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.assertTrue(IFolderish.providedBy(self.folder), "Folders are not Folderish")
 
 
-    def _setupRhaptos(self):
-        # XXX: This method needs to move to afterSetup, but afterSetup is not
-        # being called for some reason.
-        self.addProduct('RhaptosSword')
-        self.addProfile('Products.RhaptosModuleEditor:default')
-        self.addProfile('Products.CNXMLDocument:default')
-        self.addProfile('Products.CNXMLTransforms:default')
-        self.addProfile('Products.UniFile:default')
-        self.addProfile('Products.LinkMapTool:default')
-        objectIds = self.portal.objectIds()
-        if not 'content' in objectIds:
-            self.portal.manage_addProduct['RhaptosRepository'].manage_addRepository('content') 
-            # We need storage for our published modules. This is as good a place as
-            # any.
-            self.portal.content.registerStorage(StubModuleStorage('storage'))
-            self.portal.content.setDefaultStorage('storage')
-        if not 'portal_moduledb' in objectIds:
-            self.portal._setObject('portal_moduledb', StubModuleDB())
-        if not 'portal_languages' in objectIds:
-            self.portal._setObject('portal_languages', StubLanuageTool())
-        self.portal._setObject('lens_tool', DummyLensTool())
-
-    def createUploadRequest(self, filename, context, **kwargs):
-        if filename is None:
-            content = ''
-        else:
-            xml = os.path.join(DIRNAME, 'data', filename)
-            file = open(xml, 'rb')
-            content = file.read()
-            file.close()
-        env = {
-            'CONTENT_TYPE': 'application/atom+xml;type=entry',
-            'CONTENT_LENGTH': len(content),
-            'IN_PROGRESS': 'true',
-            'REQUEST_METHOD': 'POST',
-            'SERVER_NAME': 'nohost',
-            'SERVER_PORT': '80'
-        }
-        env.update(kwargs)
-        uploadresponse = HTTPResponse(stdout=StringIO())
-        uploadrequest = clone_request(self.app.REQUEST, uploadresponse, env)
-        bodyfile = StringIO(content)
-        uploadrequest.set('BODYFILE', bodyfile)
-        uploadrequest.stdin = bodyfile
-        # Fake PARENTS
-        uploadrequest.set('PARENTS', [context])
-        return uploadrequest
-
-
-    def _test_publishBadAtomXML(self):
+    def test_publishBadAtomXML(self):
         """
          See what happens when we throw bad xml at the import funtionality.
         """
@@ -572,7 +610,6 @@ class TestSwordService(PloneTestCase.PloneTestCase):
             'Returned statement and reference statement are not identical.')
 
 
-
     def testDeriveModule(self):
         self._setupRhaptos()
         self.setRoles(('Manager',))
@@ -594,7 +631,59 @@ class TestSwordService(PloneTestCase.PloneTestCase):
                 (self.folder.workspace, uploadrequest), Interface, 'sword')
         xml = adapter()
         assert "<sword:error" not in xml, xml
+
+
+    def test_handlePUT(self):
+        self._setupRhaptos()
+        self.setRoles(('Manager',))
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+
+        uploadrequest = self.createUploadRequest(
+            'multipart.txt',
+            context=self.folder.workspace,
+            CONTENT_TYPE='multipart/related; boundary="===============1338623209=="',
+            SLUG='multipart',
+            CONTENT_DISPOSITION='attachment; filename=multipart')
+        adapter = getMultiAdapter(
+                (self.folder.workspace, uploadrequest), Interface, 'sword')
+        xml = adapter()
+        assert "<sword:error" not in xml, xml
+
+        uploadrequest = self.createUploadRequest(
+                'test3_atom_entry.xml',
+            self.folder.workspace,
+            REQUEST_METHOD = 'PUT',
+            )
+        module = self.folder.workspace.objectValues()[0]
+        adapter = getMultiAdapter((module, uploadrequest), ISWORDEditIRI)
+        xml = adapter()
+
     
+    def test_addRoles(self):
+        self._setupRhaptos()
+        self.setRoles(('Manager',))
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        module = self._createModule(self.folder.workspace, 'test_roles.xml')
+    
+
+    def _createModule(self, context, filename):
+        """ Utility method to setup the environment and create a module.
+        """
+        uploadrequest = self.createUploadRequest(
+            filename, 
+            context,
+            CONTENT_DISPOSITION='attachment; filename=%s' %filename,
+        )
+
+        # Call the sword view on this request to perform the upload
+        adapter = getMultiAdapter(
+                (context, uploadrequest), Interface, 'sword')
+        xml = adapter()
+        assert "<sword:error" not in xml, xml
+
+        module = context.objectValues()[0]
+        return module
+
 
     def writecontents(self, contents, filename):
         file = open(os.path.join(DIRNAME, 'data', filename), 'w')
