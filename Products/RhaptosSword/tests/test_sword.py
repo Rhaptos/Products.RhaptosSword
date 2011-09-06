@@ -402,14 +402,15 @@ class TestSwordService(PloneTestCase.PloneTestCase):
          See what happens when we throw bad xml at the import funtionality.
         """
         self._setupRhaptos()
-        self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        if not 'workspace' in self.portal.objectIds():
+            self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
         uploadrequest = self.createUploadRequest('bad_entry.xml', self.portal.workspace)
 
         # Call the sword view on this request to perform the upload
         adapter = getMultiAdapter(
                 (self.portal.workspace, uploadrequest), Interface, 'sword')
         xml = adapter()
-        self.failUnlessRaises(ExpatError, view)
+        assert "ExpatError" in xml, 'Bad XML did not raise an exception.'
 
 
     def testMetadata(self):
