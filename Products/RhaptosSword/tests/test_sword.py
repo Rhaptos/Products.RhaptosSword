@@ -667,14 +667,33 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         module = self.folder.workspace.objectValues()[0]
         adapter = getMultiAdapter((module, uploadrequest), ISWORDEditIRI)
         xml = adapter()
+        assert "<sword:error" not in xml, xml
 
     
     def test_addRoles(self):
         self._setupRhaptos()
         self.setRoles(('Manager',))
         self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
-        module = self._createModule(self.folder.workspace, 'test_roles.xml')
-    
+        filename = 'test_roles.xml'
+        module = self._createModule(self.folder.workspace, filename)
+
+        file = open(os.path.join(DIRNAME, 'data', filename), 'r')
+        dom = parse(file)
+        file.close()
+        namespaces = ["http://purl.org/dc/terms/",
+                      "http://cnx.org/aboutus/technology/schemas/oerdc"
+                     ]
+        roles = {'creator': module.creators,
+                 'maintainer': module.maintainers,
+                 'rightsHolder': module.licensors,
+                 'editor': module.editors,
+                 'translator': module.translators}
+        for ns in namespaces:
+            for role, ids in roles.items():
+                for element in dom.getElementsByTagNameNS(ns, role):
+                    msg = 'Role:%s was not set properly.' %role
+                    assert element.getAttribute('oerdc:id') in ids, msg
+
 
     def _createModule(self, context, filename):
         """ Utility method to setup the environment and create a module.

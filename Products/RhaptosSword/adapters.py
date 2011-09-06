@@ -317,9 +317,9 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                     if value: headers.append((mappings[key], str(value)))
 
         return headers
+   
 
-
-    def addRoles(self, obj, dom):
+    def _getNewRoles(self, dom):
         newRoles = {}
         for role in ROLE_NAMES:
             for namespace in [DCTERMS_NAMESPACE, OERDC_NAMESPACE]:
@@ -328,14 +328,18 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                     ids = newRoles.get(tmp_role, [])
                     ids.append(element.getAttribute('oerdc:id'))
                     newRoles[tmp_role] = ids
+        return newRoles
 
-                user_role_delta = obj.generateCollaborationRequests(
-                        newUser=True, newRoles=newRoles)
-                for p in user_role_delta.keys():
-                    collabs = list(obj.getCollaborators())
-                    if p not in collabs:
-                        obj.addCollaborator(p)
-                        obj.requestCollaboration(p, user_role_delta[p])
+
+    def addRoles(self, obj, dom):
+        newRoles = self._getNewRoles(dom)
+        user_role_delta = obj.generateCollaborationRequests(
+                newUser=True, newRoles=newRoles)
+        for p in user_role_delta.keys():
+            collabs = list(obj.getCollaborators())
+            if p not in collabs:
+                obj.addCollaborator(p)
+                obj.requestCollaboration(p, user_role_delta[p])
 
 
     def updateRoles(self, obj, dom):
@@ -347,12 +351,10 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         Compute the cancelled roles
         - pending collaboration request for which there are no roles in the xml
         """
-        updateRoles = {}
+        updateRoles = self._getNewRoles(dom)
         deleteRoles = []
         cancelRoles = []
-        for element in dom.getElementsByTagNameNS(CNX_MD_NAMESPACE, 'role'):
-            role = element.getAttribute('type').capitalize()
-            updateRoles[role] = element.firstChild.nodeValue.split(' ')
+
         pending_collaborations = obj.getPendingCollaborations()
         for user_id in pending_collaborations.keys():
             if user_id not in updateRoles.keys() and user_id != obj.Creator():
