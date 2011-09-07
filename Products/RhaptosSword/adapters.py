@@ -5,7 +5,7 @@ from StringIO import StringIO
 
 from zope.interface import Interface, implements
 from zope.publisher.interfaces.http import IHTTPRequest
-from zope.component import adapts, queryAdapter
+from zope.component import adapts, queryAdapter, getMultiAdapter
 from AccessControl import getSecurityManager
 from Acquisition import aq_inner
 
@@ -19,8 +19,10 @@ from rhaptos.atompub.plone.exceptions import PreconditionFailed
 from rhaptos.atompub.plone.browser.atompub import ATOMPUB_CONTENT_TYPES
 from rhaptos.swordservice.plone.browser.sword import PloneFolderSwordAdapter
 from rhaptos.swordservice.plone.browser.sword import RetrieveContent
+from rhaptos.swordservice.plone.browser.sword import EditMedia
 from rhaptos.swordservice.plone.browser.sword import ISWORDContentUploadAdapter 
 from rhaptos.swordservice.plone.browser.sword import ISWORDRetrieveContentAdapter
+from rhaptos.swordservice.plone.interfaces import ISWORDEMIRI
 
 
 class ValidationError(Exception):
@@ -76,6 +78,10 @@ class IRhaptosContentRetrieveAdapter(ISWORDRetrieveContentAdapter):
     """ Marker interface for SWORD service specific to the Rhaptos 
         implementation.
     """
+
+
+class IRhaptosEditMediaAdapter(ISWORDEMIRI):
+    """ Marker interface for EM-IRI adapter specific to Rhaptos. """
 
 
 class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
@@ -389,3 +395,16 @@ class RhaptosContentRetrieveAdapter(RetrieveContent):
 
     def __call__(self):
         return self.context.module_export(format='zip')
+
+class RhaptosEditMedia(EditMedia):
+    def PUT(self):
+        """ PUT against an existing item should update it.
+        """
+        filename = self.request.get_header(
+            'Content-Disposition', self.context.title)
+        content_type = self.request.get_header('Content-Type')
+
+        parent = self.context.aq_inner.aq_parent
+        adapter = getMultiAdapter(
+            (parent, self.request), IRhaptosWorkspaceSwordAdapter)
+        adapter.updateObject(self.context, filename, self.request, self.request.response, content_type)
