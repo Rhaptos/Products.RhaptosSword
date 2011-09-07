@@ -16,6 +16,7 @@ from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from Products.CNXMLTransforms.helpers import OOoImportError, doTransform, makeContent
 
 from rhaptos.atompub.plone.exceptions import PreconditionFailed
+from rhaptos.atompub.plone.browser.atompub import ATOMPUB_CONTENT_TYPES
 from rhaptos.swordservice.plone.browser.sword import PloneFolderSwordAdapter
 from rhaptos.swordservice.plone.browser.sword import RetrieveContent
 from rhaptos.swordservice.plone.browser.sword import ISWORDContentUploadAdapter 
@@ -129,7 +130,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                 self.setActionMetadata(obj, action='checkout')
                 return obj
 
-        if content_type in self.ATOMPUB_CONTENT_TYPES:
+        if content_type in ATOMPUB_CONTENT_TYPES:
             # find our marker elements
             body = request.get('BODYFILE')
             body.seek(0)
@@ -256,7 +257,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             obj.getDefaultFile().upgrade()
 
         obj = obj.__of__(self.context)
-        if content_type in self.ATOMPUB_CONTENT_TYPES:
+        if content_type in ATOMPUB_CONTENT_TYPES:
             body = request.get('BODYFILE')
             body.seek(0)
             updateMetadata(obj, body)
