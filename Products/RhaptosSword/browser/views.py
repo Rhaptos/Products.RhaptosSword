@@ -95,10 +95,6 @@ class EditIRI(BaseEditIRI, SWORDTreatmentMixin):
     def _handlePut(self):
         """ PUT against an existing item should update it.
         """
-        # get the item
-        content_tool = getToolByName(self.context, 'content')
-        module = content_tool.getRhaptosObject(self.context.id, 'latest')
-
         filename = self.request.get_header(
             'Content-Disposition', self.context.title)
         content_type = self.request.get_header('Content-Type')
@@ -106,7 +102,7 @@ class EditIRI(BaseEditIRI, SWORDTreatmentMixin):
         parent = self.context.aq_inner.aq_parent
         adapter = getMultiAdapter(
             (parent, self.request), IRhaptosWorkspaceSwordAdapter)
-        adapter.updateObject(module, filename, self.request, self.request.response, content_type)
+        adapter.updateObject(self.context, filename, self.request, self.request.response, content_type)
 
 
     def pending_collaborations(self):
