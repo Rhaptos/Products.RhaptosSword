@@ -15,7 +15,7 @@ from Products.CMFCore.interfaces import IFolderish
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from Products.CNXMLTransforms.helpers import OOoImportError, doTransform, makeContent
 
-from rhaptos.swordservice.plone.interfaces import ISWORDEditIRI
+from rhaptos.atompub.plone.exceptions import PreconditionFailed
 from rhaptos.swordservice.plone.browser.sword import PloneFolderSwordAdapter
 from rhaptos.swordservice.plone.browser.sword import RetrieveContent
 from rhaptos.swordservice.plone.browser.sword import ISWORDContentUploadAdapter 
@@ -190,12 +190,23 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         content_tool = getToolByName(self.context, 'content')
         module = content_tool.getRhaptosObject(module_id, 'latest')
 
-        checkout_id = context.generateUniqueId()
-        context.invokeFactory(id=checkout_id, type_name=module.portal_type)
-        obj = context._getOb(checkout_id)
-        obj.setState('published')
-        obj.checkout(module.objectId)
-        return obj
+        if module_id not in context.objectIds():
+            context.invokeFactory(id=module_id, type_name=module.portal_type)
+            obj = context._getOb(module_id)
+            obj.setState('published')
+            obj.checkout(module.objectId)
+            return obj
+        else:
+            obj = context._getOb(module_id)
+            if obj.state == 'published':
+                # Check out on top of published copy
+                obj.checkout(module.objectId)
+                return obj
+            elif obj.state == "checkedout" and obj.version == module.version:
+                # Already checked out, use as is
+                return obj
+            else:
+                raise PreconditionFailed, "Cannot overwrite existing content"
 
 
     def updateObject(self, obj, filename, request, response, content_type):
