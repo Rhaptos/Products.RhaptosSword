@@ -20,5 +20,6 @@
     <dcterms:subject>subtraction</dcterms:subject>
     <dcterms:language xsi:type="ISO639-1">en</dcterms:language>
     <oerdc:analyticsCode>UA-4688042-1</oerdc:analyticsCode>
+    <dcterms:license xsi:type="dcterms:URI">http://creativecommons.org/licenses/by/3.0/</dcterms:license>
 
 </entry>

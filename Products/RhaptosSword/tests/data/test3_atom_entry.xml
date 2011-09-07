@@ -1,57 +1,39 @@
 <?xml version="1.0"?>
 <entry xmlns="http://www.w3.org/2005/Atom"
-       xmlns:cnxml="http://cnx.rice.edu/cnxml"
-       xmlns:md="http://cnx.rice.edu/mdml"
-       xmlns:dcterms="http://purl.org/dc/terms">
-  <title>Atom-Powered Robots Run Amok</title>
-  <id>urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a</id>
-  <updated>2003-12-13T18:30:02Z</updated>
-  <author><name>Roch?? Compaan</name></author>
-  <!-- some embedded metadata -->
-  <dcterms:sub>The abstract</dcterms:sub>
-  <dcterms:publisher>Publisher</dcterms:publisher>
-  <dcterms:description>Description</dcterms:description>
-  <dcterms:contributors>The contributurs</dcterms:contributors>
-  <dcterms:creators>The creators</dcterms:creators>
-  <dcterms:effective_date>03/08/2011</dcterms:effective_date>
-  <dcterms:expiration_date>03/08/2011</dcterms:expiration_date>
-  <dcterms:type>Type</dcterms:type>
-  <dcterms:format></dcterms:format>
-  <dcterms:language>en</dcterms:language>
-  <dcterms:accessRights>Access Rights</dcterms:accessRights>
-  <dcterms:rightsHolder>Rights Holder</dcterms:rightsHolder>
-  <dcterms:rights>Rights Holder</dcterms:rights>
-  <dcterms:abstract>The abstract</dcterms:abstract>
-  <dcterms:alternative>Alternative Title</dcterms:alternative>
-  <dcterms:available>Date Available</dcterms:available>
-  <dcterms:bibliographicCitation>Bibliographic Citation</dcterms:bibliographicCitation>
-  <dcterms:contributor>Contributor</dcterms:contributor>
-  <dcterms:references>References</dcterms:references>
-  <dcterms:license>http://creativecommons.org/licenses/by/1.0</dcterms:license>
-  <cnxml:googleAnalyticsTrackingCode>UA-xxxxxxx-x</cnxml:googleAnalyticsTrackingCode>
-  <md:keywordlist>
-    <md:keyword>kw1</md:keyword>
-    <md:keyword>kw2</md:keyword>
-  </md:keywordlist>
-  <md:subjectlist>
-    <md:subject>Science and Technology</md:subject>
-    <md:subject>Social Sciences</md:subject>
-  </md:subjectlist>
-  <md:abstract>Modified summary</md:abstract>
-  <md:actors>
-      <md:person userid="roche">
-      <md:firstname>Roch??</md:firstname>
-      <md:surname>Compaan</md:surname>
-      <md:fullname>Roch?? Compaan</md:fullname>
-      <md:email>roche@upfrontsystems.co.za</md:email>
-    </md:person>
-  </md:actors>
-  <md:roles>
-    <md:role type="author">roche</md:role>
-    <md:role type="maintainer">roche</md:role>
-    <md:role type="licensor">roche</md:role>
-  </md:roles>
-  <md:description_of_changes>
-      Some text description of what changed.
-  </md:description_of_changes>
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dcterms="http://purl.org/dc/terms/"
+       xmlns:oerdc="http://cnx.org/aboutus/technology/schemas/oerdc">
+
+    <title>Atom-Powered Robots Run Amok - new</title>
+    <author>Roch?? Compaan</author>
+    <summary type="text">The latest and greatest.</summary>
+
+    <!-- some embedded metadata -->
+    <dcterms:title>Basic Math</dcterms:title>
+    <dcterms:abstract>The latest and greatest.</dcterms:abstract>
+    <dcterms:creator>roche</dcterms:creator>
+    <oerdc:maintainer>roche</oerdc:maintainer>
+    <dcterms:rightsHolder>roche</dcterms:rightsHolder>
+
+    <oerdc:oer-subject>Mathematics and Statistics</oerdc:oer-subject>
+    <dcterms:subject>addition</dcterms:subject>
+    <dcterms:subject>subtraction</dcterms:subject>
+    <dcterms:language xsi:type="ISO639-1">af</dcterms:language>
+    <oerdc:analyticsCode>UA-4688042-1</oerdc:analyticsCode>
+    <dcterms:license xsi:type="dcterms:URI">http://creativecommons.org/licenses/by/3.0/</dcterms:license>
+    <!-- some embedded metadata -->
+    <dcterms:sub>The abstract - new</dcterms:sub>
+    <dcterms:publisher>Publisher - new</dcterms:publisher>
+    <dcterms:description>Description - new</dcterms:description>
+    <dcterms:contributors>The contributurs - new</dcterms:contributors>
+    <dcterms:creators>The creators - new</dcterms:creators>
+    <dcterms:effective_date>03/08/2011</dcterms:effective_date>
+    <dcterms:expiration_date>03/08/2011</dcterms:expiration_date>
+    <dcterms:type>Type - new</dcterms:type>
+    <dcterms:format></dcterms:format>
+    <dcterms:alternative>Alternative Title - new</dcterms:alternative>
+    <dcterms:available>Date Available</dcterms:available>
+    <dcterms:bibliographicCitation>Bibliographic Citation - new</dcterms:bibliographicCitation>
+    <dcterms:contributor>Contributor</dcterms:contributor>
+    <dcterms:references>References</dcterms:references>
 </entry>
