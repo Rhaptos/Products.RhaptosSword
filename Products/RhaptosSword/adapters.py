@@ -210,65 +210,64 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                 raise PreconditionFailed, "Cannot overwrite existing content"
 
 
+    def updateMetadata(self, obj, fp):
+        """ Metadata as described in:
+            SWORD V2 Spec for Publishing Modules in Connexions
+            Section: Metadata
+        """
+        dom = parse(fp)
+        metadata = self.getMetadata(dom, METADATA_MAPPING)
+        # better make sure we have a title while deriving content
+        metadata.setdefault('title', obj.title)
+        # we remove descriptionOfChanges because the update_metadata
+        # script cannot cope with it.
+        descriptionOfChanges = metadata.pop(
+            'descriptionOfChanges', self.descriptionOfChanges)
+        if descriptionOfChanges:
+            obj.logAction('create', descriptionOfChanges)
+            setattr(obj, 'description_of_changes', descriptionOfChanges)
+        setattr(obj, 'treatment', self.treatment)
+        obj.update_metadata(**metadata)
+        # IB: Always add? Or replace when modifying existing content?
+        self.addRoles(obj, dom)
+        obj.reindexObject(idxs=metadata.keys())
+
+    def updateContent(self, obj, fp):
+        kwargs = {
+            'original_file_name': 'sword-import-file',
+            'user_name': getSecurityManager().getUser().getUserName()
+        }
+        text, subobjs, meta = doTransform(obj, "zip_to_folder",
+            fp.read(), meta=1, **kwargs)
+        # For a new document, it will contain a blank index.cnxml. For
+        # existing documents, we want to replace all of it anyway. Either
+        # way, we want to  delete the contents of the module and replace
+        # it. Unless we have no text, then leave the default empty
+        # document alone
+        obj.manage_delObjects(
+            filter(lambda x: x!=obj.default_file, obj.objectIds()))
+        if text:
+            obj.manage_delObjects([obj.default_file,])
+            obj.invokeFactory('CNXML Document', obj.default_file,
+                file=text, idprefix='zip-')
+        makeContent(obj, subobjs)
+        # make sure that the cnxml is the latest version
+        obj.getDefaultFile().upgrade()
+
     def updateObject(self, obj, filename, request, response, content_type):
-
-        def updateMetadata(obj, fp):
-            """ Metadata as described in:
-                SWORD V2 Spec for Publishing Modules in Connexions
-                Section: Metadata
-            """
-            dom = parse(fp)
-            metadata = self.getMetadata(dom, METADATA_MAPPING)
-            # better make sure we have a title while deriving content
-            metadata.setdefault('title', obj.title)
-            # we remove descriptionOfChanges because the update_metadata
-            # script cannot cope with it.
-            descriptionOfChanges = metadata.pop(
-                'descriptionOfChanges', self.descriptionOfChanges)
-            if descriptionOfChanges:
-                obj.logAction('create', descriptionOfChanges)
-                setattr(obj, 'description_of_changes', descriptionOfChanges)
-            setattr(obj, 'treatment', self.treatment)
-            obj.update_metadata(**metadata)
-            # IB: Always add? Or replace when modifying existing content?
-            self.addRoles(obj, dom)
-            obj.reindexObject(idxs=metadata.keys())
-
-        def updateContent(obj, fp):
-            kwargs = {
-                'original_file_name': 'sword-import-file',
-                'user_name': getSecurityManager().getUser().getUserName()
-            }
-            text, subobjs, meta = doTransform(obj, "zip_to_folder",
-                fp.read(), meta=1, **kwargs)
-            # For a new document, it will contain a blank index.cnxml. For
-            # existing documents, we want to replace all of it anyway. Either
-            # way, we want to  delete the contents of the module and replace
-            # it. Unless we have no text, then leave the default empty
-            # document alone
-            obj.manage_delObjects(
-                filter(lambda x: x!=obj.default_file, obj.objectIds()))
-            if text:
-                obj.manage_delObjects([obj.default_file,])
-                obj.invokeFactory('CNXML Document', obj.default_file,
-                    file=text, idprefix='zip-')
-            makeContent(obj, subobjs)
-            # make sure that the cnxml is the latest version
-            obj.getDefaultFile().upgrade()
-
         obj = obj.__of__(self.context)
         if content_type in ATOMPUB_CONTENT_TYPES:
             body = request.get('BODYFILE')
             body.seek(0)
-            updateMetadata(obj, body)
+            self.updateMetadata(obj, body)
         elif content_type == 'application/zip':
             body = request.get('BODYFILE')
             body.seek(0)
-            updateContent(obj, body)
+            self.updateContent(obj, body)
         elif content_type.startswith('multipart/'):
             atom, payload = self._splitRequest(request)
-            updateMetadata(obj, StringIO(atom))
-            updateContent(obj, StringIO(payload))
+            self.updateMetadata(obj, StringIO(atom))
+            self.updateContent(obj, StringIO(payload))
 
         return obj
 
