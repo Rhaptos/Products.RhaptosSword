@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<entry xmlns="http://www.w3.org/2005/Atom"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dcterms="http://purl.org/dc/terms/"
+       xmlns:oerdc="http://cnx.org/aboutus/technology/schemas/oerdc">
+
+    <title>Basic Math</title>
+    <author>Roch?? Compaan</author>
+    <summary type="text">The latest and greatest.</summary>
+
+    <!-- some embedded metadata -->
+    <dcterms:title>Basic Math</dcterms:title>
+    <dcterms:abstract>The latest and greatest.</dcterms:abstract>
+    <dcterms:creator>roche</dcterms:creator> <!-- Note that you don???t have to give anything but the contributor???s userid -->
+    <oerdc:maintainer>roche</oerdc:maintainer> <!-- CNX Clients should always give the depositor permission to publish by default -->
+    <dcterms:rightsHolder>roche</dcterms:rightsHolder> <!-- CNX Clients should always specify rightsHolder also -->
+
+    <oerdc:oer-subject>Mathematics and Statistics</oerdc:oer-subject>  <!-- Vocabulary-controlled Connexions specific subject categorization -->
+    <dcterms:subject>addition</dcterms:subject> <!-- Unconstrained author-supplied keywords <md:keyword> -->
+    <dcterms:subject>subtraction</dcterms:subject>
+    <dcterms:language xsi:type="ISO639-1">en</dcterms:language>
+    <oerdc:analyticsCode>UA-4688042-1</oerdc:analyticsCode>
+
+</entry>
