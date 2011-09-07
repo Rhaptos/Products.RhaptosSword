@@ -280,7 +280,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
 
     def createUploadRequest(self, filename, context, **kwargs):
         if filename is None:
-            content = ''
+            content = kwargs.get('content', '')
         else:
             xml = os.path.join(DIRNAME, 'data', filename)
             file = open(xml, 'rb')
@@ -683,8 +683,17 @@ class TestSwordService(PloneTestCase.PloneTestCase):
                 (self.folder.workspace, uploadrequest), Interface, 'sword')
         xml = adapter()
         assert "<sword:error" not in xml, xml
-
-        uploadrequest = self.createUploadRequest('derive_module.xml', self.folder.workspace)
+        editIRI = getEditIRI(parseString(xml))
+        
+        filename = 'derive_module.xml'
+        file = open(os.path.join(DIRNAME, 'data', filename), 'r')
+        dom = parse(file)
+        file.close()
+        module = self.folder.workspace.objectValues()[0]
+        source = dom.getElementsByTagName('dcterms:source')[0]
+        source.firstChild.nodeValue = module.absolute_url()
+        uploadrequest = self.createUploadRequest(
+            None, self.folder.workspace, content = dom.toxml())
         adapter = getMultiAdapter(
                 (self.folder.workspace, uploadrequest), Interface, 'sword')
         xml = adapter()
