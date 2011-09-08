@@ -18,10 +18,8 @@ from Products.CNXMLTransforms.helpers import OOoImportError, doTransform, makeCo
 from rhaptos.atompub.plone.exceptions import PreconditionFailed
 from rhaptos.atompub.plone.browser.atompub import ATOMPUB_CONTENT_TYPES
 from rhaptos.swordservice.plone.browser.sword import PloneFolderSwordAdapter
-from rhaptos.swordservice.plone.browser.sword import RetrieveContent
 from rhaptos.swordservice.plone.browser.sword import EditMedia
 from rhaptos.swordservice.plone.browser.sword import ISWORDContentUploadAdapter 
-from rhaptos.swordservice.plone.browser.sword import ISWORDRetrieveContentAdapter
 from rhaptos.swordservice.plone.interfaces import ISWORDEMIRI
 
 
@@ -70,12 +68,6 @@ ROLE_NAMES = ['creator',
              ]
 
 class IRhaptosWorkspaceSwordAdapter(ISWORDContentUploadAdapter):
-    """ Marker interface for SWORD service specific to the Rhaptos 
-        implementation.
-    """
-
-
-class IRhaptosContentRetrieveAdapter(ISWORDRetrieveContentAdapter):
     """ Marker interface for SWORD service specific to the Rhaptos 
         implementation.
     """
@@ -392,12 +384,11 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         return obj
 
 
-class RhaptosContentRetrieveAdapter(RetrieveContent):
-
-    def __call__(self):
-        return self.context.module_export(format='zip')
-
 class RhaptosEditMedia(EditMedia):
+    def GET(self):
+        return self.context.module_export(format='zip')
+        
+
     def PUT(self):
         """ PUT against an existing item should update it.
         """

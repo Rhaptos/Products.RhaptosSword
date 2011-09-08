@@ -61,13 +61,6 @@
     <adapter
         for="Products.RhaptosSword.interfaces.IRhaptosSwordCollection
              zope.publisher.interfaces.http.IHTTPRequest"
-        provides="Products.RhaptosSword.adapters.IRhaptosContentRetrieveAdapter"
-        factory=".adapters.RhaptosContentRetrieveAdapter"
-        />
-
-    <adapter
-        for="Products.RhaptosSword.interfaces.IRhaptosSwordCollection
-             zope.publisher.interfaces.http.IHTTPRequest"
         provides="Products.RhaptosSword.adapters.IRhaptosEditMediaAdapter"
         factory=".adapters.RhaptosEditMedia"
         />
