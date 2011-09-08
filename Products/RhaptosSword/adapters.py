@@ -40,6 +40,7 @@ METADATA_MAPPING =\
          'abstract'            : 'abstract',
          'language'            : 'language',
          'subject'             : 'keywords',
+         'oer-subject'         : 'subject',
          'license'             : 'license',
          'descriptionOfChanges': 'descriptionOfChanges',
          'analyticsCode'       : 'GoogleAnalyticsTrackingCode',
