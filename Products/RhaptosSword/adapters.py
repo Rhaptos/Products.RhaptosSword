@@ -85,7 +85,7 @@ class IRhaptosEditMediaAdapter(ISWORDEMIRI):
     """ Marker interface for EM-IRI adapter specific to Rhaptos. """
 
 
-def splitMultipartRequest(self, request):
+def splitMultipartRequest(request):
     """ This is only to be used for multipart uploads. The first
         part is the atompub bit, the second part is the payload. """
     request.stdin.seek(0)
@@ -244,7 +244,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             'original_file_name': 'sword-import-file',
             'user_name': getSecurityManager().getUser().getUserName()
         }
-        text, subobjs, meta = doTransform(obj, "zip_to_folder",
+        text, subobjs, meta = doTransform(obj, "sword_to_folder",
             fp.read(), meta=1, **kwargs)
         # For a new document, it will contain a blank index.cnxml. For
         # existing documents, we want to replace all of it anyway. Either
