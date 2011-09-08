@@ -22,18 +22,18 @@
     <oerdc:analyticsCode>UA-4688042-1</oerdc:analyticsCode>
     <dcterms:license xsi:type="dcterms:URI">http://creativecommons.org/licenses/by/3.0/</dcterms:license>
     <!-- some embedded metadata -->
-    <dcterms:sub>The abstract - new</dcterms:sub>
-    <dcterms:publisher>Publisher - new</dcterms:publisher>
-    <dcterms:description>Description - new</dcterms:description>
-    <dcterms:contributors>The contributurs - new</dcterms:contributors>
-    <dcterms:creators>The creators - new</dcterms:creators>
+    <dcterms:sub>The abstract</dcterms:sub>
+    <dcterms:publisher>Publisher</dcterms:publisher>
+    <dcterms:description>Description</dcterms:description>
+    <dcterms:contributors>The contributurs</dcterms:contributors>
+    <dcterms:creators>The creators</dcterms:creators>
     <dcterms:effective_date>03/08/2011</dcterms:effective_date>
     <dcterms:expiration_date>03/08/2011</dcterms:expiration_date>
-    <dcterms:type>Type - new</dcterms:type>
+    <dcterms:type>Type</dcterms:type>
     <dcterms:format></dcterms:format>
-    <dcterms:alternative>Alternative Title - new</dcterms:alternative>
+    <dcterms:alternative>Alternative Title</dcterms:alternative>
     <dcterms:available>Date Available</dcterms:available>
-    <dcterms:bibliographicCitation>Bibliographic Citation - new</dcterms:bibliographicCitation>
+    <dcterms:bibliographicCitation>Bibliographic Citation</dcterms:bibliographicCitation>
     <dcterms:contributor>Contributor</dcterms:contributor>
     <dcterms:references>References</dcterms:references>
 </entry>
