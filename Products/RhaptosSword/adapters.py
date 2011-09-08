@@ -85,6 +85,21 @@ class IRhaptosEditMediaAdapter(ISWORDEMIRI):
     """ Marker interface for EM-IRI adapter specific to Rhaptos. """
 
 
+def splitMultipartRequest(self, request):
+    """ This is only to be used for multipart uploads. The first
+        part is the atompub bit, the second part is the payload. """
+    request.stdin.seek(0)
+    message = message_from_file(request.stdin)
+    atom, payload = message.get_payload()
+
+    # Call get_payload with decode=True, so it can handle the transfer
+    # encoding for us, if any.
+    atom = atom.get_payload(decode=True)
+    payload = payload.get_payload(decode=True)
+
+    return atom, payload
+
+
 class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
     """ Rhaptos specific implement of the SWORD folder adapter.
     """
@@ -99,21 +114,6 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         """ Override this method to provide a more sensible name in the
             absence of content-disposition. """
         return self.context.generateUniqueId(type_name='Module')
-
-    def _splitRequest(self, request):
-        """ This is only to be used for multipart uploads. The first
-            part is the atompub bit, the second part is the payload. """
-        request.stdin.seek(0)
-        message = message_from_file(request.stdin)
-        atom, payload = message.get_payload()
-
-        # Call get_payload with decode=True, so it can handle the transfer
-        # encoding for us, if any.
-        atom = atom.get_payload(decode=True)
-        payload = payload.get_payload(decode=True)
-
-        return atom, payload
-
 
     def createObject(self, context, name, content_type, request):
         # see if the request has a atompub payload that specifies,
@@ -149,7 +149,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             if obj is not None:
                 return obj
         elif content_type.startswith('multipart/'):
-            atom, payload = self._splitRequest(request)
+            atom, payload = splitMultipartRequest(request)
             dom = parse(StringIO(atom))
             obj = _deriveOrCheckout(dom)
             if obj is not None:
@@ -272,7 +272,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             body.seek(0)
             self.updateContent(obj, body)
         elif content_type.startswith('multipart/'):
-            atom, payload = self._splitRequest(request)
+            atom, payload = splitMultipartRequest(request)
             self.updateMetadata(obj, StringIO(atom))
             self.updateContent(obj, StringIO(payload))
 
@@ -408,4 +408,7 @@ class RhaptosEditMedia(EditMedia):
         parent = self.context.aq_inner.aq_parent
         adapter = getMultiAdapter(
             (parent, self.request), IRhaptosWorkspaceSwordAdapter)
-        adapter.updateObject(self.context, filename, self.request, self.request.response, content_type)
+
+        body = self.request.get('BODYFILE')
+        body.seek(0)
+        adapter.updateContent(self.context, body)

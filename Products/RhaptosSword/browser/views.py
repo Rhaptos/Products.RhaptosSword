@@ -9,6 +9,8 @@ from Products.CMFCore.utils import getToolByName
 from Products.Five import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 
+from rhaptos.atompub.plone.browser.atompub import ATOMPUB_CONTENT_TYPES
+from rhaptos.atompub.plone.browser.atompub import getContentType
 from rhaptos.swordservice.plone.interfaces import ISWORDEditIRI
 from rhaptos.swordservice.plone.interfaces import ISWORDServiceDocument
 from rhaptos.swordservice.plone.browser.sword import SWORDStatementAdapter
@@ -96,14 +98,20 @@ class EditIRI(BaseEditIRI, SWORDTreatmentMixin):
     def _handlePut(self):
         """ PUT against an existing item should update it.
         """
-        filename = self.request.get_header(
-            'Content-Disposition', self.context.title)
-        content_type, options = \
-            self.request.get_header('Content-Type').split(';')
+        content_type = getContentType(self.request.get_header('Content-Type'))
+
         parent = self.context.aq_inner.aq_parent
         adapter = getMultiAdapter(
             (parent, self.request), IRhaptosWorkspaceSwordAdapter)
-        adapter.updateObject(self.context, filename, self.request, self.request.response, content_type)
+
+        if content_type in ATOMPUB_CONTENT_TYPES:
+            body = self.request.get('BODYFILE')
+            body.seek(0)
+            adapter.updateMetadata(self.context, body)
+        else:
+            # This will result in a 400 error
+            raise ValueError(
+                "%s is not a valid content type for this request" % content_type)
 
     
     def canPublish(self):
