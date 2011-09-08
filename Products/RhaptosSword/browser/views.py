@@ -1,5 +1,6 @@
 from zope.interface import implements
 from Acquisition import aq_inner
+from Acquisition import Explicit
 import transaction
 
 from zope.component import getMultiAdapter
@@ -59,7 +60,7 @@ class SWORDTreatmentMixin(object):
         return requirements
 
 
-class EditIRI(BaseEditIRI, SWORDTreatmentMixin):
+class EditIRI(BaseEditIRI, SWORDTreatmentMixin, Explicit):
     """ This extends the SWORD v 2.0 Deposit Receipt to:
         - List role requests.
         - Show whether the license has been signed by the author and all
@@ -85,7 +86,8 @@ class EditIRI(BaseEditIRI, SWORDTreatmentMixin):
 
 
     def _handleGet(self, **kw):
-        pt = self.depositreceipt.__of__(self.context)
+        view = self.__of__(self.context)
+        pt = self.depositreceipt.__of__(view)
         return pt(**kw)
 
 
