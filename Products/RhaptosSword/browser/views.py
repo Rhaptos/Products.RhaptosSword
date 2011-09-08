@@ -277,5 +277,3 @@ class ServiceDocument(BrowserView):
     def portal_title(self):
         """ Return the portal title. """
         return getToolByName(self.context, 'portal_url').getPortalObject().Title()
-
-
