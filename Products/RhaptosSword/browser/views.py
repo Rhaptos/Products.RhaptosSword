@@ -84,6 +84,11 @@ class EditIRI(BaseEditIRI, SWORDTreatmentMixin):
         self.pmt = getToolByName(self.context, 'portal_membership')
 
 
+    def _handleGet(self, **kw):
+        pt = self.depositreceipt.__of__(self.context)
+        return pt(**kw)
+
+
     def _handlePublish(self):
         # We have to commit the transaction, otherwise the object has a blank
         # _p_jar and cannot be moved. And if it cannot be moved it cannot be
