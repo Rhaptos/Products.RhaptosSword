@@ -89,7 +89,8 @@ class EditIRI(BaseEditIRI, SWORDTreatmentMixin):
         transaction.commit()
         context = aq_inner(self.context)
         description_of_changes = context.message
-        context.publishContent(message=description_of_changes)
+        if self.canPublish():
+            context.publishContent(message=description_of_changes)
 
 
     def _handlePut(self):
@@ -97,13 +98,19 @@ class EditIRI(BaseEditIRI, SWORDTreatmentMixin):
         """
         filename = self.request.get_header(
             'Content-Disposition', self.context.title)
-        content_type = self.request.get_header('Content-Type')
-
+        content_type, options = \
+            self.request.get_header('Content-Type').split(';')
         parent = self.context.aq_inner.aq_parent
         adapter = getMultiAdapter(
             (parent, self.request), IRhaptosWorkspaceSwordAdapter)
         adapter.updateObject(self.context, filename, self.request, self.request.response, content_type)
 
+    
+    def canPublish(self):
+        if self.pending_collaborations() or self.has_required_metadata():
+            return False
+        return True
+    
 
     def pending_collaborations(self):
         return self.context.getPendingCollaborations()
