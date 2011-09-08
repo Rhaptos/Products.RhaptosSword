@@ -113,10 +113,10 @@
         tal:attributes="src python:context.absolute_url() + '/sword/editmedia'" />
     
     <link rel="edit-media" href="edit-media-iri"
-    tal:attributes="href string:${context/absolute_url}/sword/editmedia" />
+    tal:attributes="href string:${context/absolute_url}/sword" />
 
     <link rel="edit" href="edit-iri"
-          tal:attributes="href string:${context/absolute_url}/sword" />
+          tal:attributes="href string:${context/absolute_url}/sword/edit" />
           
     <link rel="http://purl.org/net/sword/terms/add"
           href="http://www.swordserver.ac.uk/col1/mydeposit.atom"
