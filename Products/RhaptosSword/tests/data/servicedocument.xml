@@ -14,22 +14,26 @@
                 
             <collection href="http://nohost/plone/Members/test_user_1_/sword">
                 <atom:title></atom:title>
-                <accept>application/zip</accept>
+                <accept>*/*</accept>
+                <accept alternate="multipart/related"/>
+                <sword:acceptPackaging>http://purl.org/net/sword/package/SimpleZip</sword:acceptPackaging>
                 <sword:mediation>false</sword:mediation>
-                <sword:treatment>Upload a MS Word document or CNXML zip package to this workspace.</sword:treatment>
-
+                <sword:treatment>Upload a word processing document, LaTeX document, or Connexions XML to create a module.</sword:treatment>
+                
                 <dcterms:abstract></dcterms:abstract>
             </collection>
             
         
         
                 
-            <collection href="http://link.example.com/sword">
+            <collection href="http://nohost/plone/http://link.example.com/sword/sword">
                 <atom:title>Workgroup1</atom:title>
-                <accept>application/zip</accept>
+                <accept>*/*</accept>
+                <accept alternate="multipart/related"/>
+                <sword:acceptPackaging>http://purl.org/net/sword/package/SimpleZip</sword:acceptPackaging>
                 <sword:mediation>false</sword:mediation>
-                <sword:treatment>Upload a MS Word document or CNXML zip package to this workspace.</sword:treatment>
-
+                <sword:treatment>Upload a word processing document, LaTeX document, or Connexions XML to create a module.</sword:treatment>
+                
                 <dcterms:abstract>Workgroup1</dcterms:abstract>
             </collection>
             

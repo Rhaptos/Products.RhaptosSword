@@ -288,10 +288,12 @@ class ServiceDocument(BrowserView):
         )
         for wg in self.context.getWorkspaces():
             wgurl = '%s/%s/sword' % (self.context.portal_url(), wg['link'])
+            members = ', '.join([m['id'] for m in wg.get('members', [])])
             result.append({
-                'url': wg['link'],
+                'url': wgurl,
                 'title': wg['title'],
-                'description': wg['description']
+                'description': wg['description'],
+                'members': members,
                 }
             )
         return result
