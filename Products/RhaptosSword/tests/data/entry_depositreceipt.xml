@@ -2,18 +2,18 @@
 
     <!-- SWORD deposit receipt -->
     <title>Box Plots Statistics for Non Majors</title>
-    <id>http://nohost/plone/workspace/module.2011-09-06.0665142012</id>
-    <updated>2011/09/06 19:11:06.681 GMT+2</updated>
-    <summary type="text">The summary</summary>
+    <id>entry.xml</id>
+    <updated>2011/09/11 19:33:25.811 GMT+2</updated>
+    <summary type="text">All you wanted to know about Box Plots and more.</summary>
     <generator uri="rhaptos.swordservice.plone" version="1.0"/>
 
     <!-- The metadata begins -->
-    <dcterms:identifier xsi:type="dcterms:URI">http://nohost/plone/workspace/module.2011-09-06.0665142012</dcterms:identifier> 
+    <dcterms:identifier xsi:type="dcterms:URI">http://nohost/plone/workspace/entry.xml</dcterms:identifier> 
     <dcterms:identifier xsi:type="oerdc:Version">**new**</dcterms:identifier> 
-    <dcterms:identifier xsi:type="oerdc:ContentId">http://nohost/plone/workspace/module.2011-09-06.0665142012</dcterms:identifier> 
+    <dcterms:identifier xsi:type="oerdc:ContentId">entry.xml</dcterms:identifier> 
     <dcterms:title>Box Plots Statistics for Non Majors</dcterms:title>
-    <dcterms:created>2011/09/06 19:11:06.520 GMT+2</dcterms:created> 
-    <dcterms:modified>2011/09/06 19:11:06.681 GMT+2</dcterms:modified> 
+    <dcterms:created>2011/09/11 19:33:25.634 GMT+2</dcterms:created> 
+    <dcterms:modified>2011/09/11 19:33:25.811 GMT+2</dcterms:modified> 
     <dcterms:creator oerdc:email="" oerdc:id="test_user_1_"/>
     <dcterms:maintainer oerdc:email="" oerdc:id="test_user_1_"/>
     <dcterms:maintainer oerdc:id="mrdwab"/>
@@ -22,14 +22,11 @@
     <dcterms:editor oerdc:id="mrdwab"/>
     
     <!-- CNX-Supported but not in MDML -->
-    <oerdc:descriptionOfChanges>
-        * The current description of the changes you have made for this version of the module:
-        
-    </oerdc:descriptionOfChanges> 
+     
 
-    <oerdc:oer-subject/>
+    <oerdc:oer-subject>Mathematics and Statistics</oerdc:oer-subject>
 
-    <dcterms:subject xsi:type="oerdc:Subject"/>
+    <dcterms:subject xsi:type="oerdc:Subject">Mathematics and Statistics</dcterms:subject>
     
     <dcterms:subject>box</dcterms:subject>
     <dcterms:subject>Mathematics and Statistics</dcterms:subject>
@@ -43,20 +40,39 @@
 
     <dcterms:license xsi:type="dcterms:URI">http://creativecommons.org/licenses/by/3.0/</dcterms:license>
 
-    <sword:treatment>Module 'Box Plots Statistics for Non Majors' was imported via the SWORD API.
-        * You can preview your module here to see what it will look like once it is published.
-        * The current description of the changes you have made for this version of the module: &quot;&quot;
-        Publication Requirements:The following contributors must agree to be listing on the module and sign the license agreement here.You must describe the changes that you have made to this version before publishing.</sword:treatment>
+    <sword:treatment>
+        
+Module 'Box Plots Statistics for Non Majors' was imported via the SWORD API.
+
+
+        
+You can &lt;a href=&quot;http://nohost/plone/workspace/entry.xml/module_view&quot;&gt;preview your module here&lt;/a&gt; to see what it will look like once it is published.
+
+
+        
+        
+            Publication requirements:\n
+            
+                1. 
+            
+            
+                2. 
+You must &lt;a href=&quot;http://nohost/plone/workspace/entry.xml/module_description_of_changes/description_of_changes&quot;&gt;describe the changes that you have made to this version&lt;/a&gt; before publishing.
+
+
+            
+        
+    </sword:treatment>
 
     <link href="http://nohost/plone/workspace/entry.xml/module_view?format=html" rel="alternate"/>
 
-    <content src="http://nohost/plone/workspace/entry.xml/sword/edit" type="application/zip"/>
+    <content src="http://nohost/plone/workspace/entry.xml/sword/editmedia" type="application/zip"/>
     
-    <link href="http://nohost/plone/workspace/entry.xml" rel="edit-media"/>
+    <link href="http://nohost/plone/workspace/entry.xml/sword/editmedia" rel="edit-media"/>
 
-    <link href="http://nohost/plone/workspace/entry.xml/sword/edit" rel="edit"/>
+    <link href="http://nohost/plone/workspace/entry.xml/sword" rel="edit"/>
           
-    <link href="http://nohost/plone/workspace/entry.xml/sword/edit" rel="http://purl.org/net/sword/terms/add"/>
+    <link href="http://nohost/plone/workspace/entry.xml/sword" rel="http://purl.org/net/sword/terms/add"/>
 
     <sword:packaging>http://purl.org/net/sword/package/SimpleZip</sword:packaging>
 
@@ -68,6 +84,9 @@
 
     <link href="http://nohost/plone/workspace/entry.xml/module_export?format=plain" rel="http://purl.org/net/sword/terms/derivedResource" type="application/xml"/>
 
-    <link href="http://cnx.org/Members/kef/m10000/sword/statement" rel="http://purl.org/net/sword/terms/statement" type="application/atom+xml;type=feed"/>
+    <link href="http://nohost/plone/workspace/entry.xml/sword/statement" rel="http://purl.org/net/sword/terms/statement" type="application/atom+xml;type=feed"/>
 
+    <link href="http://nohost/plone/workspace/entry.xml/" rel="http://purl.org/net/sword/terms/derivedResource"/>
+
+    <link href="http://nohost/plone/workspace/entry.xml/sword" rel="http://purl.org/net/sword/terms/add"/>
 </entry>

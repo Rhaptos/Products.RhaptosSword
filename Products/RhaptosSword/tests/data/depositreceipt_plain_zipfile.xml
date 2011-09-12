@@ -2,26 +2,28 @@
 
     <!-- SWORD deposit receipt -->
     <title>(Untitled)</title>
-    <id>http://nohost/plone/workspace/module.2011-09-06.1698380849</id>
-    <updated>2011/09/06 20:02:49.840 GMT+2</updated>
-    <summary type="text">The summary</summary>
+    <id>zipfile</id>
+    <updated>2011/09/11 18:24:32.449 GMT+2</updated>
+    
     <generator uri="rhaptos.swordservice.plone" version="1.0"/>
 
     <!-- The metadata begins -->
-    <dcterms:identifier xsi:type="dcterms:URI">http://nohost/plone/workspace/module.2011-09-06.1698380849</dcterms:identifier> 
+    <dcterms:identifier xsi:type="dcterms:URI">http://nohost/plone/workspace/zipfile</dcterms:identifier> 
     <dcterms:identifier xsi:type="oerdc:Version">**new**</dcterms:identifier> 
-    <dcterms:identifier xsi:type="oerdc:ContentId">http://nohost/plone/workspace/module.2011-09-06.1698380849</dcterms:identifier> 
+    <dcterms:identifier xsi:type="oerdc:ContentId">zipfile</dcterms:identifier> 
     <dcterms:title>(Untitled)</dcterms:title>
-    <dcterms:created>2011/09/06 20:02:49.840 GMT+2</dcterms:created> 
-    <dcterms:modified>2011/09/06 20:02:49.840 GMT+2</dcterms:modified> 
+    <dcterms:created>2011/09/11 18:24:32.449 GMT+2</dcterms:created> 
+    <dcterms:modified>2011/09/11 18:24:32.449 GMT+2</dcterms:modified> 
     <dcterms:creator oerdc:email="" oerdc:id="test_user_1_"/>
     <dcterms:maintainer oerdc:email="" oerdc:id="test_user_1_"/>
     <dcterms:rightsHolder oerdc:email="" oerdc:id="test_user_1_"/>
     
     <!-- CNX-Supported but not in MDML -->
     <oerdc:descriptionOfChanges>
-        * The current description of the changes you have made for this version of the module:
         
+The current description of the changes you have made for this version of the module: &quot;Created module&quot;
+
+
     </oerdc:descriptionOfChanges> 
 
     <oerdc:oer-subject/>
@@ -36,21 +38,39 @@
 
     <dcterms:license xsi:type="dcterms:URI"/>
 
-    <sword:treatment>Module '(Untitled)' was imported via the SWORD API.
-        * You can preview your module here to see what it will look like once it is published.
-        * The current description of the changes you have made for this version of the module: &quot;Created module&quot;
-        Publication Requirements: (account:test_user_1_), will need to sign the license.
-</sword:treatment>
+    <sword:treatment>
+        
+Module '(Untitled)' was imported via the SWORD API.
+
+
+        
+You can &lt;a href=&quot;http://nohost/plone/workspace/zipfile/module_view&quot;&gt;preview your module here&lt;/a&gt; to see what it will look like once it is published.
+
+
+        
+The current description of the changes you have made for this version of the module: &quot;Created module&quot;
+
+
+        
+            Publication requirements:\n
+            
+                1. 
+You (, account:test_user_1_), will need to &lt;a href=&quot;http://nohost/plone/workspace/zipfile/cc_license&quot;&gt;sign the license here.&lt;/a&gt;
+
+
+            
+        
+    </sword:treatment>
 
     <link href="http://nohost/plone/workspace/zipfile/module_view?format=html" rel="alternate"/>
 
-    <content src="http://nohost/plone/workspace/zipfile/sword/edit" type="application/zip"/>
+    <content src="http://nohost/plone/workspace/zipfile/sword/editmedia" type="application/zip"/>
     
-    <link href="http://nohost/plone/workspace/zipfile" rel="edit-media"/>
+    <link href="http://nohost/plone/workspace/zipfile/sword/editmedia" rel="edit-media"/>
 
-    <link href="http://nohost/plone/workspace/zipfile/sword/edit" rel="edit"/>
+    <link href="http://nohost/plone/workspace/zipfile/sword" rel="edit"/>
           
-    <link href="http://nohost/plone/workspace/zipfile/sword/edit" rel="http://purl.org/net/sword/terms/add"/>
+    <link href="http://nohost/plone/workspace/zipfile/sword" rel="http://purl.org/net/sword/terms/add"/>
 
     <sword:packaging>http://purl.org/net/sword/package/SimpleZip</sword:packaging>
 
@@ -62,6 +82,9 @@
 
     <link href="http://nohost/plone/workspace/zipfile/module_export?format=plain" rel="http://purl.org/net/sword/terms/derivedResource" type="application/xml"/>
 
-    <link href="http://cnx.org/Members/kef/m10000/sword/statement" rel="http://purl.org/net/sword/terms/statement" type="application/atom+xml;type=feed"/>
+    <link href="http://nohost/plone/workspace/zipfile/sword/statement" rel="http://purl.org/net/sword/terms/statement" type="application/atom+xml;type=feed"/>
 
+    <link href="http://nohost/plone/workspace/zipfile/" rel="http://purl.org/net/sword/terms/derivedResource"/>
+
+    <link href="http://nohost/plone/workspace/zipfile/sword" rel="http://purl.org/net/sword/terms/add"/>
 </entry>
