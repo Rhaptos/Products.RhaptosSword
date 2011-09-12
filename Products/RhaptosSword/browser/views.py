@@ -78,6 +78,7 @@ class SWORDTreatmentMixin(object):
 
 
     def get_publication_requirements(self, context):
+        encoding = context.getCharset()
         context_url = context.absolute_url()
         requirements = []
         if not context.license:
@@ -85,13 +86,13 @@ class SWORDTreatmentMixin(object):
                 user = self.pmt.getMemberById(user_id)
                 if user:
                     fullname = user.getProperty('fullname')
-                    requirements.append(
-                        AUTHOR_AGREEMENT %(fullname, user_id, context_url))
+                    req = AUTHOR_AGREEMENT %(fullname, user_id, context_url)
+                    requirements.append(unicode(req, encoding))
 
         pending_collaborations = context.getPendingCollaborations()
         for user_id, collab in pending_collaborations.items():
-            requirements.append(
-                self.formatUserInfo(context, user_id))
+            info = self.formatUserInfo(context, user_id) 
+            requirements.append(unicode(info, encoding))
 
         if not context.message:
             desc_of_changes_link = \
@@ -103,11 +104,9 @@ class SWORDTreatmentMixin(object):
 
     def formatUserInfo(self, context, user_id):
         user = self.pmt.getMemberById(user_id)
-        if user:
-            fullname = user.getProperty('fullname')
-            return CONTRIBUTOR_AGREEMENT % \
-                (fullname, user_id, context.absolute_url(), user_id)
-        return ''
+        fullname = user.getProperty('fullname')
+        return CONTRIBUTOR_AGREEMENT % \
+            (fullname, user_id, context.absolute_url(), user_id)
 
 
 class EditIRI(BaseEditIRI, SWORDTreatmentMixin, Explicit):
