@@ -171,9 +171,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         obj.checkout(module.objectId)
 
         # Do the fork
-        forked_obj = obj.forkContent(
-            license=module.getDefaultLicense(), return_context=True,
-        )
+        forked_obj = obj.forkContent(license='', return_context=True)
         forked_obj.setState('created')
         forked_obj.setGoogleAnalyticsTrackingCode(None)
 
