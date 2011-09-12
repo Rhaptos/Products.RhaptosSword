@@ -231,17 +231,17 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         """
         dom = parse(fp)
         metadata = self.getMetadata(dom, METADATA_MAPPING)
-        # better make sure we have a title while deriving content
-        metadata.setdefault('title', obj.title)
+
         # we remove descriptionOfChanges because the update_metadata
         # script cannot cope with it.
         descriptionOfChanges = metadata.pop(
             'descriptionOfChanges', self.descriptionOfChanges)
         if descriptionOfChanges:
-            obj.logAction('create', descriptionOfChanges)
             setattr(obj, 'description_of_changes', descriptionOfChanges)
         setattr(obj, 'treatment', self.treatment)
-        obj.update_metadata(**metadata)
+        if metadata:
+            obj.update_metadata(**metadata)
+
         # IB: Always add? Or replace when modifying existing content?
         self.addRoles(obj, dom)
         obj.reindexObject(idxs=metadata.keys())
