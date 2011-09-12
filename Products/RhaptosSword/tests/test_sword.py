@@ -27,6 +27,7 @@ from Products.PloneTestCase import PloneTestCase
 
 from rhaptos.swordservice.plone.browser.sword import ISWORDService
 from rhaptos.swordservice.plone.interfaces import ISWORDEditIRI
+from rhaptos.swordservice.plone.interfaces import ISWORDEMIRI
 from Products.RhaptosSword.browser.views import ServiceDocument
 from Products.RhaptosRepository.interfaces.IVersionStorage import IVersionStorage
 from Products.RhaptosRepository.VersionFolder import incrementMinor
@@ -355,9 +356,9 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         # Test that we can still reach the edit-iri
         drdom = parseString(xml)
         editiri = str(getEditIRI(drdom))
-        moduleid = editiri.split('/')[-3]
+        moduleid = editiri.split('/')[-2]
         self.assertTrue(bool(
-            self.portal.workspace.restrictedTraverse('%s/sword/edit' % moduleid)),
+            self.portal.workspace.restrictedTraverse('%s/sword' % moduleid)),
             "Cannot access deposit receipt")
         zipfile = self.portal.workspace._getOb(moduleid)
 
@@ -373,22 +374,15 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         for element in modified:
             element.firstChild.nodeValue = zipfile.revised
 
-        id = dom.getElementsByTagName('id')[0]
-        id.firstChild.nodeValue = zipfile.absolute_url()
         identifiers = dom.getElementsByTagName('dcterms:identifier')
         for identifier in identifiers:
             if identifier.getAttribute('xsi:type') == "dcterms:URI":
-                identifier.firstChild.nodeValue = zipfile.absolute_url()
-            if identifier.getAttribute('xsi:type') == 'oerdc:ContentId':
                 identifier.firstChild.nodeValue = zipfile.absolute_url()
         reference_depositreceipt = dom.toxml()
         reference_depositreceipt = reference_depositreceipt.replace('zipfile', zipfile.id)
 
         returned_depositreceipt = parseString(xml).toxml()
         self.assertTrue(bool(xml), "Upload view does not return a result")
-        # FIXME: This is probably the wrong way to check the deposit receipt.
-        # rather check programatically that everything that must be there is
-        # there.
         self.assertEqual(returned_depositreceipt, reference_depositreceipt,
             'Result does not match reference doc')
 
@@ -442,13 +436,9 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         modified = dom.getElementsByTagName('dcterms:modified')
         for element in modified:
             element.firstChild.nodeValue = module.revised
-        id = dom.getElementsByTagName('id')[0]
-        id.firstChild.nodeValue = module.absolute_url()
         identifiers = dom.getElementsByTagName('dcterms:identifier')
         for identifier in identifiers:
             if identifier.getAttribute('xsi:type') == "dcterms:URI":
-                identifier.firstChild.nodeValue = module.absolute_url()
-            if identifier.getAttribute('xsi:type') == 'oerdc:ContentId':
                 identifier.firstChild.nodeValue = module.absolute_url()
 
         reference_depositreceipt = dom.toxml()
@@ -474,7 +464,8 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         xml = adapter()
         drdom = parseString(xml)
         editiri = getEditIRI(drdom)
-        moduleid = editiri.split('/')[-3]
+        # it is no longer /sword/edit... just /sword
+        moduleid = editiri.split('/')[-2]
         returned_depositreceipt = drdom.toxml()
         self.assertTrue(moduleid in self.portal.workspace.objectIds())
         self.assertTrue("<entry" in xml, "Not a valid deposit receipt")
@@ -492,13 +483,9 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         for element in modified:
             element.firstChild.nodeValue = module.revised
 
-        id = dom.getElementsByTagName('id')[0]
-        id.firstChild.nodeValue = module.absolute_url()
         identifiers = dom.getElementsByTagName('dcterms:identifier')
         for identifier in identifiers:
             if identifier.getAttribute('xsi:type') == "dcterms:URI":
-                identifier.firstChild.nodeValue = module.absolute_url()
-            if identifier.getAttribute('xsi:type') == 'oerdc:ContentId':
                 identifier.firstChild.nodeValue = module.absolute_url()
         reference_depositreceipt = dom.toxml()
         reference_depositreceipt = reference_depositreceipt.replace('multipart', module.id)
@@ -557,7 +544,8 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         # Get the edit-iri of this item
         dr = parseString(xml)
         editiri = getEditIRI(dr)
-        editorid = str(editiri).split('/')[-3]
+
+        editorid = str(editiri).split('/')[-2]
         editor = self.portal.workspace.restrictedTraverse(editorid)
 
         # Now publish it by posting to the edit-iri
@@ -610,8 +598,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         # We should have at least one module now, this will fail if we don't
         module = self.portal.workspace.objectValues()[0]
 
-        adapter = getMultiAdapter(
-            (module, getrequest), Interface, 'sword')
+        adapter = getMultiAdapter((module, getrequest), ISWORDEMIRI)
         retrieved_content = adapter()
         file = tempfile.NamedTemporaryFile()
         file.write(retrieved_content)
@@ -774,6 +761,11 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         file = open(os.path.join(DIRNAME, 'data', filename), 'w')
         file.write(contents)
         file.close()
+    
+
+    def writedebuginfo(self, returned, reference):
+        self.writecontents(returned, 'returned.xml')
+        self.writecontents(reference, 'reference.xml')
 
 
 def test_suite():
