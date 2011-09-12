@@ -107,7 +107,7 @@
     <sword:treatment>
         <tal:actions replace="treatment/actions" />
         <tal:preview_link replace="structure treatment/preview_link" />
-        <tal:description_of_changes tal:condition="treatment/description_of_changes|nothing">\
+        <tal:description_of_changes tal:condition="treatment/description_of_changes|nothing">
         The current description of the changes you have made for this version of the module: <tal:block tal:replace="structure treatment/description_of_changes"/>
         </tal:description_of_changes>
 
