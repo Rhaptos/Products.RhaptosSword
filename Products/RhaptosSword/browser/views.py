@@ -21,43 +21,93 @@ from rhaptos.swordservice.plone.browser.sword import EditIRI as BaseEditIRI
 from Products.RhaptosSword.adapters import IRhaptosWorkspaceSwordAdapter
 from Products.RhaptosSword.adapters import METADATA_MAPPING
 
+PREVIEW_MSG = \
+"""
+You can <a href="%s/module_view">preview your module here</a> to see what it will look like once it is published.\n
+"""
+
+ACTIONS_MSG = \
+"""
+Module '%s' was imported via the SWORD API.\n
+"""
+
+DESCRIPTION_OF_CHANGES = \
+"""
+The current description of the changes you have made for this version of the module: "%s"\n
+"""
+
+AUTHOR_AGREEMENT = \
+"""
+You (%s, account:%s), will need to <a href="%s/cc_license">sign the license here.</a>\n
+"""
+
+CONTRIBUTOR_AGREEMENT = \
+"""Contributor, %s (account:%s), must <a href="%s/collaborations?user=%s">agree to be listed on this module, and sign the license agreement here</a>.\n
+"""
+         
+DESCRIPTION_CHANGES_WARNING = \
+"""
+You must <a href="%s/description_of_changes">describe the changes that you have made to this version</a> before publishing.\n
+"""
+
 
 class SWORDTreatmentMixin(object):
+
+
+    def __init__(self, context, request):
+        self.pmt = getToolByName(self.context, 'portal_membership')
+
+
     def get_treatment(self, context):
+        treatment = {}
+
         module_name = context.title
-        description_of_changes = context.message
-        message = """Module '%s' was imported via the SWORD API.
-        * You can preview your module here to see what it will look like once it is published.
-        * The current description of the changes you have made for this version of the module: "%s"
-        """ %(module_name, description_of_changes)
-        publication_requirements = self.get_publication_requirements(context)
-        if publication_requirements:
-            message += 'Publication Requirements:'
-            message += publication_requirements
-        return message
+        treatment['actions'] = ACTIONS_MSG % module_name
+
+        treatment['preview_link'] = \
+            PREVIEW_MSG %context.absolute_url()
+        
+        description_of_changes = ''
+        if context.message:
+            description_of_changes  = DESCRIPTION_OF_CHANGES %context.message
+        treatment['description_of_changes'] = description_of_changes
+
+        treatment['publication_requirements'] = \
+            self.get_publication_requirements(context)
+        return treatment
 
 
     def get_publication_requirements(self, context):
-        requirements = ""
+        context_url = context.absolute_url()
+        requirements = []
         if not context.license:
             for user_id in context.authors:
-                user = context.pmt.getMemberById(user_id)
+                user = self.pmt.getMemberById(user_id)
                 if user:
                     fullname = user.getProperty('fullname')
-                    requirements += '%s (account:%s), will need to sign the license.\n'\
-                                     %(fullname, user_id)
+                    requirements.append(
+                        AUTHOR_AGREEMENT %(fullname, user_id, context_url))
 
         pending_collaborations = context.getPendingCollaborations()
-        if pending_collaborations:
-            requirements += 'The following contributors must agree to be listing on the module and sign the license agreement here.'
         for user_id, collab in pending_collaborations.items():
-            user = context.pmt.getMemberById(user_id)
-            if user:
-                fullname = user.getProperty('fullname')
-                requirements += '%s (account:%s)' %(fullname, user_id)
+            requirements.append(
+                self.formatUserInfo(context, user_id))
+
         if not context.message:
-            requirements += 'You must describe the changes that you have made to this version before publishing.'
+            desc_of_changes_link = \
+                context_url + '/module_description_of_changes'
+            requirements.append(
+                DESCRIPTION_CHANGES_WARNING % desc_of_changes_link)
         return requirements
+
+
+    def formatUserInfo(self, context, user_id):
+        user = self.pmt.getMemberById(user_id)
+        if user:
+            fullname = user.getProperty('fullname')
+            return CONTRIBUTOR_AGREEMENT % \
+                (fullname, user_id, context.absolute_url(), user_id)
+        return ''
 
 
 class EditIRI(BaseEditIRI, SWORDTreatmentMixin, Explicit):
@@ -81,8 +131,9 @@ class EditIRI(BaseEditIRI, SWORDTreatmentMixin, Explicit):
     depositreceipt = ViewPageTemplateFile('depositreceipt.pt')
     
     def __init__(self, context, request):
-        super(EditIRI, self).__init__(context, request)
-        self.pmt = getToolByName(self.context, 'portal_membership')
+        BaseEditIRI.__init__(self, context, request)
+        SWORDTreatmentMixin.__init__(self, context, request)
+        Explicit.__init__(self)
 
 
     def _handleGet(self, **kw):
@@ -132,8 +183,7 @@ class EditIRI(BaseEditIRI, SWORDTreatmentMixin, Explicit):
 
 
     def get_user(self, userid):
-        pmt = getToolByName(self.context, 'portal_membership')
-        return pmt.getMemberById(userid)
+        return self.pmt.getMemberById(userid)
 
 
     def get_roles(self, collaboration_requests):
@@ -202,7 +252,9 @@ class RhaptosSWORDStatement(SWORDStatementAdapter, SWORDTreatmentMixin):
     statement = ViewPageTemplateFile('statement.pt')
 
     def __init__(self, context, request):
-        super(SWORDStatementAdapter, self).__init__(context, request)
+        SWORDStatementAdapter.__init__(self, context, request)
+        SWORDTreatmentMixin.__init__(self, context, request)
+
         self.missing_metadata = self.check_metadata()
         self.has_required_metadata = True
         if not self.missing_metadata: self.has_required_metadata = False
