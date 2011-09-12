@@ -37,7 +37,7 @@ CONTRIBUTOR_AGREEMENT = \
 """Contributor, %s (account:%s), must <a href="%s/collaborations?user=%s">agree to be listed on this module, and sign the license agreement here</a>."""
          
 DESCRIPTION_CHANGES_WARNING = \
-"""You must <a href="%s/description_of_changes">describe the changes that you have made to this version</a> before publishing."""
+"""You must <a href="%s">describe the changes that you have made to this version</a> before publishing."""
 
 
 class SWORDTreatmentMixin(object):
