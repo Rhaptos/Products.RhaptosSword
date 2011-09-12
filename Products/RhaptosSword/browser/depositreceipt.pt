@@ -112,10 +112,10 @@
         </tal:description_of_changes>
 
         <tal:publication_requirements condition="treatment/publication_requirements">
-            Publication requirements:
-            <tal:requirements repeat="requirement treatment/publication_requirements">
-                <tal:requirement replace="structure string:${repeat/requirement/number}. ${requirement}" />
-            </tal:requirements>
+        Publication requirements:
+        <tal:requirements repeat="requirement treatment/publication_requirements">
+            <tal:requirement replace="structure string:${repeat/requirement/number}. ${requirement}" />
+        </tal:requirements>
         </tal:publication_requirements>
     </sword:treatment>
 
