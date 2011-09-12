@@ -6,7 +6,8 @@
        xmlns:tal="http://xml.zope.org/namespaces/tal"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:oerdc="http://cnx.org/aboutus/technology/schemas/oerdc"
-       tal:define="pending_collaborations view/pending_collaborations">
+       tal:define="pending_collaborations view/pending_collaborations;
+                   treatment view/treatment">
 
     <!-- SWORD deposit receipt -->
     <title tal:content="context/title">My Deposit</title>
@@ -73,9 +74,8 @@
     </dcterms:editor>
     
     <!-- CNX-Supported but not in MDML -->
-    <oerdc:descriptionOfChanges>
-        * The current description of the changes you have made for this version of the module:
-        <span tal:replace="context/description_of_changes">Description of changes</span>
+    <oerdc:descriptionOfChanges tal:condition="treatment/description_of_changes">
+        <tal:description_of_changes replace="treatment/description_of_changes" />
     </oerdc:descriptionOfChanges> 
 
     <oerdc:oer-subject tal:content="view/subject">
@@ -104,13 +104,23 @@
 
     <dcterms:license xsi:type="dcterms:URI" tal:content="context/license">http://creativecommons.org/licenses/by/3.0/</dcterms:license>
 
-    <sword:treatment tal:content="view/treatment" />
+    <sword:treatment>
+        <tal:actions replace="treatment/actions" />
+        <tal:preview_link replace="treatment/preview_link" />
+        <tal:description_of_changes replace="treatment/description_of_changes" />
+        <tal:publication_requirements condition="treatment/publication_requirements">
+            Publication requirements:\n
+            <tal:requirements repeat="requirement treatment/publication_requirements">
+                <tal:requirement replace="string:${repeat/requirement/number}. ${requirement}" />
+            </tal:requirements>
+        </tal:publication_requirements>
+    </sword:treatment>
 
     <link rel="alternate" href="http://cnx.org/Members/kef/m10000/module_view?format=html"
-        tal:attributes="href python:context.absolute_url() + '/module_view?format=html'" />
+    tal:attributes="href string:${context/absolute_url}/module_view?format=html" />
 
     <content type="application/zip" src="http://cnx.org/Members/kef/m10000/sword/editmedia"
-        tal:attributes="src python:context.absolute_url() + '/sword/editmedia'" />
+    tal:attributes="src string:${context/absolute_url}/sword/editmedia" />
     
     <link rel="edit-media" href="edit-media-iri"
     tal:attributes="href string:${context/absolute_url}/sword/editmedia" />
@@ -120,7 +130,7 @@
           
     <link rel="http://purl.org/net/sword/terms/add"
           href="http://www.swordserver.ac.uk/col1/mydeposit.atom"
-          tal:attributes="href string:${context/absolute_url}/sword/edit" />
+          tal:attributes="href string:${context/absolute_url}/sword" />
 
     <sword:packaging>http://purl.org/net/sword/package/SimpleZip</sword:packaging>
 
