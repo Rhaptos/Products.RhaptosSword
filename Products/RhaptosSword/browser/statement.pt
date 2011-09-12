@@ -1,6 +1,7 @@
 <atom:feed xmlns:sword="http://purl.org/net/sword/terms/" 
       xmlns:atom="http://www.w3.org/2005/Atom"
-      tal:define="context nocall:view/context">
+      tal:define="context nocall:view/context;
+                  treatment view/treatment">
 
     <!-- SWORD statement atom feed representation -->
     <atom:category scheme="http://purl.org/net/sword/terms/state"
@@ -17,6 +18,16 @@
         />
     </atom:entry>
 
-    <sword:treatment tal:content="view/treatment">Stored</sword:treatment>
+    <sword:treatment>
+        <tal:actions replace="treatment/actions" />
+        <tal:preview_link replace="treatment/preview_link" />
+        <tal:description_of_changes replace="treatment/description_of_changes" />
+        <tal:publication_requirements condition="treatment/publication_requirements">
+            Publication requirements:\n
+            <tal:requirements repeat="requirement treatment/publication_requirements">
+                <tal:requirement replace="string:${repeat/requirement/number}. ${requirement}" />
+            </tal:requirements>
+        </tal:publication_requirements>
+    </sword:treatment>
 
 </atom:feed>
