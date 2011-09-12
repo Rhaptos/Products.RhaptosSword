@@ -39,7 +39,6 @@ METADATA_MAPPING =\
          'language'            : 'language',
          'subject'             : 'keywords',
          'oer-subject'         : 'subject',
-         'license'             : 'license',
          'descriptionOfChanges': 'descriptionOfChanges',
          'analyticsCode'       : 'GoogleAnalyticsTrackingCode',
         }
@@ -283,9 +282,6 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         headers = self.getHeaders(dom, mapping)
         metadata = {}
         for key, value in headers:
-            if key == 'license':
-                mdt = getToolByName(self.context, 'portal_moduledb')
-                mdt.getLicenseData(value)
             if key == 'keywords':
                 value = value.split('\n')
             if key == 'language':
