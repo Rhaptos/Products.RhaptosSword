@@ -158,8 +158,33 @@ class EditIRI(BaseEditIRI, SWORDTreatmentMixin, Explicit):
 
     
     def canPublish(self):
+        versioninfo = self.context.rmeVersionInfo()
+        if self.context.publishBlocked(versioninfo):
+            return False
+
         if self.pending_collaborations() or self.has_required_metadata():
             return False
+
+        context = self.context
+        try:
+            published_version = \
+                context.content.getRhaptosObject(context.id).latest.version
+        except KeyError:
+            published_version = None
+
+        # Someone else has edited and published this object
+        if published_version and (context.version != published_version):
+            return False
+
+        # You must specify at least one Author, Maintainer and Copyright
+        # Holder.
+        if not context.authors or not context.maintainers or \
+           not context.licensors:
+            return False
+
+        if not context.validate():
+            return False
+
         return True
     
 
