@@ -56,10 +56,7 @@ class SWORDTreatmentMixin(object):
         treatment['preview_link'] = \
             PREVIEW_MSG %context.absolute_url()
         
-        description_of_changes = ''
-        if context.message:
-            description_of_changes  = DESCRIPTION_OF_CHANGES %context.message
-        treatment['description_of_changes'] = description_of_changes
+        treatment['description_of_changes'] = context.description_of_changes
 
         treatment['publication_requirements'] = \
             self.get_publication_requirements(context)
