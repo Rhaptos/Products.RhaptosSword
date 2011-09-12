@@ -8,6 +8,7 @@ from zope.publisher.interfaces.http import IHTTPRequest
 from zope.component import adapts, queryAdapter, getMultiAdapter
 from AccessControl import getSecurityManager
 from Acquisition import aq_inner
+from zExceptions import Unauthorized
 
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.interfaces import IFolderish
@@ -182,12 +183,29 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         return forked_obj
 
 
+    def canCheckout(self, module):
+        #return False
+        pms = getToolByName(self.context, 'portal_membership')
+        member = pms.getAuthenticatedMember()
+
+        li = list(module.authors) \
+            + list(module.maintainers) \
+            + list(module.licensors) \
+            + list(module.roles.get('translators', []))
+
+        return member.getId() in li
+
+
     def checkoutModule(self, url):
         context = aq_inner(self.context)
         module_id = url.split('/')[-1]
+
         # Fetch module
         content_tool = getToolByName(self.context, 'content')
         module = content_tool.getRhaptosObject(module_id, 'latest')
+
+        if not self.canCheckout(module):
+            raise Unauthorized
 
         if module_id not in context.objectIds():
             context.invokeFactory(id=module_id, type_name=module.portal_type)
