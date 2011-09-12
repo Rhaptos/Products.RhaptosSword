@@ -22,33 +22,22 @@ from Products.RhaptosSword.adapters import IRhaptosWorkspaceSwordAdapter
 from Products.RhaptosSword.adapters import METADATA_MAPPING
 
 PREVIEW_MSG = \
-"""
-You can <a href="%s/module_view">preview your module here</a> to see what it will look like once it is published.\n
-"""
+"""You can <a href="%s/module_view">preview your module here</a> to see what it will look like once it is published."""
 
 ACTIONS_MSG = \
-"""
-Module '%s' was imported via the SWORD API.\n
-"""
+"""Module '%s' was imported via the SWORD API."""
 
 DESCRIPTION_OF_CHANGES = \
-"""
-The current description of the changes you have made for this version of the module: "%s"\n
-"""
+"""The current description of the changes you have made for this version of the module: "%s" """
 
 AUTHOR_AGREEMENT = \
-"""
-You (%s, account:%s), will need to <a href="%s/cc_license">sign the license here.</a>\n
-"""
+"""You (%s, account:%s), will need to <a href="%s/cc_license">sign the license here.</a>"""
 
 CONTRIBUTOR_AGREEMENT = \
-"""Contributor, %s (account:%s), must <a href="%s/collaborations?user=%s">agree to be listed on this module, and sign the license agreement here</a>.\n
-"""
+"""Contributor, %s (account:%s), must <a href="%s/collaborations?user=%s">agree to be listed on this module, and sign the license agreement here</a>."""
          
 DESCRIPTION_CHANGES_WARNING = \
-"""
-You must <a href="%s/description_of_changes">describe the changes that you have made to this version</a> before publishing.\n
-"""
+"""You must <a href="%s/description_of_changes">describe the changes that you have made to this version</a> before publishing."""
 
 
 class SWORDTreatmentMixin(object):
