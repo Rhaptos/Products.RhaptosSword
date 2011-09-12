@@ -109,7 +109,7 @@
         <tal:preview_link replace="treatment/preview_link" />
         <tal:description_of_changes replace="treatment/description_of_changes" />
         <tal:publication_requirements condition="treatment/publication_requirements">
-            Publication requirements:\n
+            Publication requirements:
             <tal:requirements repeat="requirement treatment/publication_requirements">
                 <tal:requirement replace="string:${repeat/requirement/number}. ${requirement}" />
             </tal:requirements>
