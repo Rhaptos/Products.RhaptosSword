@@ -334,10 +334,12 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         for role in ROLE_NAMES:
             for namespace in [DCTERMS_NAMESPACE, OERDC_NAMESPACE]:
                 for element in dom.getElementsByTagNameNS(namespace, role):
-                    tmp_role = role.capitalize()
-                    ids = newRoles.get(tmp_role, [])
-                    ids.append(element.getAttribute('oerdc:id'))
-                    newRoles[tmp_role] = ids
+                    role = role.capitalize()
+                    ids = newRoles.get(role, [])
+                    userid = element.getAttribute('oerdic:id')
+                    if userid:
+                        ids.append(element.getAttribute('oerdc:id'))
+                        newRoles[role] = ids
         return newRoles
 
 
