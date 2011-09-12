@@ -31,7 +31,7 @@ DESCRIPTION_OF_CHANGES = \
 """The current description of the changes you have made for this version of the module: "%s" """
 
 AUTHOR_AGREEMENT = \
-"""You (%s, account:%s), will need to <a href="%s/cc_license">sign the license here.</a>"""
+"""You (%s, account:%s), will need to <a href="%s/module_publish">sign the license here.</a>"""
 
 CONTRIBUTOR_AGREEMENT = \
 """Contributor, %s (account:%s), must <a href="%s/collaborations?user=%s">agree to be listed on this module, and sign the license agreement here</a>."""
