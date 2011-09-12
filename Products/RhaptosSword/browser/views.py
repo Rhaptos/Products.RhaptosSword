@@ -80,7 +80,7 @@ class SWORDTreatmentMixin(object):
             info = self.formatUserInfo(context, user_id) 
             requirements.append(unicode(info, encoding))
 
-        if not context.message:
+        if not context.description_of_changes:
             desc_of_changes_link = \
                 context_url + '/module_description_of_changes'
             requirements.append(
