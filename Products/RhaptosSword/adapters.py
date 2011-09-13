@@ -329,7 +329,6 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                 if values:
                     headers.append((mappings[name], '\n'.join(values)))
 
-        import pdb; pdb.set_trace()
         return headers
    
 
