@@ -44,12 +44,6 @@ METADATA_MAPPING =\
          'analyticsCode'       : 'GoogleAnalyticsTrackingCode',
         }
 
-XSI_TYPE_TO_MDML_NAME_MAP =\
-        {'oerdc:Subject': 'subject',
-         'ISO639-1'     : 'language',
-         'dcterms:URI'  : 'license',
-        }
-
 DESCRIPTION_OF_CHANGES =\
         {'derive': 'Derived a copy.',
          'checkout': 'Checked out a copy.'
@@ -319,25 +313,23 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
 
     def getHeaders(self, dom, mappings): 
         headers = []
+        # default to utf-8 if no encoding specified
+        encoding = dom.encoding or 'utf-8'
         for prefix, uri in dom.documentElement.attributes.items():
             for name in mappings.keys():
-                temp_dict = {}
-                values = dom.getElementsByTagNameNS(uri, name)
-                # split the simple values from those with xsi types
-                for v in values:
-                    xsi_type = v.getAttribute('xsi:type')
-                    temp_name = XSI_TYPE_TO_MDML_NAME_MAP.get(xsi_type, name)
-                    temp_values = temp_dict.get(temp_name, [])
-                    temp_values.append(v)
-                    temp_dict[temp_name] = temp_values
-                
-                for key, values in temp_dict.items():
-                    value = '\n'.join([str(v.firstChild.nodeValue).strip()\
-                                       for v in values\
-                                       if v.firstChild is not None]
-                                     )
-                    if value: headers.append((mappings[key], str(value)))
+                values = []
+                for node in dom.getElementsByTagNameNS(uri, name):
+                    content = ""
+                    # get the xml of all child nodes since some tags
+                    # may contain markup, eg abstract may contain CNXML
+                    for child in node.childNodes:
+                        content += child.toxml().encode(encoding)
+                    if content:
+                        values.append(content)
+                if values:
+                    headers.append((mappings[name], '\n'.join(values)))
 
+        import pdb; pdb.set_trace()
         return headers
    
 
