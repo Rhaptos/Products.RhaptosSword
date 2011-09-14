@@ -339,9 +339,9 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                 for element in dom.getElementsByTagNameNS(namespace, role):
                     role = role.capitalize()
                     ids = newRoles.get(role, [])
-                    userid = element.getAttribute('oerdic:id')
+                    userid = element.getAttribute('oerdc:id')
                     if userid:
-                        ids.append(element.getAttribute('oerdc:id'))
+                        ids.append(userid)
                         newRoles[role] = ids
         return newRoles
 
