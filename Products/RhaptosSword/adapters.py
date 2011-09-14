@@ -341,8 +341,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                     ids = newRoles.get(cnx_role, [])
                     userid = element.getAttribute('oerdc:id')
                     if userid:
-                        #FIXME: str != nice way... make it better!
-                        ids.append(str(userid.decode(encoding)))
+                        ids.append(userid.encode(encoding))
                         newRoles[cnx_role] = ids
         return newRoles
 
