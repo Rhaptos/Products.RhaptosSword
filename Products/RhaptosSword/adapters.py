@@ -28,7 +28,7 @@ class ValidationError(Exception):
     """ Basic validation error
     """
 
-CNX_MD_NAMESPACE = 'http://cnx.rice.edu/mdml'
+CNX_MD_NAMESPACE = "http://cnx.rice.edu/mdml"
 
 DCTERMS_NAMESPACE = "http://purl.org/dc/terms/"
 
@@ -54,12 +54,12 @@ DESCRIPTION_OF_TREATMENT =\
          'checkout': 'Checkout to users workspace.',
         }
 
-ROLE_NAMES = ['creator',
-              'maintainer',
-              'rightsHolder',
-              'editor',
-              'translator',
-             ]
+ROLE_MAPPING = {'creator': 'Author',
+                'maintainer': 'Maintainer',
+                'rightsHolder': 'Licensor',
+                'editor': 'Editor',
+                'translator': 'Translator',
+               }
 
 class IRhaptosWorkspaceSwordAdapter(ISWORDContentUploadAdapter):
     """ Marker interface for SWORD service specific to the Rhaptos 
@@ -333,16 +333,17 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
    
 
     def _getNewRoles(self, dom):
+        encoding = dom.encoding or 'utf-8'
         newRoles = {}
-        for role in ROLE_NAMES:
+        for atom_role, cnx_role in ROLE_MAPPING.items():
             for namespace in [DCTERMS_NAMESPACE, OERDC_NAMESPACE]:
-                for element in dom.getElementsByTagNameNS(namespace, role):
-                    role = role.capitalize()
-                    ids = newRoles.get(role, [])
+                for element in dom.getElementsByTagNameNS(namespace, atom_role):
+                    ids = newRoles.get(cnx_role, [])
                     userid = element.getAttribute('oerdc:id')
                     if userid:
-                        ids.append(userid)
-                        newRoles[role] = ids
+                        #FIXME: str != nice way... make it better!
+                        ids.append(str(userid.decode(encoding)))
+                        newRoles[cnx_role] = ids
         return newRoles
 
 
