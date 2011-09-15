@@ -44,13 +44,13 @@
                             oerdc:email python:view.email(creator)">
         Creator full name  
     </dcterms:creator>
-    <dcterms:maintainer oerdc:id="maintainer id" oerdc:email="owner email"
+    <oerdc:maintainer oerdc:id="maintainer id" oerdc:email="owner email"
             tal:repeat="maintainer context/maintainers"
             tal:content="python:view.fullname(maintainer)"
             tal:attributes="oerdc:id maintainer;
                             oerdc:email python:view.email(maintainer)">
         Maintainer full name  
-    </dcterms:maintainer>
+    </oerdc:maintainer>
     <dcterms:rightsHolder oerdc:id="rightsholder id" oerdc:email="rightsholder email"
             tal:repeat="rightsholder context/licensors"
             tal:content="python:view.fullname(rightsholder)"
@@ -58,20 +58,20 @@
                             oerdc:email python:view.email(rightsholder)">
         Rights holder full name  
     </dcterms:rightsHolder>
-    <dcterms:translator oerdc:id="translator id" oerdc:email="translator email"
+    <oerdc:translator oerdc:id="translator id" oerdc:email="translator email"
             tal:repeat="translator context/translators|python:()"
             tal:content="python:view.fullname(translator)"
             tal:attributes="oerdc:id translator;
                             oerdc:email python:view.email(translator)">
         Translator full name  
-    </dcterms:translator>
-    <dcterms:editor oerdc:id="editor id" oerdc:email="editor email"
+    </oerdc:translator>
+    <oerdc:editor oerdc:id="editor id" oerdc:email="editor email"
             tal:repeat="editor context/editors|python:()"
             tal:content="python:view.fullname(editor)"
             tal:attributes="oerdc:id editor;
                             oerdc:email python:view.email(editor)">
         Editor full name  
-    </dcterms:editor>
+    </oerdc:editor>
     
     <!-- CNX-Supported but not in MDML -->
     <oerdc:descriptionOfChanges tal:condition="treatment/description_of_changes">
@@ -165,4 +165,8 @@
     <link rel="http://purl.org/net/sword/terms/add"
            href="http://cnx.org/Members/kef/m9000/sword"
            tal:attributes="href string:${context/absolute_url}/sword" />
+
+    <oerdc:analyticsCode tal:condition="context/getGoogleAnalyticsTrackingCode"
+           tal:content="context/getGoogleAnalyticsTrackingCode">UA-4688042-1</oerdc:analyticsCode> 
+
 </entry>
