@@ -96,6 +96,24 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
     # keep a handle on the treatment of the object
     treatment = ''
     
+    # the basic default encoding.
+    # we change it to that set on the site a little later.
+    encoding = None
+
+    def getEncoding(self):
+        """ if we have on return it,
+            if not, figure out what it is, store it and return it.
+        """
+        if self.encoding: return self.encoding
+
+        properties = getToolByName(self.context, 'portal_properties')
+        site_properties = getattr(properties, 'site_properties', None)
+        if site_properties:
+            self.encoding = site_properties.getProperty('default_charset')
+        else:
+            self.encoding = 'utf-8'
+        return self.encoding
+    
     def generateFilename(self, name):
         """ Override this method to provide a more sensible name in the
             absence of content-disposition. """
@@ -312,9 +330,8 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
 
 
     def getHeaders(self, dom, mappings): 
+        encoding = self.getEncoding()
         headers = []
-        # default to utf-8 if no encoding specified
-        encoding = dom.encoding or 'utf-8'
         for prefix, uri in dom.documentElement.attributes.items():
             for name in mappings.keys():
                 values = []
@@ -333,7 +350,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
    
 
     def _getNewRoles(self, dom):
-        encoding = dom.encoding or 'utf-8'
+        encoding = self.getEncoding()
         newRoles = {}
         for atom_role, cnx_role in ROLE_MAPPING.items():
             for namespace in [DCTERMS_NAMESPACE, OERDC_NAMESPACE]:
