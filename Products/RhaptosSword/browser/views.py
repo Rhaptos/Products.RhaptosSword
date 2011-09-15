@@ -19,8 +19,11 @@ from rhaptos.swordservice.plone.browser.sword import SWORDStatementAtomAdapter
 from rhaptos.swordservice.plone.browser.sword import EditIRI as BaseEditIRI
 
 from Products.RhaptosSword.adapters import IRhaptosWorkspaceSwordAdapter
+from Products.RhaptosSword.adapters import getSiteEncoding
 from Products.RhaptosSword.adapters import METADATA_MAPPING
 
+
+# TODO: move all these strings to the relevant templates; make macros as required.
 PREVIEW_MSG = \
 """You can <a href="%s/module_view">preview your module here</a> to see what it will look like once it is published."""
 
@@ -42,10 +45,21 @@ DESCRIPTION_CHANGES_WARNING = \
 
 class SWORDTreatmentMixin(object):
 
+    encoding = None
+
 
     def __init__(self, context, request):
         self.pmt = getToolByName(self.context, 'portal_membership')
 
+
+    def getEncoding(self):
+        """ Get the encoding to use.
+            We prefer the site encoding, but will fall back to utf-8
+        """
+        if not self.encoding:
+            self.encoding = getSiteEncoding(self.context)
+        return self.encoding
+    
 
     def get_treatment(self, context):
         treatment = {}
@@ -64,7 +78,7 @@ class SWORDTreatmentMixin(object):
 
 
     def get_publication_requirements(self, context):
-        encoding = context.getCharset()
+        encoding = self.getEncoding() 
         context_url = context.absolute_url()
         requirements = []
         if not context.license:
