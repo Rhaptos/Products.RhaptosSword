@@ -24,6 +24,18 @@ from rhaptos.swordservice.plone.browser.sword import ISWORDContentUploadAdapter
 from rhaptos.swordservice.plone.interfaces import ISWORDEMIRI
 
 
+def getSiteEncoding(context):
+    """ if we have on return it,
+        if not, figure out what it is, store it and return it.
+    """
+    encoding = 'utf-8'
+    properties = getToolByName(context, 'portal_properties')
+    site_properties = getattr(properties, 'site_properties', None)
+    if site_properties:
+        encoding = site_properties.getProperty('default_charset')
+    return encoding
+
+    
 class ValidationError(Exception):
     """ Basic validation error
     """
@@ -104,14 +116,8 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         """ if we have on return it,
             if not, figure out what it is, store it and return it.
         """
-        if self.encoding: return self.encoding
-
-        properties = getToolByName(self.context, 'portal_properties')
-        site_properties = getattr(properties, 'site_properties', None)
-        if site_properties:
-            self.encoding = site_properties.getProperty('default_charset')
-        else:
-            self.encoding = 'utf-8'
+        if not self.encoding:
+            self.encoding = getSiteEncoding(self.context)
         return self.encoding
     
     def generateFilename(self, name):
