@@ -1,3 +1,4 @@
+from copy import copy
 from xml.dom.minidom import parse
 from zipfile import BadZipfile
 from email import message_from_file
@@ -47,13 +48,23 @@ DCTERMS_NAMESPACE = "http://purl.org/dc/terms/"
 OERDC_NAMESPACE = "http://cnx.org/aboutus/technology/schemas/oerdc"
 
 METADATA_MAPPING =\
-        {'title'               : 'title',
-         'abstract'            : 'abstract',
-         'language'            : 'language',
-         'subject'             : 'keywords',
-         'oer-subject'         : 'subject',
+        {'title': 'title',
+         'abstract': 'abstract',
+         'language': 'language',
+         'subject': 'keywords',
+         'oer-subject': 'subject',
          'descriptionOfChanges': 'descriptionOfChanges',
-         'analyticsCode'       : 'GoogleAnalyticsTrackingCode',
+         'analyticsCode': 'GoogleAnalyticsTrackingCode',
+        }
+
+METADATA_DEFAULTS = \
+        {'title': '(Untitled)',
+         'abstract': '',
+         'language': 'en',
+         'keywords': [],
+         'subject': [],
+         'descriptionOfChanges': 'Created Module',
+         'GoogleAnalyticsTrackingCode': '',
         }
 
 DESCRIPTION_OF_CHANGES =\
@@ -72,6 +83,7 @@ ROLE_MAPPING = {'creator': 'Author',
                 'editor': 'Editor',
                 'translator': 'Translator',
                }
+
 
 class IRhaptosWorkspaceSwordAdapter(ISWORDContentUploadAdapter):
     """ Marker interface for SWORD service specific to the Rhaptos 
@@ -250,19 +262,64 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         dom = parse(fp)
         metadata = self.getMetadata(dom, METADATA_MAPPING)
 
+        props = {}
         # we remove descriptionOfChanges because the update_metadata
         # script cannot cope with it.
         descriptionOfChanges = metadata.pop(
             'descriptionOfChanges', self.descriptionOfChanges)
         if descriptionOfChanges:
-            setattr(obj, 'description_of_changes', descriptionOfChanges)
-        setattr(obj, 'treatment', self.treatment)
+            props['description_of_changes'] = descriptionOfChanges
+        props['treatment'] = self.treatment
+        obj.manage_changeProperties(props)
+
         if metadata:
             obj.update_metadata(**metadata)
 
         # IB: Always add? Or replace when modifying existing content?
+        # FIXME: Start paying attention to the merge header.
         self.addRoles(obj, dom)
         obj.reindexObject(idxs=metadata.keys())
+
+    
+    def replaceMetadata(self, obj, fp):
+        """ Replace the metadata on the obj (module) with whatever is in the fp
+            parameter. From the spec. what should be replaced and what we should
+            just add to.
+            - title (dcterms:title) : Replace
+            - abstract/summary (dcterms:abstract) : Replace
+            - language (dcterms:language) : Replace
+            - keyword (dcterms:subject) : Add
+            - subject (dcterms:subject xsi:type="oerdc:Subjects") : Replace
+            - contributor roles : Add
+            - descriptionOfChanges : Replace
+            - analyticsCode : Replace
+            For more current info see: 
+            - Google doc: SWORD V2 Spec for Publishing Modules in Connexions
+        """
+        props = {}
+        dom = parse(fp)
+        # create a metadata dict that has all the defaults, overridden by the
+        # current dom values. This way we will 'clear' the properties not in
+        # the dom.
+        metadata = copy(METADATA_DEFAULTS)
+        metadata.update(self.getMetadata(dom, METADATA_MAPPING))
+        for oerdc_name, cnx_name in METADATA_MAPPING.items():
+            if cnx_name in ['keywords',]:
+                old_value = getattr(obj, cnx_name)
+                if old_value:
+                    current_value = metadata.get(cnx_name, [])
+                    current_value.extend(old_value)
+                    metadata[cnx_name] = current_value
+            # these ones we cannot pass on to the update_metadata script
+            if cnx_name in ['descriptionOfChanges', ]:
+                props[cnx_name] = metadata.pop(cnx_name, '')
+        props['treatment'] = self.treatment
+        obj.manage_changeProperties(props)
+        if metadata:
+            obj.update_metadata(**metadata)
+        self.addRoles(obj, dom)
+        obj.reindexObject(idxs=metadata.keys())
+
 
     def updateContent(self, obj, fp):
         kwargs = {

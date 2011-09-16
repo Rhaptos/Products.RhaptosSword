@@ -157,7 +157,7 @@ class StubLanuageTool(SimpleItem):
         self.id = 'language_tool'
 
     def getAvailableLanguages(self):
-        return {'en': 'English'}
+        return {'en': 'English', 'af': 'Afrikaans'}
 
     def getLanguageBindings(self):
         return ('en', 'en', [])
@@ -283,7 +283,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         if filename is None:
             content = kwargs.get('content', '')
         else:
-            xml = os.path.join(DIRNAME, 'data', filename)
+            xml = os.path.join(DIRNAME, 'data', 'unittest', filename)
             file = open(xml, 'rb')
             content = file.read()
             file.close()
@@ -309,7 +309,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
     def testSwordService(self):
         self._setupRhaptos()
         self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
-        file = open(os.path.join(DIRNAME, 'data', 'servicedocument.xml'), 'r')
+        file = open(os.path.join(DIRNAME, 'data', 'unittest', 'servicedocument.xml'), 'r')
         reference_servicedoc = file.read()
         file.close()
 
@@ -326,7 +326,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         assert xml == reference_servicedoc, 'Result does not match reference doc,'
 
         # Upload a zip file, but don't publish
-        zipfilename = os.path.join(DIRNAME, 'data', 'm11868_1.6.zip')
+        zipfilename = os.path.join(DIRNAME, 'data', 'unittest', 'm11868_1.6.zip')
         zipfile = open(zipfilename, 'r')
         env = {
             'CONTENT_TYPE': 'application/zip',
@@ -362,7 +362,8 @@ class TestSwordService(PloneTestCase.PloneTestCase):
             "Cannot access deposit receipt")
         zipfile = self.portal.workspace._getOb(moduleid)
 
-        file = open(os.path.join(DIRNAME, 'data', 'depositreceipt_plain_zipfile.xml'), 'r')
+        file = open(os.path.join(
+            DIRNAME, 'data', 'unittest', 'depositreceipt_plain_zipfile.xml'), 'r')
         dom = parse(file)
         file.close()
         dates = dom.getElementsByTagName('updated')
@@ -424,7 +425,8 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         dom = parseString(xml)
         returned_depositreceipt = dom.toxml()
 
-        file = open(os.path.join(DIRNAME, 'data', 'entry_depositreceipt.xml'), 'r')
+        file = open(os.path.join(
+            DIRNAME, 'data', 'unittest', 'entry_depositreceipt.xml'), 'r')
         dom = parse(file)
         file.close()
         dates = dom.getElementsByTagName('updated')
@@ -471,7 +473,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.assertTrue("<entry" in xml, "Not a valid deposit receipt")
 
         module = self.portal.workspace.objectValues()[0]
-        file = open(os.path.join(DIRNAME, 'data', 'multipart_depositreceipt.xml'), 'r')
+        file = open(os.path.join(DIRNAME, 'data', 'unittest', 'multipart_depositreceipt.xml'), 'r')
         dom = parse(file)
         file.close()
         dates = dom.getElementsByTagName('updated')
@@ -495,7 +497,11 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.assertEqual(returned_depositreceipt, reference_depositreceipt,
             'Result does not match reference doc')
 
-    def testUploadAndPublish(self):
+    def _testUploadAndPublish(self):
+        """ Upload a module
+            Set its metadata
+            See if we can publish it.
+        """
         self._setupRhaptos()
         self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
         uploadrequest = self.createUploadRequest(
@@ -516,18 +522,25 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         # workspace. Probably something to do with trusted code and what not.
         self.setRoles(('Member', 'Manager'))
         xml = adapter()
-        self.setRoles(('Member',))
         self.assertTrue("<sword:error" not in xml, xml)
-        self.assertTrue("m10001" in self.portal.workspace.objectIds())
-        pubmod = self.portal.workspace._getOb('m10001')
-        self.assertTrue(pubmod.state == 'published', "Did not publish")
-        self.assertTrue(pubmod.version == "1.1",
-            "First published is not version 1.1")
         self.assertTrue("<entry" in xml, "Not a valid deposit receipt")
 
+        self.setRoles(('Member',))
+        pubmod = self.portal.workspace.objectValues()[0]
+        # we set the license in order to continue with the process. 
+        pubmod.license = "http://creativecommons.org/licenses/by/3.0/"
+        pubmod.state = 'published'
+        pubmod.version = "1.1"
+        
+        file = open(os.path.join(
+            DIRNAME, 'data', 'unittest', 'checkout_and_update.txt'), 'r')
+        content = file.read()
+        file.close()
+        content = content.replace('module_url', pubmod.absolute_url())
         # Now check it out again, and replace the content, but don't publish
         uploadrequest = self.createUploadRequest(
-            'checkout_and_update.txt',
+            None,
+            content=content,
             context=self.portal.workspace,
             CONTENT_TYPE='multipart/related; boundary="===============1338623209=="',
             IN_PROGRESS='true'
@@ -583,6 +596,8 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         adapter = getMultiAdapter(
                 (self.portal.workspace, uploadrequest), Interface, 'sword')
         xml = adapter()
+        self.assertTrue("<sword:error" not in xml, xml)
+        self.assertTrue("<entry" in xml, "Not a valid deposit receipt")
 
         env = {
             'REQUEST_METHOD': 'GET',
@@ -606,7 +621,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         retrieved_file = zf.ZipFile(file.name)
         file.close()
         reference_file = zf.ZipFile(
-            os.path.join(DIRNAME, 'data', 'retrievedcontent.zip'))
+            os.path.join(DIRNAME, 'data', 'unittest', 'retrievedcontent.zip'))
         self.assertEqual(len(retrieved_file.namelist()), len(reference_file.namelist()),
             'The files are not the same.')
         retrieved_fl = retrieved_file.filelist
@@ -647,7 +662,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         assert "<sword:error" not in xml, xml
         returned_statement = parseString(xml).toxml()
 
-        file = open(os.path.join(DIRNAME, 'data', 'multipart_statement.xml'), 'r')
+        file = open(os.path.join(DIRNAME, 'data', 'unittest', 'multipart_statement.xml'), 'r')
         dom = parse(file)
         file.close()
         reference_statement = dom.toxml()
@@ -673,7 +688,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         editIRI = getEditIRI(parseString(xml))
         
         filename = 'derive_module.xml'
-        file = open(os.path.join(DIRNAME, 'data', filename), 'r')
+        file = open(os.path.join(DIRNAME, 'data', 'unittest', filename), 'r')
         dom = parse(file)
         file.close()
         module = self.folder.workspace.objectValues()[0]
@@ -693,7 +708,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
 
         uploadrequest = self.createUploadRequest(
-            'multipart.txt',
+            'put_test_step1.txt',
             context=self.folder.workspace,
             CONTENT_TYPE='multipart/related; boundary="===============1338623209=="',
             CONTENT_DISPOSITION='attachment; filename=multipart')
@@ -702,15 +717,69 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         xml = adapter()
         assert "<sword:error" not in xml, xml
 
+        module = self.folder.workspace.objectValues()[0]
         uploadrequest = self.createUploadRequest(
-                'test3_atom_entry.xml',
-            self.folder.workspace,
+            'put_test_step2.xml',
+            module,
             REQUEST_METHOD = 'PUT',
             )
-        module = self.folder.workspace.objectValues()[0]
-        adapter = getMultiAdapter((module, uploadrequest), ISWORDEditIRI)
-        xml = adapter()
-        assert "<sword:error" not in xml, xml
+        adapter = getMultiAdapter(
+                (module, uploadrequest), Interface, 'sword')
+        adapter()
+        xml = module.restrictedTraverse('@@sword')()
+        dom = parseString(xml)
+        id = dom.getElementsByTagName(
+            'id')[0].firstChild.toxml().encode('utf-8')
+        uri = dom.getElementsByTagName(
+            'dcterms:identifier')[0].firstChild.toxml().encode('utf-8')
+        version = dom.getElementsByTagName(
+            'dcterms:identifier')[1].firstChild.toxml().encode('utf-8')
+        contentId = dom.getElementsByTagName(
+            'dcterms:identifier')[2].firstChild.toxml().encode('utf-8')
+        title = dom.getElementsByTagName(
+            'dcterms:title')[0].firstChild.toxml().encode('utf-8')
+        created = dom.getElementsByTagName(
+            'dcterms:created')[0].firstChild.toxml().encode('utf-8')
+        modified = dom.getElementsByTagName(
+            'dcterms:modified')[0].firstChild.toxml().encode('utf-8')
+        creator = dom.getElementsByTagName(
+            'dcterms:creator')[0].getAttribute('oerdc:id').encode('utf-8')
+        maintainer = dom.getElementsByTagName(
+            'oerdc:maintainer')[0].getAttribute('oerdc:id').encode('utf-8')
+        rightsHolder = dom.getElementsByTagName(
+            'dcterms:rightsHolder')[0].getAttribute('oerdc:id').encode('utf-8')
+        description_of_changes = dom.getElementsByTagName(
+            'oerdc:descriptionOfChanges')[0].firstChild.toxml().encode('utf-8')
+        # oerdc:subject should not be in the dom, but let's try to find it anyway.
+        try:
+            subject = dom.getElementsByTagName(
+                'oerdc:subject')[0].firstChild.toxml().encode('utf-8')
+        except IndexError:
+            subject = ''
+        # analyticsCode should not be in the dom either...
+        try:
+            analyticsCode = dom.getElementsByTagName(
+                'oerdc:analyticsCode')[0].firstChild.toxml().encode('utf-8')
+        except IndexError:
+            analyticsCode = ''
+        abstract = dom.getElementsByTagName(
+            'dcterms:abstract')[0].firstChild.toxml().encode('utf-8')
+        language = dom.getElementsByTagName(
+            'dcterms:language')[0].firstChild.toxml().encode('utf-8')
+        # we can potentially drop these 2 fields from the test.
+        keywords = ''
+        dcterms_subject = None
+        license = None
+
+        self.assertEqual(title, 'My Title 2', 'Title was not updated')
+        self.assertEqual(creator, 'test_user_1_', 'Creator was not updated')
+        self.assertEqual(abstract, 'The abstract 2', 'Abstract was not updated')
+        self.assertEqual(language, 'en', 'Language was not updated')
+        self.assertEqual(keywords, '', 'Keywords were not updated')
+        self.assertEqual(subject, '', 'Subject was not updated')
+        self.assertEqual(description_of_changes, '\n        Frobnicate the Bar\n    ',
+            'descriptionOfChanges was not updated')
+        self.assertEqual(analyticsCode, '', 'analyticsCode was not updated')
 
     
     def test_addRoles(self):
@@ -720,7 +789,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         filename = 'test_roles.xml'
         module = self._createModule(self.folder.workspace, filename)
 
-        file = open(os.path.join(DIRNAME, 'data', filename), 'r')
+        file = open(os.path.join(DIRNAME, 'data', 'unittest', filename), 'r')
         dom = parse(file)
         file.close()
         namespaces = ["http://purl.org/dc/terms/",
@@ -736,6 +805,17 @@ class TestSwordService(PloneTestCase.PloneTestCase):
                 for element in dom.getElementsByTagNameNS(ns, role):
                     msg = 'Role:%s was not set properly.' %role
                     assert element.getAttribute('oerdc:id') in ids, msg
+
+    
+    def test_updateMetadata(self):
+        """ Testing the merge semantics implementation.
+        """
+        # create a new module
+        self._setupRhaptos()
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        filename = 'entry.xml'
+        module = self._createModule(self.folder.workspace, filename)
+        self.fail()
 
 
     def _createModule(self, context, filename):
@@ -758,7 +838,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
 
 
     def writecontents(self, contents, filename):
-        file = open(os.path.join(DIRNAME, 'data', filename), 'w')
+        file = open(os.path.join(DIRNAME, 'data', 'unittest', filename), 'w')
         file.write(contents)
         file.close()
     
