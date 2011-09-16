@@ -254,35 +254,18 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                 raise PreconditionFailed, "Cannot overwrite existing content"
 
 
-    def updateMetadata(self, obj, fp):
-        """ Metadata as described in:
-            SWORD V2 Spec for Publishing Modules in Connexions
-            Section: Metadata
-        """
-        dom = parse(fp)
-        metadata = self.getMetadata(dom, METADATA_MAPPING)
+    def getModuleMetadata(self, obj, defaults_dict):
+        metadata = {}
+        for oerdc_name, cnx_name in METADATA_MAPPING.items():
+            value = getattr(obj, cnx_name, defaults_dict.get(cnx_name, None))
+            if value:
+                metadata[cnx_name] = value
+        return metadata
 
-        props = {}
-        # we remove descriptionOfChanges because the update_metadata
-        # script cannot cope with it.
-        descriptionOfChanges = metadata.pop(
-            'descriptionOfChanges', self.descriptionOfChanges)
-        if descriptionOfChanges:
-            props['description_of_changes'] = descriptionOfChanges
-        props['treatment'] = self.treatment
-        obj.manage_changeProperties(props)
 
-        if metadata:
-            obj.update_metadata(**metadata)
-
-        # IB: Always add? Or replace when modifying existing content?
-        # FIXME: Start paying attention to the merge header.
-        self.addRoles(obj, dom)
-        obj.reindexObject(idxs=metadata.keys())
-
-    
-    def replaceMetadata(self, obj, fp):
-        """ Replace the metadata on the obj (module) with whatever is in the fp
+    def mergeMetadata(self, obj, fp):
+        """        
+            Merge the metadata on the obj (module) with whatever is in the fp
             parameter. From the spec. what should be replaced and what we should
             just add to.
             - title (dcterms:title) : Replace
@@ -295,13 +278,12 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             - analyticsCode : Replace
             For more current info see: 
             - Google doc: SWORD V2 Spec for Publishing Modules in Connexions
-        """
+        """        
         props = {}
         dom = parse(fp)
-        # create a metadata dict that has all the defaults, overridden by the
-        # current dom values. This way we will 'clear' the properties not in
-        # the dom.
-        metadata = copy(METADATA_DEFAULTS)
+        # create a metadata dict that has all the values from obj, overridden
+        # by the current dom values.
+        metadata = self.getModuleMetadata(obj, {})
         metadata.update(self.getMetadata(dom, METADATA_MAPPING))
         for oerdc_name, cnx_name in METADATA_MAPPING.items():
             if cnx_name in ['keywords',]:
@@ -317,6 +299,70 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         obj.manage_changeProperties(props)
         if metadata:
             obj.update_metadata(**metadata)
+        self.addRoles(obj, dom)
+        obj.reindexObject(idxs=metadata.keys())
+
+
+    def updateMetadata(self, obj, fp):
+        """ Metadata as described in:
+            SWORD V2 Spec for Publishing Modules in Connexions
+            Section: Metadata
+        """
+        dom = parse(fp)
+        # by passing an empty dict we ensure that only those fields currently
+        # set on the module will be in the metadata dict.
+        # those are then replaced by the values from the request (fp)
+        # this effectively replaces the metadata on the module with new values
+        # from the request.
+        metadata = self.getModuleMetadata(obj, {})
+        metadata.update(self.getMetadata(dom, METADATA_MAPPING))
+
+        props = {}
+        # we remove descriptionOfChanges because the update_metadata
+        # script cannot cope with it.
+        descriptionOfChanges = metadata.pop(
+            'descriptionOfChanges', self.descriptionOfChanges)
+        if descriptionOfChanges:
+            props['description_of_changes'] = descriptionOfChanges
+        props['treatment'] = self.treatment
+        obj.manage_changeProperties(props)
+
+        if metadata:
+            obj.update_metadata(**metadata)
+
+        self.addRoles(obj, dom)
+        obj.reindexObject(idxs=metadata.keys())
+
+    
+    def replaceMetadata(self, obj, fp):
+        """ We replace the module metadata with the values from the request.
+            We use METADATA_DEFAULTS to reset those values we don't have
+            on the request back to what they would be for a new module.
+            This effictive 'clears' all metadata fields that were not supplied
+            on the request.
+            We delete all collaboration requests that are 'pending', but
+            don't have equivalent data on the request.
+            We add all new roles.
+        """
+        props = {}
+        dom = parse(fp)
+        # create a metadata dict that has all the defaults, overridden by the
+        # current dom values. This way we will 'clear' the properties not in
+        # the dom.
+        metadata = copy(METADATA_DEFAULTS)
+        metadata.update(self.getMetadata(dom, METADATA_MAPPING))
+        for oerdc_name, cnx_name in METADATA_MAPPING.items():
+            # these ones we cannot pass on to the update_metadata script
+            if cnx_name in ['descriptionOfChanges', ]:
+                props[cnx_name] = metadata.pop(cnx_name, '')
+        props['treatment'] = self.treatment
+        obj.manage_changeProperties(props)
+        if metadata:
+            obj.update_metadata(**metadata)
+        # first delete all the pending collab request for which we have
+        # no data in the request dom.
+        self.deleteRoles(obj, dom)
+        # now add any new roles
         self.addRoles(obj, dom)
         obj.reindexObject(idxs=metadata.keys())
 
@@ -425,6 +471,17 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                         newRoles[cnx_role] = ids
         return newRoles
 
+
+    def deleteRoles(self, obj, dom):
+        """ Compare the roles in the dom to all the pending collab requests on obj.
+            Delete the pending collabs not listed in the dom.
+        """
+        pending_collaborations = obj.getPendingCollaborations()
+        roles = self._getNewRoles(dom)
+        for user_id, collab_request in pending_collaborations.items():
+            if user_id not in roles.keys() and user_id != obj.Creator():
+                obj.reverseCollaborationRequest(collab_request.id)
+        
 
     def addRoles(self, obj, dom):
         newRoles = self._getNewRoles(dom)
