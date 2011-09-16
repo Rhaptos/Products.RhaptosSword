@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding='utf-8'?>
+<service xmlns="http://www.w3.org/2007/app"
+         xmlns:atom="http://www.w3.org/2005/Atom"
+         xmlns:sword="http://purl.org/net/sword/terms/"
+         xmlns:dcterms="http://purl.org/dc/terms/">
+
+    <sword:version>2.0</sword:version>
+    <sword:maxuploadsize>60000</sword:maxuploadsize>
+
+    <workspace>
+
+        <atom:title>Portal</atom:title>
+        
+                
+            <collection href="http://nohost/plone/Members/test_user_1_/sword">
+                <atom:title></atom:title>
+                <accept>*/*</accept>
+                <accept alternate="multipart/related"/>
+                <sword:acceptPackaging>http://purl.org/net/sword/package/SimpleZip</sword:acceptPackaging>
+                <sword:mediation>false</sword:mediation>
+                <sword:treatment>Upload a word processing document, LaTeX document, or Connexions XML to create a module.</sword:treatment>
+                
+                <dcterms:abstract></dcterms:abstract>
+            </collection>
+            
+        
+        
+                
+            <collection href="http://nohost/plone/http://link.example.com/sword/sword">
+                <atom:title>Workgroup1</atom:title>
+                <accept>*/*</accept>
+                <accept alternate="multipart/related"/>
+                <sword:acceptPackaging>http://purl.org/net/sword/package/SimpleZip</sword:acceptPackaging>
+                <sword:mediation>false</sword:mediation>
+                <sword:treatment>Upload a word processing document, LaTeX document, or Connexions XML to create a module.</sword:treatment>
+                
+                <dcterms:abstract>Workgroup1</dcterms:abstract>
+            </collection>
+            
+        
+
+    </workspace>
+
+</service>

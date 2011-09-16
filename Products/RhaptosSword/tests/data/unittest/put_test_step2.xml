@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<entry xmlns="http://www.w3.org/2005/Atom"
+       xmlns:dcterms="http://purl.org/dc/terms/">
+    <title>My Title 2</title>
+    <id>urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a</id>
+    <updated>2011-09-15T17:17:08Z</updated>
+    <author><name>user 2</name></author>
+    <summary type="text">The abstract 2</summary>
+    <license>http://creativecommons.org/licenses/by/3.0/</license>
+    <descriptionOfChanges>Frobnicate the Bar - second time.</descriptionOfChanges>
+    <dcterms:abstract>The abstract 2</dcterms:abstract>
+</entry>
