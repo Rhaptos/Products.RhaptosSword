@@ -233,7 +233,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         module = content_tool.getRhaptosObject(module_id, 'latest')
 
         if not self.canCheckout(module):
-            raise Unauthorized
+            raise Unauthorized, module_id
 
         if module_id not in context.objectIds():
             context.invokeFactory(id=module_id, type_name=module.portal_type)
