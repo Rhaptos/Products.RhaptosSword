@@ -42,8 +42,6 @@ CONTRIBUTOR_AGREEMENT = \
 DESCRIPTION_CHANGES_WARNING = \
 """You must <a href="%s">describe the changes that you have made to this version</a> before publishing."""
 
-MERGE_FLAG = 'Metadata-Semantics:http://purl.org/oerpub/semantics/Merge'
-
 class SWORDTreatmentMixin(object):
 
     encoding = None
@@ -165,7 +163,8 @@ class EditIRI(BaseEditIRI, SWORDTreatmentMixin, Explicit):
         if content_type in ATOMPUB_CONTENT_TYPES:
             body = self.request.get('BODYFILE')
             body.seek(0)
-            merge = self.request.get(MERGE_FLAG) and True or False
+            merge = self.request.get_header(
+                'HTTP_METADATA_SEMANTICS') and True or False
             if merge:
                 # merge the metadata on the request with what is on the
                 # module (in this case 'self.context')
