@@ -725,8 +725,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
             )
         adapter = getMultiAdapter(
                 (module, uploadrequest), Interface, 'sword')
-        adapter()
-        xml = module.restrictedTraverse('@@sword')()
+        xml = adapter()
         dom = parseString(xml)
         id = dom.getElementsByTagName(
             'id')[0].firstChild.toxml().encode('utf-8')
@@ -807,7 +806,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
                     assert element.getAttribute('oerdc:id') in ids, msg
 
     
-    def test_updateMetadata(self):
+    def test_updateMetadataWithPOSTto_SE_IRI(self):
         """ Testing the merge semantics implementation.
         """
         # create a new module
@@ -815,6 +814,15 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
         filename = 'entry.xml'
         module = self._createModule(self.folder.workspace, filename)
+        uploadrequest = self.createUploadRequest(
+            'entry.xml',
+            module,
+            CONTENT_DISPOSITION='attachment; filename=entry.xml',
+        )
+        adapter = getMultiAdapter(
+                (module, uploadrequest), Interface, 'sword')
+        xml = adapter()
+        
         self.fail()
 
 
