@@ -167,11 +167,17 @@ class EditIRI(BaseEditIRI, SWORDTreatmentMixin, Explicit):
             body.seek(0)
             merge = self.request.get(MERGE_FLAG) and True or False
             if merge:
-                # merge the metadata dict with what is on the module (obj) 
-                adapter.updateMetadata(self.context, body)
+                # merge the metadata on the request with what is on the
+                # module (in this case 'self.context')
+                adapter.mergeMetadata(self.context, body)
             else:
-                # replace what is on the module with metadata above
+                # replace what is on the module with metadata on the request
+                # in the process all fields not on the request will be reset
+                # on the module (see METADATA_DEFAULTS) for the values used.
                 adapter.replaceMetadata(self.context, body)
+            view = self.__of__(self.context)
+            pt = self.depositreceipt.__of__(view)
+            return pt()
         else:
             # This will result in a 400 error
             raise ValueError(
