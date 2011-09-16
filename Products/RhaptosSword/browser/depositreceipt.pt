@@ -167,6 +167,6 @@
            tal:attributes="href string:${context/absolute_url}/sword" />
 
     <oerdc:analyticsCode tal:condition="context/getGoogleAnalyticsTrackingCode"
-           tal:content="context/getGoogleAnalyticsTrackingCode">UA-4688042-1</oerdc:analyticsCode> 
+           tal:content="context/getGoogleAnalyticsTrackingCode">UA-4688042-1</oerdc:analyticsCode>
 
 </entry>
