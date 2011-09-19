@@ -303,32 +303,32 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         obj.reindexObject(idxs=metadata.keys())
 
 
-    def updateMetadata(self, obj, dom):
+    def updateMetadata(self, obj, fp):
         """ Metadata as described in:
             SWORD V2 Spec for Publishing Modules in Connexions
             Section: Metadata
         """
-        # by passing an empty dict we ensure that only those fields currently
-        # set on the module will be in the metadata dict.
-        # those are then replaced by the values from the request (dom)
-        # this effectively replaces the metadata on the module with new values
-        # from the request.
-        metadata = self.getModuleMetadata(obj, {})
-        metadata.update(self.getMetadata(dom, METADATA_MAPPING))
-
         props = {}
-        # we remove descriptionOfChanges because the update_metadata
-        # script cannot cope with it.
-        descriptionOfChanges = metadata.pop(
-            'descriptionOfChanges', self.descriptionOfChanges)
-        if descriptionOfChanges:
-            props['description_of_changes'] = descriptionOfChanges
+        dom = parse(fp)
+        metadata = {}
+        metadata.update(self.getMetadata(dom, METADATA_MAPPING))
+        for oerdc_name, cnx_name in METADATA_MAPPING.items():
+            if cnx_name in ['keywords',]:
+                old_value = getattr(obj, cnx_name)
+                if old_value:
+                    current_value = metadata.get(cnx_name, [])
+                    current_value.extend(old_value)
+                    metadata[cnx_name] = current_value
+            # these ones we cannot pass on to the update_metadata script
+            if cnx_name in ['descriptionOfChanges', ]:
+                # if the object does not currently have a value for this field,
+                # we must update it.
+                if not getattr(obj, cnx_name, None):
+                    props[cnx_name] = metadata.pop(cnx_name, '')
         props['treatment'] = self.treatment
         obj.manage_changeProperties(props)
-
         if metadata:
             obj.update_metadata(**metadata)
-
         self.addRoles(obj, dom)
         obj.reindexObject(idxs=metadata.keys())
 
