@@ -59,7 +59,7 @@ METADATA_MAPPING =\
          'language': 'language',
          'subject': 'keywords',
          'oer-subject': 'subject',
-         'descriptionOfChanges': 'descriptionOfChanges',
+         'descriptionOfChanges': 'description_of_changes',
          'analyticsCode': 'GoogleAnalyticsTrackingCode',
         }
 
@@ -69,7 +69,7 @@ METADATA_DEFAULTS = \
          'language': 'en',
          'keywords': [],
          'subject': [],
-         'descriptionOfChanges': 'Created Module',
+         'description_of_changes': 'Created Module',
          'GoogleAnalyticsTrackingCode': '',
         }
 
@@ -194,8 +194,8 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         elif content_type.startswith('multipart/'):
             # Check upload size
             checkUploadSize(context, request.stdin)
-            atom, payload = splitMultipartRequest(request)
-            obj = _deriveOrCheckout(atom)
+            atom_dom, payload = splitMultipartRequest(request)
+            obj = _deriveOrCheckout(atom_dom)
             if obj is not None:
                 return obj
 
@@ -351,7 +351,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                             current_values.extend(value)
                     metadata[cnx_name] = new_values
             # these ones we cannot pass on to the update_metadata script
-            if cnx_name in ['descriptionOfChanges', ]:
+            if cnx_name in ['description_of_changes', ]:
                 # if the object does not currently have a value for this field,
                 # we must update it.
                 if not getattr(obj, cnx_name, None):
@@ -383,7 +383,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         metadata.update(self.getMetadata(dom, METADATA_MAPPING))
         for oerdc_name, cnx_name in METADATA_MAPPING.items():
             # these ones we cannot pass on to the update_metadata script
-            if cnx_name in ['descriptionOfChanges', ]:
+            if cnx_name in ['description_of_changes', ]:
                 props[cnx_name] = metadata.pop(cnx_name, '')
         props['treatment'] = self.treatment
         obj.manage_changeProperties(props)
@@ -444,8 +444,8 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             self.updateContent(obj, body, cksum)
         elif content_type.startswith('multipart/'):
             cksum = request.get_header('Content-MD5')
-            atom, payload = splitMultipartRequest(request)
-            self.updateMetadata(obj, atom)
+            atom_dom, payload = splitMultipartRequest(request)
+            self.updateMetadata(obj, atom_dom)
             self.updateContent(obj, StringIO(payload), cksum)
 
         return obj
