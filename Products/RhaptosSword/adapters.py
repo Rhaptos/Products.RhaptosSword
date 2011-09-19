@@ -400,7 +400,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         obj.reindexObject(idxs=metadata.keys())
 
 
-    def updateContent(self, obj, fp, cksum):
+    def updateContent(self, obj, fp, cksum, merge=False):
         kwargs = {
             'original_file_name': 'sword-import-file',
             'user_name': getSecurityManager().getUser().getUserName()
@@ -416,18 +416,25 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
 
         text, subobjs, meta = doTransform(obj, "sword_to_folder",
             content, meta=1, **kwargs)
-        # For a new document, it will contain a blank index.cnxml. For
-        # existing documents, we want to replace all of it anyway. Either
-        # way, we want to  delete the contents of the module and replace
-        # it. Unless we have no text, then leave the default empty
-        # document alone
-        obj.manage_delObjects(
-            filter(lambda x: x!=obj.default_file, obj.objectIds()))
-        if text:
-            obj.manage_delObjects([obj.default_file,])
-            obj.invokeFactory('CNXML Document', obj.default_file,
-                file=text, idprefix='zip-')
-        makeContent(obj, subobjs)
+        if merge:
+            if text:
+                # Replace index.cnxml
+                obj.manage_delObjects([obj.default_file,])
+                obj.invokeFactory('CNXML Document', obj.default_file,
+                    file=text, idprefix='zip-')
+            makeContent(obj, subobjs)
+        else:
+            # Delete everything
+            obj.manage_delObjects(obj.objectIds())
+            if text:
+                obj.invokeFactory('CNXML Document', obj.default_file,
+                    file=text, idprefix='zip-')
+            else:
+                # Create an empty index.cnxml
+                obj.invokeFactory('CNXML Document', obj.default_file,
+                    idprefix='zip-')
+            makeContent(obj, subobjs)
+
         # make sure that the cnxml is the latest version
         obj.getDefaultFile().upgrade()
 
@@ -579,6 +586,7 @@ class RhaptosEditMedia(EditMedia):
         """ PUT against an existing item should update it.
         """
         # Check upload size
+        body = self.request.get('BODYFILE')
         checkUploadSize(self.context, body)
 
         filename = self.request.get_header(
@@ -589,7 +597,9 @@ class RhaptosEditMedia(EditMedia):
         adapter = getMultiAdapter(
             (parent, self.request), IRhaptosWorkspaceSwordAdapter)
 
-        body = self.request.get('BODYFILE')
         cksum = self.request.get_header('Content-MD5')
+        merge = self.request.get_header('Update-Semantics')
+
         body.seek(0)
-        adapter.updateContent(self.context, body, cksum)
+        adapter.updateContent(self.context, body, cksum,
+            merge is not None and merge.lower()=='merge')
