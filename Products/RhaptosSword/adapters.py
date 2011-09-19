@@ -3,6 +3,7 @@ from xml.dom.minidom import parse
 from zipfile import BadZipfile
 from email import message_from_file
 from StringIO import StringIO
+from types import StringType, ListType, TupleType
 import md5
 
 from zope.interface import Interface, implements
@@ -337,12 +338,18 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         metadata = {}
         metadata.update(self.getMetadata(dom, METADATA_MAPPING))
         for oerdc_name, cnx_name in METADATA_MAPPING.items():
-            if cnx_name in ['keywords',]:
-                old_value = getattr(obj, cnx_name)
-                if old_value:
-                    current_value = metadata.get(cnx_name, [])
-                    current_value.extend(old_value)
-                    metadata[cnx_name] = current_value
+            if cnx_name in ['keywords', 'subject',]:
+                current_values = getattr(obj, cnx_name)
+                if current_values:
+                    if type(current_values) == TupleType:
+                        current_values = list(current_values)
+                    new_values = metadata.get(cnx_name, [])
+                    if type(new_values) == StringType:
+                        new_values = [new_values,]
+                    for value in new_values:
+                        if value not in current_values:
+                            current_values.extend(value)
+                    metadata[cnx_name] = new_values
             # these ones we cannot pass on to the update_metadata script
             if cnx_name in ['descriptionOfChanges', ]:
                 # if the object does not currently have a value for this field,
