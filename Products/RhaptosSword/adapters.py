@@ -323,13 +323,12 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         obj.reindexObject(idxs=metadata.keys())
 
 
-    def updateMetadata(self, obj, fp):
+    def updateMetadata(self, obj, dom):
         """ Metadata as described in:
             SWORD V2 Spec for Publishing Modules in Connexions
             Section: Metadata
         """
         props = {}
-        dom = parse(fp)
         metadata = {}
         metadata.update(self.getMetadata(dom, METADATA_MAPPING))
         for oerdc_name, cnx_name in METADATA_MAPPING.items():
