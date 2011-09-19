@@ -324,32 +324,19 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         xml = view()
         assert "<sword:error" not in xml
         assert xml == reference_servicedoc, 'Result does not match reference doc,'
-
-        # Upload a zip file, but don't publish
-        zipfilename = os.path.join(DIRNAME, 'data', 'unittest', 'm11868_1.6.zip')
-        zipfile = open(zipfilename, 'r')
-        env = {
-            'CONTENT_TYPE': 'application/zip',
-            'CONTENT_LENGTH': os.path.getsize(zipfilename),
-            'CONTENT_DISPOSITION': 'attachment; filename=m11868_1.6.zip',
-            'REQUEST_METHOD': 'POST',
-            'SERVER_NAME': 'nohost',
-            'SERVER_PORT': '80',
-            'IN_PROGRESS': 'true',
-        }
-        uploadresponse = HTTPResponse(stdout=StringIO())
-        uploadrequest = clone_request(self.app.REQUEST, uploadresponse, env)
-        uploadrequest.set('BODYFILE', zipfile)
-        uploadrequest.stdin = bodyfile
-        # Fake PARENTS
-        uploadrequest.set('PARENTS', [self.portal.workspace])
-
+        
+        uploadrequest = self.createUploadRequest(
+            'm11868_1.6.zip',
+            self.portal.workspace,
+            CONTENT_TYPE= 'application/zip',
+            CONTENT_DISPOSITION= 'attachment; filename=m11868_1.6.zip',
+            IN_PROGRESS= 'true',
+        )
         # Call the sword view on this request to perform the upload
         self.setRoles(('Manager',))
         adapter = getMultiAdapter(
             (self.portal.workspace, uploadrequest), Interface, 'sword')
         xml = adapter()
-        zipfile.close()
 
         # There should be no errors
         self.assertTrue("<sword:error" not in xml, xml)
@@ -666,6 +653,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         file = open(os.path.join(DIRNAME, 'data', 'unittest', 'multipart_statement.xml'), 'r')
         dom = parse(file)
         file.close()
+        reference_statement = dom.toxml()
         reference_statement = reference_statement.replace('__MODULE_ID__', module.id)
         self.assertEqual(returned_statement, reference_statement,
             'Returned statement and reference statement are not identical.')
@@ -776,7 +764,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.assertEqual(language, 'en', 'Language was not updated')
         self.assertEqual(keywords, '', 'Keywords were not updated')
         self.assertEqual(subject, '', 'Subject was not updated')
-        self.assertEqual(description_of_changes, '\n        Frobnicate the Bar\n    ',
+        self.assertEqual(description_of_changes, '\n        Frobnicate the Bar - second time.\n    ',
             'descriptionOfChanges was not updated')
         self.assertEqual(analyticsCode, '', 'analyticsCode was not updated')
 
@@ -823,8 +811,6 @@ class TestSwordService(PloneTestCase.PloneTestCase):
                 (module, uploadrequest), Interface, 'sword')
         xml = adapter()
         
-        self.fail()
-
 
     def _createModule(self, context, filename):
         """ Utility method to setup the environment and create a module.
