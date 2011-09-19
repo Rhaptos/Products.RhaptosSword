@@ -6,47 +6,50 @@
     </atom:category>
     
     <atom:entry>
-        <link href="http://nohost/plone/workspace/multipart/index.cnxml" rel="edit-media"/>
+        <link href="http://nohost/plone/workspace/__MODULE_ID__/index.cnxml" rel="edit-media"/>
     </atom:entry>
     <atom:entry>
-        <link href="http://nohost/plone/workspace/multipart/index_auto_generated.cnxml" rel="edit-media"/>
+        <link href="http://nohost/plone/workspace/__MODULE_ID__/index_auto_generated.cnxml" rel="edit-media"/>
     </atom:entry>
     <atom:entry>
-        <link href="http://nohost/plone/workspace/multipart/h_allpass.png" rel="edit-media"/>
+        <link href="http://nohost/plone/workspace/__MODULE_ID__/h_allpass.png" rel="edit-media"/>
     </atom:entry>
     <atom:entry>
-        <link href="http://nohost/plone/workspace/multipart/h_lowpass.png" rel="edit-media"/>
+        <link href="http://nohost/plone/workspace/__MODULE_ID__/h_lowpass.png" rel="edit-media"/>
     </atom:entry>
     <atom:entry>
-        <link href="http://nohost/plone/workspace/multipart/index.cnxml.pre-v07" rel="edit-media"/>
+        <link href="http://nohost/plone/workspace/__MODULE_ID__/index.cnxml.pre-v07" rel="edit-media"/>
     </atom:entry>
     <atom:entry>
-        <link href="http://nohost/plone/workspace/multipart/h_bandstop.png" rel="edit-media"/>
+        <link href="http://nohost/plone/workspace/__MODULE_ID__/h_bandstop.png" rel="edit-media"/>
     </atom:entry>
     <atom:entry>
-        <link href="http://nohost/plone/workspace/multipart/h_bandpass.png" rel="edit-media"/>
+        <link href="http://nohost/plone/workspace/__MODULE_ID__/h_bandpass.png" rel="edit-media"/>
     </atom:entry>
     <atom:entry>
-        <link href="http://nohost/plone/workspace/multipart/idealFilters.m" rel="edit-media"/>
+        <link href="http://nohost/plone/workspace/__MODULE_ID__/idealFilters.m" rel="edit-media"/>
     </atom:entry>
     <atom:entry>
-        <link href="http://nohost/plone/workspace/multipart/h_highpass.png" rel="edit-media"/>
+        <link href="http://nohost/plone/workspace/__MODULE_ID__/h_highpass.png" rel="edit-media"/>
     </atom:entry>
     <atom:entry>
-        <link href="http://nohost/plone/workspace/multipart/notchFilter.m" rel="edit-media"/>
+        <link href="http://nohost/plone/workspace/__MODULE_ID__/notchFilter.m" rel="edit-media"/>
     </atom:entry>
     <atom:entry>
-        <link href="http://nohost/plone/workspace/multipart/h_notch.png" rel="edit-media"/>
+        <link href="http://nohost/plone/workspace/__MODULE_ID__/h_notch.png" rel="edit-media"/>
     </atom:entry>
 
     <sword:treatment>
         Module 'My Title' was imported via the SWORD API.
-        You can &lt;a href=&quot;http://nohost/plone/workspace/multipart/module_view&quot;&gt;preview your module here&lt;/a&gt; to see what it will look like once it is published.
-        Frobnicate the Bar
+        You can &lt;a href=&quot;http://nohost/plone/workspace/__MODULE_ID__/module_view&quot;&gt;preview your module here&lt;/a&gt; to see what it will look like once it is published.
+        
         
             Publication requirements:\n
             
-                1. You (, account:test_user_1_), will need to &lt;a href=&quot;http://nohost/plone/workspace/multipart/module_publish&quot;&gt;sign the license here.&lt;/a&gt;
+                1. You (, account:test_user_1_), will need to &lt;a href=&quot;http://nohost/plone/workspace/__MODULE_ID__/module_publish&quot;&gt;sign the license here.&lt;/a&gt;
+            
+            
+                2. You must &lt;a href=&quot;http://nohost/plone/workspace/module.2011-09-19.2535174052/module_description_of_changes&quot;&gt;describe the changes that you have made to this version&lt;/a&gt; before publishing.
             
         
     </sword:treatment>

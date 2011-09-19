@@ -666,8 +666,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         file = open(os.path.join(DIRNAME, 'data', 'unittest', 'multipart_statement.xml'), 'r')
         dom = parse(file)
         file.close()
-        reference_statement = dom.toxml()
-        reference_statement = reference_statement.replace('multipart', module.id)
+        reference_statement = reference_statement.replace('__MODULE_ID__', module.id)
         self.assertEqual(returned_statement, reference_statement,
             'Returned statement and reference statement are not identical.')
 
