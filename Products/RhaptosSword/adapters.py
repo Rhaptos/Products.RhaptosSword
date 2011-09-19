@@ -106,8 +106,9 @@ def splitMultipartRequest(request):
     # encoding for us, if any.
     atom = atom.get_payload(decode=True)
     payload = payload.get_payload(decode=True)
+    dom = parse(StringIO(atom))
 
-    return atom, payload
+    return dom, payload
 
 
 class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
@@ -172,8 +173,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                 return obj
         elif content_type.startswith('multipart/'):
             atom, payload = splitMultipartRequest(request)
-            dom = parse(StringIO(atom))
-            obj = _deriveOrCheckout(dom)
+            obj = _deriveOrCheckout(atom)
             if obj is not None:
                 return obj
 
@@ -303,15 +303,14 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         obj.reindexObject(idxs=metadata.keys())
 
 
-    def updateMetadata(self, obj, fp):
+    def updateMetadata(self, obj, dom):
         """ Metadata as described in:
             SWORD V2 Spec for Publishing Modules in Connexions
             Section: Metadata
         """
-        dom = parse(fp)
         # by passing an empty dict we ensure that only those fields currently
         # set on the module will be in the metadata dict.
-        # those are then replaced by the values from the request (fp)
+        # those are then replaced by the values from the request (dom)
         # this effectively replaces the metadata on the module with new values
         # from the request.
         metadata = self.getModuleMetadata(obj, {})
@@ -394,14 +393,14 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         if content_type in ATOMPUB_CONTENT_TYPES:
             body = request.get('BODYFILE')
             body.seek(0)
-            self.updateMetadata(obj, body)
+            self.updateMetadata(obj, parse(body))
         elif content_type == 'application/zip':
             body = request.get('BODYFILE')
             body.seek(0)
             self.updateContent(obj, body)
         elif content_type.startswith('multipart/'):
             atom, payload = splitMultipartRequest(request)
-            self.updateMetadata(obj, StringIO(atom))
+            self.updateMetadata(obj, atom)
             self.updateContent(obj, StringIO(payload))
 
         return obj
