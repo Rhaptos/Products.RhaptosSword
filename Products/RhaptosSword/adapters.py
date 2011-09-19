@@ -289,7 +289,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             if cnx_name in ['keywords',]:
                 old_value = getattr(obj, cnx_name)
                 if old_value:
-                    current_value = metadata.get(cnx_name, [])
+                    current_value = list(metadata.get(cnx_name, []))
                     current_value.extend(old_value)
                     metadata[cnx_name] = current_value
             # these ones we cannot pass on to the update_metadata script
