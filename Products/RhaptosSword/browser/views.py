@@ -22,6 +22,8 @@ from Products.RhaptosSword.adapters import IRhaptosWorkspaceSwordAdapter
 from Products.RhaptosSword.adapters import getSiteEncoding
 from Products.RhaptosSword.adapters import METADATA_MAPPING
 
+from Products.RhaptosSword.exceptions import PublishUnauthorized
+
 
 # TODO: move all these strings to the relevant templates; make macros as required.
 PREVIEW_MSG = \
@@ -149,6 +151,11 @@ class EditIRI(BaseEditIRI, SWORDTreatmentMixin, Explicit):
         description_of_changes = context.message
         if self.canPublish():
             context.publishContent(message=description_of_changes)
+        else:
+            requirements = self.get_publication_requirements(context)
+            raise PublishUnauthorized(
+                "You do not have permission to publish this module",
+                requirements)
 
 
     def _handlePut(self):
