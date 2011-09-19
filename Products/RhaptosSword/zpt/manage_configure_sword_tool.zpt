@@ -18,13 +18,24 @@
     <table cellspacing="0" cellpadding="2" border="0">
       <tr>
         <td align="left" valign="top">
-        <input type="checkbox" name="acceptingSwordRequests" value=""
-               tal:attributes="checked python:here.acceptingSwordRequests and 'yes' or ''"/>
-        </td>
-        <td align="left" valign="top">
           <div class="form-optional">
             Accepting Sword requests.
           </div>
+        </td>
+        <td align="left" valign="top">
+        <input type="checkbox" name="acceptingSwordRequests" value=""
+               tal:attributes="checked python:here.acceptingSwordRequests and 'yes' or ''"/>
+        </td>
+      </tr>
+      <tr>
+        <td>
+            <div class="form-optional">
+                Maximum upload size.
+            </div>
+        </td>
+        <td>
+            <input type="text" name="maxUploadSize" value="1000000"
+                   tal:attributes="value python:here.maxUploadSize" />
         </td>
       </tr>
       <tr>
