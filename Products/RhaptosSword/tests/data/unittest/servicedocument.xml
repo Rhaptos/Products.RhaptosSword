@@ -5,7 +5,7 @@
          xmlns:dcterms="http://purl.org/dc/terms/">
 
     <sword:version>2.0</sword:version>
-    <sword:maxuploadsize>60000</sword:maxuploadsize>
+    <sword:maxuploadsize>10485760</sword:maxuploadsize>
 
     <workspace>
 
