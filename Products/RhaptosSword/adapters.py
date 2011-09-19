@@ -27,6 +27,8 @@ from rhaptos.swordservice.plone.interfaces import ISWORDEMIRI
 from rhaptos.swordservice.plone.exceptions import MaxUploadSizeExceeded
 from rhaptos.swordservice.plone.exceptions import ErrorChecksumMismatch
 
+from Products.RhaptosSword.exceptions import CheckoutUnauthorized
+
 
 def getSiteEncoding(context):
     """ if we have on return it,
@@ -253,7 +255,10 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         module = content_tool.getRhaptosObject(module_id, 'latest')
 
         if not self.canCheckout(module):
-            raise Unauthorized, module_id
+            raise CheckoutUnauthorized(
+                "You do not have permission to checkout %s" % module_id,
+                "You are not a maintainer of the requested module or "
+                "you do not have sufficient permissions for this workspace")
 
         if module_id not in context.objectIds():
             context.invokeFactory(id=module_id, type_name=module.portal_type)
