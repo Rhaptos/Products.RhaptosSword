@@ -340,6 +340,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         uploadresponse = HTTPResponse(stdout=StringIO())
         uploadrequest = clone_request(self.app.REQUEST, uploadresponse, env)
         uploadrequest.set('BODYFILE', zipfile)
+        uploadrequest.stdin = bodyfile
         # Fake PARENTS
         uploadrequest.set('PARENTS', [self.portal.workspace])
 
