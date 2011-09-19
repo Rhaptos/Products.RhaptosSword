@@ -389,6 +389,9 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         obj.manage_changeProperties(props)
         if metadata:
             obj.update_metadata(**metadata)
+        # we set GoogleAnalyticsTrackingCode explicitly, since the script
+        # 'update_metadata' ignores empty strings.
+        obj.GoogleAnalyticsTrackingCode = metadata.get('GoogleAnalyticsTrackingCode')
         # first delete all the pending collab request for which we have
         # no data in the request dom.
         self.deleteRoles(obj, dom)
