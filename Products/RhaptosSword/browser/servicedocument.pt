@@ -6,7 +6,7 @@
          xmlns:tal="http://xml.zope.org/namespaces/tal" >
 
     <sword:version>2.0</sword:version>
-    <sword:maxuploadsize>60000</sword:maxuploadsize>
+    <sword:maxuploadsize tal:content="view/maxuploadsize">60000</sword:maxuploadsize>
 
     <workspace>
 

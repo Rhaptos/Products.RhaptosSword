@@ -362,6 +362,11 @@ class ServiceDocument(BrowserView):
     def __call__(self):
         return self.servicedocument()
 
+    @property
+    def maxuploadsize(self):
+        """ Returns the maximum file size we will accept. """
+        return getToolByName(self.context, 'sword_tool').getMaxUploadSize()
+
     def collections(self):
         """ Return home folder and workgroups we have access too """
         result = []
