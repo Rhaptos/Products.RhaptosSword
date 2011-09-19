@@ -20,6 +20,7 @@
         <td align="left" valign="top">
         <input type="checkbox" name="acceptingSwordRequests" value=""
                tal:attributes="checked python:here.acceptingSwordRequests and 'yes' or ''"/>
+        </td>
         <td align="left" valign="top">
           <div class="form-optional">
             Accepting Sword requests.
@@ -40,4 +41,3 @@
   </form>
 
 </html>
-
