@@ -3,6 +3,7 @@ from xml.dom.minidom import parse
 from zipfile import BadZipfile
 from email import message_from_file
 from StringIO import StringIO
+import md5
 
 from zope.interface import Interface, implements
 from zope.publisher.interfaces.http import IHTTPRequest
@@ -23,6 +24,8 @@ from rhaptos.swordservice.plone.browser.sword import PloneFolderSwordAdapter
 from rhaptos.swordservice.plone.browser.sword import EditMedia
 from rhaptos.swordservice.plone.browser.sword import ISWORDContentUploadAdapter 
 from rhaptos.swordservice.plone.interfaces import ISWORDEMIRI
+from rhaptos.swordservice.plone.exceptions import MaxUploadSizeExceeded
+from rhaptos.swordservice.plone.exceptions import ErrorChecksumMismatch
 
 
 def getSiteEncoding(context):
@@ -111,6 +114,17 @@ def splitMultipartRequest(request):
     return dom, payload
 
 
+def checkUploadSize(context, fp):
+    """ Check size of file handle. """
+    maxupload = getToolByName(context, 'sword_tool').getMaxUploadSize()
+    fp.seek(0, 2)
+    size = fp.tell()
+    fp.seek(0)
+    if size > maxupload:
+        raise MaxUploadSizeExceeded("Maximum upload size exceeded",
+            "The uploaded content is larger than the allowed %d bytes." % maxupload)
+
+
 class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
     """ Rhaptos specific implement of the SWORD folder adapter.
     """
@@ -141,7 +155,6 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
     def createObject(self, context, name, content_type, request):
         # see if the request has a atompub payload that specifies,
         # module id in "source" or "mdml:derived_from" in ATOM entry.
-
         def _deriveOrCheckout(dom):
             # Check if this is a request to derive or checkout a module
             elements = dom.getElementsByTagNameNS(
@@ -163,6 +176,10 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         if content_type in ATOMPUB_CONTENT_TYPES:
             # find our marker elements
             body = request.get('BODYFILE')
+
+            # Check upload size
+            checkUploadSize(context, body)
+
             body.seek(0)
             dom = parse(body)
             body.seek(0)
@@ -172,11 +189,14 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             if obj is not None:
                 return obj
         elif content_type.startswith('multipart/'):
+            # Check upload size
+            checkUploadSize(context, request.stdin)
             atom, payload = splitMultipartRequest(request)
             obj = _deriveOrCheckout(atom)
             if obj is not None:
                 return obj
 
+        checkUploadSize(context, request.stdin)
         return super(RhaptosWorkspaceSwordAdapter, self).createObject(
             context, name, content_type, request)
 
@@ -366,13 +386,22 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         obj.reindexObject(idxs=metadata.keys())
 
 
-    def updateContent(self, obj, fp):
+    def updateContent(self, obj, fp, cksum):
         kwargs = {
             'original_file_name': 'sword-import-file',
             'user_name': getSecurityManager().getUser().getUserName()
         }
+        content = fp.read()
+
+        # check the md5sum, if provided
+        if cksum is not None:
+            h = md5.md5(content).hexdigest()
+            if h != cksum:
+                raise ErrorChecksumMismatch("Checksum does not match",
+                    "Calulcated Checksum %s does not match %s" % (h, cksum))
+
         text, subobjs, meta = doTransform(obj, "sword_to_folder",
-            fp.read(), meta=1, **kwargs)
+            content, meta=1, **kwargs)
         # For a new document, it will contain a blank index.cnxml. For
         # existing documents, we want to replace all of it anyway. Either
         # way, we want to  delete the contents of the module and replace
@@ -396,12 +425,14 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             self.updateMetadata(obj, parse(body))
         elif content_type == 'application/zip':
             body = request.get('BODYFILE')
+            cksum = request.get_header('Content-MD5')
             body.seek(0)
-            self.updateContent(obj, body)
+            self.updateContent(obj, body, cksum)
         elif content_type.startswith('multipart/'):
+            cksum = request.get_header('Content-MD5')
             atom, payload = splitMultipartRequest(request)
             self.updateMetadata(obj, atom)
-            self.updateContent(obj, StringIO(payload))
+            self.updateContent(obj, StringIO(payload), cksum)
 
         return obj
 
@@ -533,6 +564,9 @@ class RhaptosEditMedia(EditMedia):
     def PUT(self):
         """ PUT against an existing item should update it.
         """
+        # Check upload size
+        checkUploadSize(self.context, body)
+
         filename = self.request.get_header(
             'Content-Disposition', self.context.title)
         content_type = self.request.get_header('Content-Type')
@@ -542,5 +576,6 @@ class RhaptosEditMedia(EditMedia):
             (parent, self.request), IRhaptosWorkspaceSwordAdapter)
 
         body = self.request.get('BODYFILE')
+        cksum = self.request.get_header('Content-MD5')
         body.seek(0)
-        adapter.updateContent(self.context, body)
+        adapter.updateContent(self.context, body, cksum)
