@@ -18,6 +18,7 @@
     <oerdc:oer-subject>Mathematics and Statistics</oerdc:oer-subject>
     <dcterms:subject>addition</dcterms:subject>
     <dcterms:subject>subtraction</dcterms:subject>
+    <dcterms:subject>division</dcterms:subject>
     <dcterms:language xsi:type="ISO639-1">af</dcterms:language>
     <oerdc:analyticsCode>UA-4688042-1</oerdc:analyticsCode>
     <dcterms:license xsi:type="dcterms:URI">http://creativecommons.org/licenses/by/3.0/</dcterms:license>
