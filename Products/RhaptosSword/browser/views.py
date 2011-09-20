@@ -171,7 +171,7 @@ class EditIRI(BaseEditIRI, SWORDTreatmentMixin, Explicit):
             body = self.request.get('BODYFILE')
             body.seek(0)
             merge = self.request.get_header(
-                'HTTP_METADATA_SEMANTICS') and True or False
+                'Update-Semantics') and True or False
             if merge:
                 # merge the metadata on the request with what is on the
                 # module (in this case 'self.context')
