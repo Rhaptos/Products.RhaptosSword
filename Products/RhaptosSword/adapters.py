@@ -134,7 +134,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
     adapts(IFolderish, IHTTPRequest)
 
     # keep a handle on what changed during the process
-    descriptionOfChanges = ''
+    description_of_changes = ''
     # keep a handle on the treatment of the object
     treatment = ''
     
@@ -319,7 +319,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                     current_value.extend(old_value)
                     metadata[cnx_name] = current_value
             # these ones we cannot pass on to the update_metadata script
-            if cnx_name in ['descriptionOfChanges', ]:
+            if cnx_name in ['description_of_changes', ]:
                 props[cnx_name] = metadata.pop(cnx_name, '')
         props['treatment'] = self.treatment
         obj.manage_changeProperties(props)
@@ -572,7 +572,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
 
     
     def setActionMetadata(self, obj, action):
-        self.descriptionOfChanges = DESCRIPTION_OF_CHANGES[action]
+        self.description_of_changes = DESCRIPTION_OF_CHANGES[action]
         self.treatment = DESCRIPTION_OF_TREATMENT[action]
         return obj
 
