@@ -5,6 +5,8 @@ from email import message_from_file
 from StringIO import StringIO
 from types import StringType, ListType, TupleType
 import md5
+import os
+from zipfile import ZipFile, BadZipfile
 
 from zope.interface import Interface, implements
 from zope.publisher.interfaces.http import IHTTPRequest
@@ -608,6 +610,35 @@ class RhaptosEditMedia(EditMedia):
         adapter.updateContent(self.context, body, cksum,
             merge is not None and merge.lower()=='merge')
 
+    def addFile(self, context, filename, f):
+        # These files may never be uploaded, because we cannot process
+        # them here, the spec says no.
+        if filename == 'index.cnxml':
+            raise OverwriteNotPermitted(
+                "Overwriting index.cnxml is not allowed")
+
+        # Word processor documents are not allowed
+        wordext = [x for x in ('odt','sxw','docx','rtf','doc') \
+            if filename.endswith('.' + x)]
+        if wordext:
+            # Its a word processor file, reject it
+            raise OverwriteNotPermitted(
+                "Overwriting files of type %s is not allowed" % wordext[0])
+
+        filename = normalizeFilename(filename)
+
+        # If there is another file by the same name, protest
+        if filename in context.objectIds():
+            raise OverwriteNotPermitted(
+                "An object named %s already exists" % filename)
+
+        # Finally, upload as a unified file
+        context.invokeFactory('UnifiedFile', filename, file=f)
+        obj = context._getOb(filename)
+        obj.setTitle(filename)
+        obj.reindexObject(idxs='Title')
+        return obj
+
     @show_error_document
     def POST(self):
         """ This implements POST functionality on the EM-IRI. A POST always
@@ -617,15 +648,45 @@ class RhaptosEditMedia(EditMedia):
             converted to other formats, such as OOo or MS Word, will be
             left as is. """
         context = aq_inner(self.context)
-        if self.request.get(
-            'CONTENT_TYPE').lower().startswith('application/zip'):
+        if self.request.get_header('Content-Type').lower().startswith(
+            'application/zip') or self.request.get_header(
+            'Packaging', '').endswith('/SimpleZip'):
             # Unpack the zip and add the various items
-            raise NotImplementedError, "TODO"
+            try:
+                zipfile = ZipFile(self.request['BODYFILE'], 'r')
+            except BadZipfile:
+                raise BadRequest("Invalid zip file")
+
+            namelist = zipfile.namelist()
+            lenlist = len(namelist)
+
+            # Empty zip file?
+            if lenlist == 0:
+                raise BadRequest("Zip file is empty")
+
+            if lenlist > 1:
+                prefix = os.path.commonprefix(namelist)
+            else:
+                prefix = os.path.dirname(namelist[0]) + '/'
+            namelist = [name[len(prefix):] for name in namelist]
+
+            for f in namelist:
+                if not f:
+                    continue # Directory name in the listing
+                if f.find('/')!=-1:
+                    continue  # Subdirectories ignored
+                # When this moves to python2.6, please use zipfile.open here
+                unzipfile = StringIO(zipfile.read(prefix + f))
+                self.addFile(context, f, unzipfile)
+
+            # Returned Location header points to the EM-IRI for zipfile upload
+            self.request.response.setHeader('Location', '%s/editmedia' % context.absolute_url())
+            self.request.response.setStatus(201)
+            return ''
         else:
             # Rhaptos uses UnifiedFile for everything, so we will not use
-            # content_type_registry here.
-    
-            # First get the file name. The client MUST supply this
+            # content_type_registry here. First get the file name. The client
+            # MUST supply this
             disposition = self.request.get_header('Content-Disposition')
             if disposition is None:
                 raise BadRequest("The request has no Content-Disposition")
@@ -636,33 +697,7 @@ class RhaptosEditMedia(EditMedia):
                 raise BadRequest(
                     "The Content-Disposition header has no filename")
 
-            # These files may never be uploaded, because we cannot process
-            # them here, the spec says no.
-            if filename == 'index.cnxml':
-                raise OverwriteNotPermitted(
-                    "Overwriting index.cnxml is not allowed")
-
-            # Word processor documents are not allowed
-            wordext = [x for x in ('odt','sxw','docx','rtf','doc') \
-                if filename.endswith('.' + x)]
-            if wordext:
-                # Its a word processor file, reject it
-                raise OverwriteNotPermitted(
-                    "Overwriting files of type %s is not allowed" % wordext[0])
-
-            filename = normalizeFilename(filename)
-
-            # If there is another file by the same name, protest
-            if filename in context.objectIds():
-                raise OverwriteNotPermitted(
-                    "An object named %s already exists" % filename)
-
-            # Finally, upload as a unified file
-            context.invokeFactory('UnifiedFile', filename)
-            obj = context._getOb(filename)
-            obj.PUT(self.request, self.request.response)
-            obj.setTitle(filename)
-            obj.reindexObject(idxs='Title')
+            obj = self.addFile(context, filename, self.request['BODYFILE'])
 
             # Returned Location header must point directly at the file
             self.request.response.setHeader('Location', obj.absolute_url())
