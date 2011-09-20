@@ -30,6 +30,7 @@ from rhaptos.swordservice.plone.exceptions import MaxUploadSizeExceeded
 from rhaptos.swordservice.plone.exceptions import ErrorChecksumMismatch
 from rhaptos.swordservice.plone.exceptions import BadRequest
 
+from Products.RhaptosSword.normalize import normalizeFilename
 from Products.RhaptosSword.exceptions import CheckoutUnauthorized
 from Products.RhaptosSword.exceptions import OverwriteNotPermitted
 
@@ -649,8 +650,7 @@ class RhaptosEditMedia(EditMedia):
                 raise OverwriteNotPermitted(
                     "Overwriting files of type %s is not allowed" % wordext[0])
 
-            plone_utils = getToolByName(self.context, 'plone_utils')
-            filename = plone_utils.normalizeString(filename)
+            filename = normalizeFilename(filename)
 
             # If there is another file by the same name, protest
             if filename in context.objectIds():
