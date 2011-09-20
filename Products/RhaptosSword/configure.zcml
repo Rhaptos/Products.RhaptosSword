@@ -65,4 +65,10 @@
         factory=".adapters.RhaptosEditMedia"
         />
 
+    <adapter
+        for="Products.RhaptosSword.interfaces.IRhaptosSwordWorkspace
+             zope.publisher.interfaces.http.IHTTPRequest"
+        provides="rhaptos.swordservice.plone.interfaces.ISWORDListCollection"
+        factory="rhaptos.swordservice.plone.browser.sword.ListCollection" />
+
 </configure>
