@@ -419,7 +419,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             h = md5.md5(content).hexdigest()
             if h != cksum:
                 raise ErrorChecksumMismatch("Checksum does not match",
-                    "Calulcated Checksum %s does not match %s" % (h, cksum))
+                    "Calculated Checksum %s does not match %s" % (h, cksum))
 
         try:
             text, subobjs, meta = doTransform(obj, "sword_to_folder",
