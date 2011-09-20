@@ -44,6 +44,8 @@ CONTRIBUTOR_AGREEMENT = \
 DESCRIPTION_CHANGES_WARNING = \
 """You must <a href="%s">describe the changes that you have made to this version</a> before publishing."""
 
+REQUIRED_METADATA = ['title', 'subject',]
+
 class SWORDTreatmentMixin(object):
 
     encoding = None
@@ -243,8 +245,11 @@ class EditIRI(BaseEditIRI, SWORDTreatmentMixin, Explicit):
 
     def has_required_metadata(self):
         obj = self.context.aq_inner
-        for key, value in METADATA_MAPPING.items():
-            if not getattr(obj, key, None): return False
+        for attr in REQUIRED_METADATA:
+            value = getattr(obj, attr, None)
+            if not value: return False
+            if attr == 'title' and value == '(Untitled)':
+                return False
         return True
 
     
@@ -307,9 +312,12 @@ class RhaptosSWORDStatement(SWORDStatementAdapter, SWORDTreatmentMixin):
     def check_metadata(self):
         obj = self.context.aq_inner
         missing_metadata = []
-        for key, value in METADATA_MAPPING.items():
-            if not getattr(obj, key, None):
-                missing_metadata.append(key)
+        for attr in REQUIRED_METADATA:
+            value = getattr(obj, attr, None)
+            if not value:
+                missing_metadata.append(attr)
+            if attr == 'title' and value == '(Untitled)':
+                missing_metadata.append(attr)
         return missing_metadata
 
 
