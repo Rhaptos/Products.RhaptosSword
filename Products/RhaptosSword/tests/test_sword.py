@@ -645,7 +645,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         # date and time back.
         now = DateTime()
         module.created = now
-        view = module.restrictedTraverse('sword/statement')
+        view = module.restrictedTraverse('sword/statement.atom')
         xml = view()
         assert "<sword:error" not in xml, xml
         returned_statement = parseString(xml).toxml()
