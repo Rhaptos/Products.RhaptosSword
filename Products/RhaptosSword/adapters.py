@@ -24,11 +24,14 @@ from rhaptos.atompub.plone.browser.atompub import ATOMPUB_CONTENT_TYPES
 from rhaptos.swordservice.plone.browser.sword import PloneFolderSwordAdapter
 from rhaptos.swordservice.plone.browser.sword import EditMedia
 from rhaptos.swordservice.plone.browser.sword import ISWORDContentUploadAdapter 
+from rhaptos.swordservice.plone.browser.sword import show_error_document
 from rhaptos.swordservice.plone.interfaces import ISWORDEMIRI
 from rhaptos.swordservice.plone.exceptions import MaxUploadSizeExceeded
 from rhaptos.swordservice.plone.exceptions import ErrorChecksumMismatch
+from rhaptos.swordservice.plone.exceptions import BadRequest
 
 from Products.RhaptosSword.exceptions import CheckoutUnauthorized
+from Products.RhaptosSword.exceptions import OverwriteNotPermitted
 
 
 def getSiteEncoding(context):
@@ -603,3 +606,65 @@ class RhaptosEditMedia(EditMedia):
         body.seek(0)
         adapter.updateContent(self.context, body, cksum,
             merge is not None and merge.lower()=='merge')
+
+    @show_error_document
+    def POST(self):
+        """ This implements POST functionality on the EM-IRI. A POST always
+            adds content, and in this case it is not allowed to overwrite.
+            Within the rhaptos context it is also not allowed to use any
+            of the usual transforms, and files that would normally be
+            converted to other formats, such as OOo or MS Word, will be
+            left as is. """
+        context = aq_inner(self.context)
+        if self.request.get(
+            'CONTENT_TYPE').lower().startswith('application/zip'):
+            # Unpack the zip and add the various items
+            raise NotImplementedError, "TODO"
+        else:
+            # Rhaptos uses UnifiedFile for everything, so we will not use
+            # content_type_registry here.
+    
+            # First get the file name. The client MUST supply this
+            disposition = self.request.get_header('Content-Disposition')
+            if disposition is None:
+                raise BadRequest("The request has no Content-Disposition")
+            try:
+                filename = [x.strip() for x in disposition.split(';') \
+                    if x.strip().startswith('filename=')][0][9:]
+            except IndexError:
+                raise BadRequest(
+                    "The Content-Disposition header has no filename")
+
+            # These files may never be uploaded, because we cannot process
+            # them here, the spec says no.
+            if filename == 'index.cnxml':
+                raise OverwriteNotPermitted(
+                    "Overwriting index.cnxml is not allowed")
+
+            # Word processor documents are not allowed
+            wordext = [x for x in ('odt','sxw','docx','rtf','doc') \
+                if filename.endswith('.' + x)]
+            if wordext:
+                # Its a word processor file, reject it
+                raise OverwriteNotPermitted(
+                    "Overwriting files of type %s is not allowed" % wordext[0])
+
+            plone_utils = getToolByName(self.context, 'plone_utils')
+            filename = plone_utils.normalizeString(filename)
+
+            # If there is another file by the same name, protest
+            if filename in context.objectIds():
+                raise OverwriteNotPermitted(
+                    "An object named %s already exists" % filename)
+
+            # Finally, upload as a unified file
+            context.invokeFactory('UnifiedFile', filename)
+            obj = context._getOb(filename)
+            obj.PUT(self.request, self.request.response)
+            obj.setTitle(filename)
+            obj.reindexObject(idxs='Title')
+
+            # Returned Location header must point directly at the file
+            self.request.response.setHeader('Location', obj.absolute_url())
+            self.request.response.setStatus(201)
+            return ''
