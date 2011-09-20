@@ -28,6 +28,7 @@ from Products.PloneTestCase import PloneTestCase
 from rhaptos.swordservice.plone.browser.sword import ISWORDService
 from rhaptos.swordservice.plone.interfaces import ISWORDEditIRI
 from rhaptos.swordservice.plone.interfaces import ISWORDEMIRI
+from rhaptos.swordservice.plone.interfaces import ISWORDListCollection
 from Products.RhaptosSword.browser.views import ServiceDocument
 from Products.RhaptosRepository.interfaces.IVersionStorage import IVersionStorage
 from Products.RhaptosRepository.VersionFolder import incrementMinor
@@ -810,6 +811,31 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         adapter = getMultiAdapter(
                 (module, uploadrequest), Interface, 'sword')
         xml = adapter()
+
+
+    def test_ListCollection(self):
+        self._setupRhaptos()
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        filename = 'entry.xml'
+        
+        number_of_modules = 4
+        modules = []
+        for i in range(0, number_of_modules):
+            modules.append(self._createModule(self.folder.workspace, filename))
+        get_request = self.createUploadRequest(
+            None,
+            self.folder.workspace,
+            REQUEST_METHOD='GET',
+        )
+        adapter = getMultiAdapter(
+            (self.folder.workspace, get_request), ISWORDListCollection)
+        xml = adapter()
+        assert "<sword:error" not in xml, xml
+        
+        dom = parseString(xml)
+        entries = dom.getElementsByTagName('entry')
+        self.assertEqual(
+            len(entries), number_of_modules, 'Not all modules were returned')
         
 
     def _createModule(self, context, filename):
@@ -826,8 +852,10 @@ class TestSwordService(PloneTestCase.PloneTestCase):
                 (context, uploadrequest), Interface, 'sword')
         xml = adapter()
         assert "<sword:error" not in xml, xml
-
-        module = context.objectValues()[0]
+        
+        editIri = getEditIRI(parseString(xml))
+        module_id = editIri.split('/')[-2]
+        module = context._getOb(module_id)
         return module
 
 
