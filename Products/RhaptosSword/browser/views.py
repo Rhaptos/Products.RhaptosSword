@@ -195,7 +195,7 @@ class EditIRI(BaseEditIRI, SWORDTreatmentMixin, Explicit):
         if self.context.publishBlocked(versioninfo):
             return False
 
-        if self.pending_collaborations() or self.has_required_metadata():
+        if self.pending_collaborations():
             return False
 
         context = self.context
@@ -215,7 +215,8 @@ class EditIRI(BaseEditIRI, SWORDTreatmentMixin, Explicit):
            not context.licensors:
             return False
 
-        if not context.validate():
+        errors = context.validate()
+        if errors:
             return False
 
         return True
