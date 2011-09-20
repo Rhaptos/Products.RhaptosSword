@@ -35,6 +35,7 @@ from rhaptos.swordservice.plone.exceptions import BadRequest
 from Products.RhaptosSword.normalize import normalizeFilename
 from Products.RhaptosSword.exceptions import CheckoutUnauthorized
 from Products.RhaptosSword.exceptions import OverwriteNotPermitted
+from Products.RhaptosSword.exceptions import TransformFailed
 
 
 def getSiteEncoding(context):
@@ -420,8 +421,12 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                 raise ErrorChecksumMismatch("Checksum does not match",
                     "Calulcated Checksum %s does not match %s" % (h, cksum))
 
-        text, subobjs, meta = doTransform(obj, "sword_to_folder",
-            content, meta=1, **kwargs)
+        try:
+            text, subobjs, meta = doTransform(obj, "sword_to_folder",
+                content, meta=1, **kwargs)
+        except (OOoImportError, BadZipfile), e:
+            raise TransformFailed(str(e))
+
         if merge:
             if text:
                 # Replace index.cnxml
