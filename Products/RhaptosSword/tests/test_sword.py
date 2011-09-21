@@ -836,6 +836,36 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         entries = dom.getElementsByTagName('entry')
         self.assertEqual(
             len(entries), number_of_modules, 'Not all modules were returned')
+
+    
+    def test_handleDelete(self):
+        self._setupRhaptos()
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        filename = 'entry.xml'
+        
+        assert(len(self.folder.workspace.objectIds()) == 0,
+               'There should be nothing here.')
+        number_of_modules = 4
+        modules = []
+        for i in range(0, number_of_modules):
+            modules.append(self._createModule(self.folder.workspace, filename))
+        assert(len(self.folder.workspace.objectIds()) == 4,
+               'There should be 4 modules here now.')
+        
+        for count, module in enumerate(modules):
+            get_request = self.createUploadRequest(
+                None,
+                module,
+                REQUEST_METHOD='DELETE',
+            )
+            adapter = getMultiAdapter((module, get_request), ISWORDEditIRI)
+            adapter()
+            assert(
+                len(self.folder.workspace.objectIds())==number_of_modules-count,
+                   'There should be nothing here.')
+
+        assert(len(self.folder.workspace.objectIds())==0,
+               'There should be nothing here.')
         
 
     def _createModule(self, context, filename):
