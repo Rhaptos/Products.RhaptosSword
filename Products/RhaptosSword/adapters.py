@@ -708,3 +708,11 @@ class RhaptosEditMedia(EditMedia):
             self.request.response.setHeader('Location', obj.absolute_url())
             self.request.response.setStatus(201)
             return ''
+
+    def DELETE(self):
+        """ Delete the contained items of a collection.
+            The reset the required fields to the Rhaptos defaults.
+        """
+        returnValue = EditMedia.DELETE(self)
+        self.context.createTemplate()
+        return returnValue
