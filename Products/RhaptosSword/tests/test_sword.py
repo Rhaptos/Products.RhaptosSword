@@ -866,7 +866,23 @@ class TestSwordService(PloneTestCase.PloneTestCase):
 
         assert(len(self.folder.workspace.objectIds())==0,
                'There should be nothing here.')
-        
+   
+
+    def test_handleDeleteContents(self):
+        self._setupRhaptos()
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        filename = 'entry.xml'
+        module = self._createModule(self.folder.workspace, filename)
+        assert('index.cnxml' in module.objectIds(), 'Module has no index.cnxml')
+        get_request = self.createUploadRequest(
+            None,
+            module,
+            REQUEST_METHOD='DELETE',
+        )
+        adapter = getMultiAdapter((module, get_request), ISWORDEMIRI)
+        adapter()
+        assert('index.cnxml' in module.objectIds(), 'Module has no index.cnxml')
+
 
     def _createModule(self, context, filename):
         """ Utility method to setup the environment and create a module.
