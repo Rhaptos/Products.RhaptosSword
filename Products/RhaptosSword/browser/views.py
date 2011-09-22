@@ -1,6 +1,7 @@
 from zope.interface import implements
 from Acquisition import aq_inner
 from Acquisition import Explicit
+from AccessControl import getSecurityManager
 import transaction
 
 from zope.component import getMultiAdapter
@@ -36,13 +37,70 @@ DESCRIPTION_OF_CHANGES = \
 """The current description of the changes you have made for this version of the module: "%s" """
 
 AUTHOR_AGREEMENT = \
-"""You (%s, account:%s), will need to <a href="%s/module_publish">sign the license here.</a>"""
+"""Author (%s, account:%s), will need to <a href="%s/module_publish">sign the license here.</a>"""
 
-CONTRIBUTOR_AGREEMENT = \
-"""Contributor, %s (account:%s), must <a href="%s/collaborations?user=%s">agree to be listed on this module, and sign the license agreement here</a>."""
+COLABORATION_WARNING = \
+"""You cannot publish with pending role requests. Contributor, %s (account:%s),
+must <a href="%s/collaborations?user=%s">agree to thw pending requests</a>."""
          
 DESCRIPTION_CHANGES_WARNING = \
 """You must <a href="%s">describe the changes that you have made to this version</a> before publishing."""
+
+NEW_LICENSE_WARNING = \
+"""The publication license agreement has changed since you last agreed to it.
+The previous license on this content was %s. You will need to <a
+href="%s/module_publish">accept the new license prior to publishing</a>."""
+
+NO_TITLE_WARNING = \
+"""PUBLISH BLOCKED: This object has an invalid title. You will not be able to
+publish until you enter a title on the <a href="%s/module_metadata">metadata
+page</a>."""
+
+CNXML_INVALID_WARNING = \
+"""The module did not validate. Please fix before publishing.
+<a href="%s/module_publish_description">See the errors</a>."""
+
+CNXML_VERSION_WARNING = \
+"""You need to <a href="%s/cc_license_prepub">upgrade this module</a> to
+version 0.7 before you can publish it or make metadata changes."""
+
+MODULE_VERSION_WARNING = \
+"""PUBLISH BLOCKED: This module is unpublishable in its current state because
+it has been superseded by later revisions. To fix this problem, use the
+<a href="%s/diff">View Changes</a> feature to make a note of the work you have
+done on this copy of the module; then <a href="%s/confirm_discard">discard the
+module and check out a fresh copy to edit.  Details: This copy of the module is
+based on version %s, but the current published version is %s."""
+
+AUTHOR_WARNING = \
+"""Authors: There are currently no Authors! You must add one before previewing
+or publishing."""
+
+COPYHOLDERS_WARNING = \
+""" Copyright Holders: There are currently no Copyright Holders! You must
+add one before previewing or publishing."""
+
+NOMAINTAINER_WARNING = \
+"""Maintainers: There are currently no Maintainers! You must add one before
+previewing or publishing."""
+
+PERMISSION_WARNING = \
+"""PUBLISH BLOCKED: You do not have maintainer permissions on the published
+version of this object, so you will not be able to publish the current
+revision. Other options are to <a href="%s/module_send_patch">suggest your
+edits</a> to the module's maintainers, or <a href="%s/confirm_fork">derive your
+own copy</a> based on this module."""
+
+REVIEW_WARNING = \
+"""
+This item will be submitted for publication.<br />
+NOTE: Due to an increase of spam on our site:
+<ul>
+<li>The first publish of a new author is held to ensure it does not violate the Site User Agreement.</li>
+<li>Once your content is accepted and published, subsequent publishes will not have to be held.</li>
+<li>We appreciate your patience with this policy.</li>
+</ul>
+"""
 
 REQUIRED_METADATA = ['title', 'subject',]
 
@@ -75,16 +133,55 @@ class SWORDTreatmentMixin(object):
         
         treatment['description_of_changes'] = context.description_of_changes
 
-        treatment['publication_requirements'] = \
-            self.get_publication_requirements(context)
+        if context.state == 'published':
+            # No requirements if we are already published
+            treatment['publication_requirements'] = []
+        else:
+            treatment['publication_requirements'] = \
+                self.get_publication_requirements(context)
+
+            # If user does not have publisher rights, add something here
+            # to tell him that it has been submitted for review. This is seperate
+            # from get_publication_requirements because it is not a hard
+            # requirement for attempting to publish, while all the other cases
+            # are.
+            if not self.pmt.checkPermission('Publish Rhaptos Object', context):
+                treatment['publication_requirements'].append(
+                    unicode(REVIEW_WARNING, self.getEncoding()))
+
         return treatment
 
 
     def get_publication_requirements(self, context):
+        """ Things we need to check for (including but likely not limited to):
+            1. License is signed
+            2. Title is properly set
+            3. Module has xml and it is valid
+            4. CNXML version must be current
+            5. versioned-from must match the current published module
+            6. module has at least one maintainer/copyright holder/author
+            7. Latest by-CC agreed to
+            8. All contributors have agreed to license
+            9. No pending role requests/removals
+            10. A description of changes have been added
+            11. User has the publisher role
+            12. User has permission to publish
+        """
+        def formatUserInfo(user_id):
+            user = self.pmt.getMemberById(user_id)
+            fullname = user.getProperty('fullname')
+            return COLABORATION_WARNING % \
+                (fullname, user_id, context.absolute_url(), user_id)
+
         encoding = self.getEncoding() 
         context_url = context.absolute_url()
         requirements = []
-        if not context.license:
+        # Items 1, 7 and 8
+        if context.license:
+            if context.license != context.getDefaultLicense():
+                req = NEW_LICENSE_WARNING % (context.license, context.absolute_url())
+                requirements.append(unicode(req, encoding))
+        else:
             for user_id in context.authors:
                 user = self.pmt.getMemberById(user_id)
                 if user:
@@ -92,24 +189,81 @@ class SWORDTreatmentMixin(object):
                     req = AUTHOR_AGREEMENT %(fullname, user_id, context_url)
                     requirements.append(unicode(req, encoding))
 
+        # Item 2
+        title = context.title
+        if not title or title == '(Untitled)':
+            requirements.append(
+                unicode(NO_TITLE_WARNING % context.absolute_url(), encoding))
+
+        # Item 3
+        # validate returns an empty list if all is fine, so the meaning of this
+        # is inverted. Negated. All the wrong way upside down.
+        if context.validate():
+            requirements.append(unicode(
+                CNXML_INVALID_WARNING % context.absolute_url(), encoding))
+
+        # Item 4
+        # Hard-coding of 0.7. Its already done in too many places :-(
+        doc = context.getDefaultFile()
+        if float(doc.getVersion()) < 0.7:
+            requirements.append(unicode(
+                CNXML_VERSION_WARNING % context.absolute_url(), encoding))
+
+        # Item 5
+        content_tool = getToolByName(self.context, 'content')
+        if context.objectId is None:
+            pubobj = None
+            published_version = None
+        else:
+            try:
+                pubobj = content_tool.getRhaptosObject(context.objectId)
+                published_version = pubobj.latest.version
+            except KeyError:
+                pubobj = None
+                published_version = None
+
+        if published_version and (context.version != published_version):
+            requirements.append(unicode(
+                MODULE_VERSION_WARNING % (context.absolute_url(),
+                    context.absolute_url(), context.version, published_version),
+                    encoding))
+
+        # Item 6
+        if not context.authors:
+            requirements.append(unicode(AUTHOR_WARNING, encoding))
+        if not context.maintainers:
+            requirements.append(unicode(NOMAINTAINER_WARNING, encoding))
+        if not context.licensors:
+            requirements.append(unicode(COPYHOLDERS_WARNING, encoding))
+
+        # Item 9
         pending_collaborations = context.getPendingCollaborations()
         for user_id, collab in pending_collaborations.items():
-            info = self.formatUserInfo(context, user_id) 
+            info = self.formatUserInfo(user_id) 
             requirements.append(unicode(info, encoding))
 
+        # Item 10
         if not context.description_of_changes:
             desc_of_changes_link = \
                 context_url + '/module_description_of_changes'
             requirements.append(
                 DESCRIPTION_CHANGES_WARNING % desc_of_changes_link)
+
+        # Item 12
+        if pubobj is not None:
+            haspermission = self.pmt.checkPermission('Edit Rhaptos Object', pubobj)
+        else:
+            cur_user = getSecurityManager().getUser().getUserName()
+            haspermission = cur_user in context.maintainers or \
+                self.pmt.checkPermission('Edit Rhaptos Object', context)
+
+        if not haspermission:
+            requirements.append(unicode(
+                PERMISSION_WARNING % (context.absolute_url(),)*2, encoding))
+
         return requirements
 
 
-    def formatUserInfo(self, context, user_id):
-        user = self.pmt.getMemberById(user_id)
-        fullname = user.getProperty('fullname')
-        return CONTRIBUTOR_AGREEMENT % \
-            (fullname, user_id, context.absolute_url(), user_id)
 
 
 class EditIRI(BaseEditIRI, SWORDTreatmentMixin, Explicit):
@@ -145,19 +299,22 @@ class EditIRI(BaseEditIRI, SWORDTreatmentMixin, Explicit):
 
 
     def _handlePublish(self):
+        context = aq_inner(self.context)
+        if context.state == 'published':
+            raise Unpublishable, "Module already published"
+
         # We have to commit the transaction, otherwise the object has a blank
         # _p_jar and cannot be moved. And if it cannot be moved it cannot be
         # published.
         transaction.commit()
-        context = aq_inner(self.context)
         description_of_changes = context.message
-        if self.canPublish():
+        requirements = self.get_publication_requirements(context)
+        if not requirements:
             context.publishContent(message=description_of_changes)
         else:
-            requirements = self.get_publication_requirements(context)
             raise PublishUnauthorized(
                 "You do not have permission to publish this module",
-                requirements)
+                "<br />\n".join(requirements))
 
 
     def _handlePut(self):
@@ -192,38 +349,6 @@ class EditIRI(BaseEditIRI, SWORDTreatmentMixin, Explicit):
                 "%s is not a valid content type for this request" % content_type)
 
     
-    def canPublish(self):
-        versioninfo = self.context.rmeVersionInfo()
-        if self.context.publishBlocked(versioninfo):
-            return False
-
-        if self.pending_collaborations():
-            return False
-
-        context = self.context
-        try:
-            published_version = \
-                context.content.getRhaptosObject(context.id).latest.version
-        except KeyError:
-            published_version = None
-
-        # Someone else has edited and published this object
-        if published_version and (context.version != published_version):
-            return False
-
-        # You must specify at least one Author, Maintainer and Copyright
-        # Holder.
-        if not context.authors or not context.maintainers or \
-           not context.licensors:
-            return False
-
-        errors = context.validate()
-        if errors:
-            return False
-
-        return True
-    
-
     def pending_collaborations(self):
         return self.context.getPendingCollaborations()
 
