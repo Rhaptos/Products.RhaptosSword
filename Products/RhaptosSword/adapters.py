@@ -20,6 +20,7 @@ from Products.CMFCore.interfaces import IFolderish
 
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from Products.CNXMLTransforms.helpers import OOoImportError, doTransform, makeContent
+from Products.CNXMLDocument.XMLService import XMLParserError
 
 from rhaptos.atompub.plone.exceptions import PreconditionFailed
 from rhaptos.atompub.plone.browser.atompub import ATOMPUB_CONTENT_TYPES
@@ -36,6 +37,7 @@ from Products.RhaptosSword.normalize import normalizeFilename
 from Products.RhaptosSword.exceptions import CheckoutUnauthorized
 from Products.RhaptosSword.exceptions import OverwriteNotPermitted
 from Products.RhaptosSword.exceptions import TransformFailed
+from Products.RhaptosSword.exceptions import DepositFailed
 
 
 def getSiteEncoding(context):
@@ -431,6 +433,8 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                 content, meta=1, **kwargs)
         except (OOoImportError, BadZipfile), e:
             raise TransformFailed(str(e))
+        except XMLParserError, e:
+            raise DepositFailed(str(e))
 
         if merge:
             if text:
@@ -453,6 +457,9 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
 
         # make sure that the cnxml is the latest version
         obj.getDefaultFile().upgrade()
+
+        # After updating the content, set status to modified, reindex
+        obj.logAction('save')
 
     def updateObject(self, obj, filename, request, response, content_type):
         obj = obj.__of__(self.context)
