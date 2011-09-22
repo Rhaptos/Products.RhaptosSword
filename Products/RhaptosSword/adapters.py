@@ -60,6 +60,11 @@ DCTERMS_NAMESPACE = "http://purl.org/dc/terms/"
 
 OERDC_NAMESPACE = "http://cnx.org/aboutus/technology/schemas/oerdc"
 
+ATOM_NAMESPACE = "http://www.w3.org/2005/Atom"
+
+# in order of precedence
+METADATA_NAMESPACES = (OERDC_NAMESPACE, DCTERMS_NAMESPACE, ATOM_NAMESPACE)
+
 METADATA_MAPPING =\
         {'title': 'title',
          'abstract': 'abstract',
@@ -470,55 +475,47 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
 
 
     def getMetadata(self, dom, mapping):
-        """
-        TODO:
-            Set the attribution_note on the module.
-            Investigate using 'getLanguagesWithoutSubtypes' and
-            'getLanguageWithSubtypes' instead of sql call.
-
+        """ Get metadata from DOM
         """
         mdt = getToolByName(self.context, 'portal_moduledb')
-        headers = self.getHeaders(dom, mapping)
-        metadata = {}
-        for key, value in headers:
-            if key == 'keywords':
-                value = value.split('\n')
-            if key == 'language':
-                plt = getToolByName(self.context, 'portal_languages')
-                languages = plt.getAvailableLanguages()
-                if value not in languages.keys():
-                    raise ValidationError('The language %s is not valid.' %value)
-            if key == 'subject':
-                values = value.split('\n')
-                subjects = mdt.sqlGetTags(scheme='ISKME subject').tuples()
-                subjects = [tup[1].lower() for tup in subjects]
-                for v in values:
-                    if v.lower() not in subjects:
-                        raise ValidationError('The subject %s is invalid.' %v)
-
-            if value: metadata[key] = value
-        return metadata
-
-
-    def getHeaders(self, dom, mappings): 
         encoding = self.getEncoding()
-        headers = []
-        for prefix, uri in dom.documentElement.attributes.items():
-            for name in mappings.keys():
-                values = []
-                for node in dom.getElementsByTagNameNS(uri, name):
+        metadata = {}
+        for ns in METADATA_NAMESPACES:
+            for metaname, cnxname in mapping.items():
+                value = []
+                for node in dom.getElementsByTagNameNS(ns, metaname):
                     content = ""
                     # get the xml of all child nodes since some tags
                     # may contain markup, eg abstract may contain CNXML
                     for child in node.childNodes:
                         content += child.toxml().encode(encoding)
                     if content:
-                        values.append(content)
-                if values:
-                    headers.append((mappings[name], '\n'.join(values)))
+                        value.append(content)
 
-        return headers
-   
+                # format values
+                if cnxname not in ('keywords', 'subject'):
+                    value = ''.join(value)
+
+                if value and not metadata.has_key(cnxname):
+                    metadata[cnxname] = value
+
+        # validate language
+        plt = getToolByName(self.context, 'portal_languages')
+        languages = plt.getAvailableLanguages()
+        lang = metadata.get('language', 'en')
+        if lang not in languages.keys():
+            raise ValidationError('The language %s is not valid.' % value)
+
+        # validate subject
+        subjects = mdt.sqlGetTags(scheme='ISKME subject').tuples()
+        subjects = [tup[1].lower() for tup in subjects]
+        for subject in metadata.get('subject', []):
+            if subject.lower() not in subjects:
+                raise ValidationError(
+                    'The subject %s is invalid.' % subject)
+
+        return metadata
+
 
     def _getNewRoles(self, dom):
         encoding = self.getEncoding()
