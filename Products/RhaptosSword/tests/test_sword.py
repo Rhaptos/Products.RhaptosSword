@@ -418,8 +418,12 @@ class TestSwordService(PloneTestCase.PloneTestCase):
             DIRNAME, 'data', 'unittest', 'entry_depositreceipt.xml'), 'r')
         dom = parse(file)
         file.close()
-        dates = dom.getElementsByTagName('updated')
+
         module = self.portal.workspace.objectValues()[0]
+        mid = dom.getElementsByTagName('id')
+        for element in mid:
+            element.firstChild.nodeValue = module.id
+        dates = dom.getElementsByTagName('updated')
         dates[0].firstChild.nodeValue = module.revised
         created = dom.getElementsByTagName('dcterms:created')
         for element in created:
