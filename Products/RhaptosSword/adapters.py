@@ -168,19 +168,19 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         def _deriveOrCheckout(dom):
             # Check if this is a request to derive or checkout a module
             elements = dom.getElementsByTagNameNS(
+                "http://purl.org/dc/terms/", 'isVersionOf')
+            if len(elements) > 0:
+                obj = self.checkoutModule(
+                    str(elements[0].firstChild.nodeValue))
+                self.setActionMetadata(obj, action='checkout')
+                return obj
+            elements = dom.getElementsByTagNameNS(
                 "http://purl.org/dc/terms/", 'source')
             if len(elements) > 0:
                 # now we can fork / derive the module
                 obj = self.deriveModule(
                     str(elements[0].firstChild.nodeValue))
                 self.setActionMetadata(obj, action='derive')
-                return obj
-            elements = dom.getElementsByTagNameNS(
-                "http://purl.org/dc/terms/", 'isVersionOf')
-            if len(elements) > 0:
-                obj = self.checkoutModule(
-                    str(elements[0].firstChild.nodeValue))
-                self.setActionMetadata(obj, action='checkout')
                 return obj
 
         if content_type in ATOMPUB_CONTENT_TYPES:
