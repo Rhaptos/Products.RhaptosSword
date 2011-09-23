@@ -322,11 +322,10 @@ class EditIRI(BaseEditIRI, SWORDTreatmentMixin, Explicit):
         """
         content_type = getContentType(self.request.get_header('Content-Type'))
 
-        parent = self.context.aq_inner.aq_parent
-        adapter = getMultiAdapter(
-            (parent, self.request), IRhaptosWorkspaceSwordAdapter)
-
         if content_type in ATOMPUB_CONTENT_TYPES:
+            parent = self.context.aq_inner.aq_parent
+            adapter = getMultiAdapter(
+                (parent, self.request), IRhaptosWorkspaceSwordAdapter)
             body = self.request.get('BODYFILE')
             body.seek(0)
             merge = self.request.get_header(
