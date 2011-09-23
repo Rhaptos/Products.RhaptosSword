@@ -18,6 +18,7 @@ from rhaptos.swordservice.plone.interfaces import ISWORDServiceDocument
 from rhaptos.swordservice.plone.browser.sword import SWORDStatementAdapter
 from rhaptos.swordservice.plone.browser.sword import SWORDStatementAtomAdapter
 from rhaptos.swordservice.plone.browser.sword import EditIRI as BaseEditIRI
+from rhaptos.swordservice.plone.exceptions import BadRequest
 
 from Products.RhaptosSword.adapters import IRhaptosWorkspaceSwordAdapter
 from Products.RhaptosSword.adapters import getSiteEncoding
@@ -320,7 +321,10 @@ class EditIRI(BaseEditIRI, SWORDTreatmentMixin, Explicit):
     def _handlePut(self):
         """ PUT against an existing item should update it.
         """
-        content_type = getContentType(self.request.get_header('Content-Type'))
+        content_type = self.request.get_header('Content-Type')
+        if content_type is None:
+            raise BadRequest("You have no Content-Type header in your request")
+        content_type = getContentType(content_type)
 
         if content_type in ATOMPUB_CONTENT_TYPES:
             parent = self.context.aq_inner.aq_parent
