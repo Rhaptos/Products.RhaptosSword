@@ -147,7 +147,9 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
     """ Rhaptos specific implement of the SWORD folder adapter.
     """
     adapts(IFolderish, IHTTPRequest)
-
+    
+    # the action currently being taken
+    action = 'create'
     # keep a handle on what changed during the process
     description_of_changes = ''
     # keep a handle on the treatment of the object
@@ -155,16 +157,13 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
     
     # the basic default encoding.
     # we change it to that set on the site a little later.
-    encoding = None
+    encoding = 'utf-8'
 
-    def getEncoding(self):
-        """ if we have on return it,
-            if not, figure out what it is, store it and return it.
-        """
-        if not self.encoding:
-            self.encoding = getSiteEncoding(self.context)
-        return self.encoding
-    
+
+    def __init__(self, context, request):
+        super(RhaptosWorkspaceSwordAdapter, self).__init__(context, request)
+        self.encoding = getSiteEncoding(self.context)
+
     def generateFilename(self, name):
         """ Override this method to provide a more sensible name in the
             absence of content-disposition. """
@@ -186,8 +185,9 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                 "http://purl.org/dc/terms/", 'source')
             if len(elements) > 0:
                 # now we can fork / derive the module
-                obj = self.deriveModule(
-                    str(elements[0].firstChild.nodeValue))
+                module_id = \
+                    elements[0].firstChild.toxml().encode(self.encoding)
+                obj = self.deriveModule(module_id)
                 self.setActionMetadata(obj, action='derive')
                 return obj
 
@@ -240,6 +240,10 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
 
         # Do the fork
         forked_obj = obj.forkContent(license='', return_context=True)
+        props = {'subject': module.subject,
+                 'keywords': module.keywords,
+                }
+        obj.manage_changeProperties(props)
         forked_obj.setState('created')
         forked_obj.setGoogleAnalyticsTrackingCode(None)
 
@@ -469,7 +473,10 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         if content_type in ATOMPUB_CONTENT_TYPES:
             body = request.get('BODYFILE')
             body.seek(0)
-            self.updateMetadata(obj, parse(body))
+            if self.action == 'derive':
+                self.mergeMetadata(obj, body)
+            else:
+                self.updateMetadata(obj, parse(body))
         elif content_type == 'application/zip':
             body = request.get('BODYFILE')
             cksum = request.get_header('Content-MD5')
@@ -488,7 +495,6 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         """ Get metadata from DOM
         """
         mdt = getToolByName(self.context, 'portal_moduledb')
-        encoding = self.getEncoding()
         metadata = {}
         for ns in METADATA_NAMESPACES:
             for metaname, cnxname in mapping.items():
@@ -498,7 +504,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                     # get the xml of all child nodes since some tags
                     # may contain markup, eg abstract may contain CNXML
                     for child in node.childNodes:
-                        content += child.toxml().encode(encoding)
+                        content += child.toxml().encode(self.encoding)
                     if content:
                         value.append(content)
 
@@ -528,7 +534,6 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
 
 
     def _getNewRoles(self, dom):
-        encoding = self.getEncoding()
         newRoles = {}
         for atom_role, cnx_role in ROLE_MAPPING.items():
             for namespace in [DCTERMS_NAMESPACE, OERDC_NAMESPACE]:
@@ -536,7 +541,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                     ids = newRoles.get(cnx_role, [])
                     userid = element.getAttribute('oerdc:id')
                     if userid:
-                        ids.append(userid.encode(encoding))
+                        ids.append(userid.encode(self.encoding))
                         newRoles[cnx_role] = ids
         return newRoles
 
@@ -590,6 +595,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
 
     
     def setActionMetadata(self, obj, action):
+        self.action = action
         self.description_of_changes = DESCRIPTION_OF_CHANGES[action]
         self.treatment = DESCRIPTION_OF_TREATMENT[action]
         return obj
@@ -720,6 +726,7 @@ class RhaptosEditMedia(EditMedia):
         """ Delete the contained items of a collection.
             The reset the required fields to the Rhaptos defaults.
         """
-        returnValue = EditMedia.DELETE(self)
+        ids = self.context.objectIds()
+        self.context.manage_delObjects(ids)
         self.context.createTemplate()
-        return returnValue
+        return self.request.response.setStatus(200)
