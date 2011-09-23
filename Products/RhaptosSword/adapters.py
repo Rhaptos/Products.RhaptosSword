@@ -34,6 +34,7 @@ from rhaptos.swordservice.plone.exceptions import ErrorChecksumMismatch
 from rhaptos.swordservice.plone.exceptions import BadRequest
 
 from Products.RhaptosSword.normalize import normalizeFilename
+from Products.RhaptosSword.interfaces import ICollabRequest
 from Products.RhaptosSword.exceptions import CheckoutUnauthorized
 from Products.RhaptosSword.exceptions import OverwriteNotPermitted
 from Products.RhaptosSword.exceptions import TransformFailed
@@ -444,8 +445,10 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                     file=text, idprefix='zip-')
             makeContent(obj, subobjs)
         else:
-            # Delete everything
-            obj.manage_delObjects(obj.objectIds())
+            # Delete everything, but preserve collaboration requests
+            obj.manage_delObjects(
+                [x.getId() for x in obj.objectValues() \
+                    if not ICollabRequest.providedBy(x)])
             if text:
                 obj.invokeFactory('CNXML Document', obj.default_file,
                     file=text, idprefix='zip-')

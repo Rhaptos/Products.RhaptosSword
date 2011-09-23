@@ -51,6 +51,12 @@
         interface="Products.RhaptosSword.interfaces.IRhaptosSwordCollection"
         /> 
 
+    <!-- Mark collaboration requests -->
+    <five:implements
+        class="Products.RhaptosCollaborationTool.CollaborationFolder.CollabRequest"
+        interface="Products.RhaptosSword.interfaces.ICollabRequest"
+        />
+
     <adapter
         for="Products.RhaptosSword.interfaces.IRhaptosSwordWorkspace
              zope.publisher.interfaces.http.IHTTPRequest"
