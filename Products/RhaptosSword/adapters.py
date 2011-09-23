@@ -149,7 +149,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
     adapts(IFolderish, IHTTPRequest)
     
     # the action currently being taken
-    action = 'create'
+    action = None
     # keep a handle on what changed during the process
     description_of_changes = ''
     # keep a handle on the treatment of the object
@@ -177,8 +177,9 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             elements = dom.getElementsByTagNameNS(
                 "http://purl.org/dc/terms/", 'isVersionOf')
             if len(elements) > 0:
-                obj = self.checkoutModule(
-                    str(elements[0].firstChild.nodeValue))
+                module_id = \
+                    elements[0].firstChild.toxml().encode(self.encoding)
+                obj = self.checkoutModule(module_id)
                 self.setActionMetadata(obj, action='checkout')
                 return obj
             elements = dom.getElementsByTagNameNS(
@@ -240,12 +241,17 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
 
         # Do the fork
         forked_obj = obj.forkContent(license='', return_context=True)
-        props = {'subject': module.subject,
-                 'keywords': module.keywords,
-                }
-        obj.manage_changeProperties(props)
         forked_obj.setState('created')
         forked_obj.setGoogleAnalyticsTrackingCode(None)
+
+        # remove all roles except those of the author
+        forked_obj.resetOptionalRoles()
+        # should not be necessary...
+        forked_obj.deleteCollaborationRequests()
+        owner_id = forked_obj.Creator()
+        for user_id in forked_obj.getCollaborators():
+            if user_id != owner_id:
+                forked_obj.removeCollaborator(user_id)
 
         # Delete temporary copy
         if to_delete_id:
@@ -392,6 +398,8 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             We delete all collaboration requests that are 'pending', but
             don't have equivalent data on the request.
             We add all new roles.
+            TODO: Checkout the _reset method in ModuleEditor. It might be
+                  better to use that than do our own thing here.
         """
         props = {}
         dom = parse(fp)
@@ -473,7 +481,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         if content_type in ATOMPUB_CONTENT_TYPES:
             body = request.get('BODYFILE')
             body.seek(0)
-            if self.action == 'derive':
+            if self.action in ['derive', 'checkout']:
                 self.mergeMetadata(obj, body)
             else:
                 self.updateMetadata(obj, parse(body))
