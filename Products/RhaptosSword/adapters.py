@@ -163,6 +163,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
     def __init__(self, context, request):
         super(RhaptosWorkspaceSwordAdapter, self).__init__(context, request)
         self.encoding = getSiteEncoding(self.context)
+        self.pmt = getToolByName(self.context, 'portal_membership')
 
     def generateFilename(self, name):
         """ Override this method to provide a more sensible name in the
@@ -548,10 +549,14 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                 for element in dom.getElementsByTagNameNS(namespace, atom_role):
                     ids = newRoles.get(cnx_role, [])
                     userid = element.getAttribute('oerdc:id')
-                    if userid:
+                    if userid and self.userExists(userid):
                         ids.append(userid.encode(self.encoding))
                         newRoles[cnx_role] = ids
         return newRoles
+
+    
+    def userExists(self, userid):
+        return self.pmt.getMemberById(userid)
 
 
     def deleteRoles(self, obj, dom):
