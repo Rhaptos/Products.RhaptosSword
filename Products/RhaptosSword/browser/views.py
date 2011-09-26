@@ -169,10 +169,13 @@ class SWORDTreatmentMixin(object):
             12. User has permission to publish
         """
         def formatUserInfo(user_id):
+            # TODO: wrap in error handling decorator.
             user = self.pmt.getMemberById(user_id)
-            fullname = user.getProperty('fullname')
-            return COLABORATION_WARNING % \
-                (fullname, user_id, context.absolute_url(), user_id)
+            if user:
+                fullname = user.getProperty('fullname')
+                return COLABORATION_WARNING % \
+                    (fullname, user_id, context.absolute_url(), user_id)
+            return ''
 
         encoding = self.getEncoding() 
         context_url = context.absolute_url()
@@ -240,7 +243,7 @@ class SWORDTreatmentMixin(object):
         # Item 9
         pending_collaborations = context.getPendingCollaborations()
         for user_id, collab in pending_collaborations.items():
-            info = self.formatUserInfo(user_id) 
+            info = formatUserInfo(user_id) 
             requirements.append(unicode(info, encoding))
 
         # Item 10
