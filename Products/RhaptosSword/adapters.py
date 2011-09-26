@@ -94,8 +94,10 @@ DESCRIPTION_OF_CHANGES =\
         }
 
 DESCRIPTION_OF_TREATMENT =\
-        {'derive': 'Checkout and derive a new copy.',
-         'checkout': 'Checkout to users workspace.',
+        {'derive': "Checkout and derive a new copy.",
+         'checkout': "Checkout to user's workspace.",
+         'create': "Created a module.",
+         'save': "Changes saved."
         }
 
 ROLE_MAPPING = {'creator': 'Author',
@@ -181,7 +183,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                 module_id = \
                     elements[0].firstChild.toxml().encode(self.encoding)
                 obj = self.checkoutModule(module_id)
-                self.setActionMetadata(obj, action='checkout')
+                self.setActionMetadata(obj, 'checkout', None)
                 return obj
             elements = dom.getElementsByTagNameNS(
                 "http://purl.org/dc/terms/", 'source')
@@ -190,7 +192,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                 module_id = \
                     elements[0].firstChild.toxml().encode(self.encoding)
                 obj = self.deriveModule(module_id)
-                self.setActionMetadata(obj, action='derive')
+                self.setActionMetadata(obj, 'derive', None)
                 return obj
 
         if content_type in ATOMPUB_CONTENT_TYPES:
@@ -217,6 +219,10 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                 return obj
 
         checkUploadSize(context, request.stdin)
+        # if none of the above is the case we let the ancestor to its thing
+        # we set the action to 'create' since there is no more info to work
+        # with.
+        self.setActionMetadata(obj, 'create', None)
         return super(RhaptosWorkspaceSwordAdapter, self).createObject(
             context, name, content_type, request)
 
@@ -257,6 +263,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         # Delete temporary copy
         if to_delete_id:
             area.manage_delObjects(ids=[to_delete_id])
+        self.setActionMetadata(obj, 'create', None)
         return forked_obj
 
 
@@ -346,7 +353,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                     metadata[cnx_name] = current_value
             # these ones we cannot pass on to the update_metadata script
             if cnx_name in ['description_of_changes', ]:
-                props[cnx_name] = metadata.pop(cnx_name, '')
+                self.description_of_changes = metadata.pop(cnx_name, None)
         props['treatment'] = self.treatment
         obj.manage_changeProperties(props)
         if metadata:
@@ -376,12 +383,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                         if value not in current_values:
                             current_values.extend(value)
                     metadata[cnx_name] = new_values
-            # these ones we cannot pass on to the update_metadata script
-            if cnx_name in ['description_of_changes', ]:
-                # if the object does not currently have a value for this field,
-                # we must update it.
-                if not getattr(obj, cnx_name, None):
-                    props[cnx_name] = metadata.pop(cnx_name, '')
+        self.description_of_changes = metadata.pop(cnx_name, None)
         props['treatment'] = self.treatment
         obj.manage_changeProperties(props)
         if metadata:
@@ -409,12 +411,8 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         # the dom.
         metadata = copy(METADATA_DEFAULTS)
         metadata.update(self.getMetadata(dom, METADATA_MAPPING))
-        for oerdc_name, cnx_name in METADATA_MAPPING.items():
-            # these ones we cannot pass on to the update_metadata script
-            if cnx_name in ['description_of_changes', ]:
-                props[cnx_name] = metadata.pop(cnx_name, '')
-        props['treatment'] = self.treatment
-        obj.manage_changeProperties(props)
+        self.description_of_changes = metadata.pop('description_of_changes', None)
+        self.setActionMetadata(obj, 'save', self.description_of_changes)
         if metadata:
             obj.update_metadata(**metadata)
         # we set GoogleAnalyticsTrackingCode explicitly, since the script
@@ -475,7 +473,9 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         obj.getDefaultFile().upgrade()
 
         # After updating the content, set status to modified, reindex
-        obj.logAction('save')
+        #obj.logAction('save')
+        self.setActionMetadata(obj, 'save', None)
+
 
     def updateObject(self, obj, filename, request, response, content_type):
         obj = obj.__of__(self.context)
@@ -497,6 +497,8 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             self.updateMetadata(obj, atom_dom)
             self.updateContent(obj, StringIO(payload), cksum)
 
+        self.setActionMetadata(obj, self.action, self.description_of_changes)
+        obj.logAction(self.action, self.description_of_changes)
         return obj
 
 
@@ -607,9 +609,9 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                          cancelRoles = cancelRoles)
 
     
-    def setActionMetadata(self, obj, action):
+    def setActionMetadata(self, obj, action, message):
         self.action = action
-        self.description_of_changes = DESCRIPTION_OF_CHANGES[action]
+        self.description_of_changes = message
         self.treatment = DESCRIPTION_OF_TREATMENT[action]
         return obj
 

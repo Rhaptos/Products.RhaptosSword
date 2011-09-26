@@ -132,7 +132,7 @@ class SWORDTreatmentMixin(object):
         treatment['preview_link'] = \
             PREVIEW_MSG %context.absolute_url()
         
-        treatment['description_of_changes'] = context.description_of_changes
+        treatment['description_of_changes'] = context.message
 
         if context.state == 'published':
             # No requirements if we are already published
@@ -247,7 +247,7 @@ class SWORDTreatmentMixin(object):
             requirements.append(unicode(info, encoding))
 
         # Item 10
-        if not context.description_of_changes:
+        if not context.message:
             desc_of_changes_link = \
                 context_url + '/module_description_of_changes'
             requirements.append(
@@ -313,10 +313,9 @@ class EditIRI(BaseEditIRI, SWORDTreatmentMixin, Explicit):
         # _p_jar and cannot be moved. And if it cannot be moved it cannot be
         # published.
         transaction.commit()
-        description_of_changes = context.message
         requirements = self.get_publication_requirements(context)
         if not requirements:
-            context.publishContent(message=description_of_changes)
+            context.publishContent(message=context.message)
         else:
             raise PublishUnauthorized(
                 "You do not have permission to publish this module",
