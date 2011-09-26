@@ -268,6 +268,8 @@ class SWORDTreatmentMixin(object):
         return requirements
 
 
+    def is_pending(self, user_id):
+        return user_id in self.context.pending_collaborations()
 
 
 class EditIRI(BaseEditIRI, SWORDTreatmentMixin, Explicit):

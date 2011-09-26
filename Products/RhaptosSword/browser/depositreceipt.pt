@@ -41,35 +41,40 @@
             tal:repeat="creator context/creators"
             tal:content="python:view.fullname(creator)"
             tal:attributes="oerdc:id creator;
-                            oerdc:email python:view.email(creator)">
+                            oerdc:email python:view.email(creator);
+                            oerdc:pending python:view.is_pending(creator)">
         Creator full name  
     </dcterms:creator>
     <oerdc:maintainer oerdc:id="maintainer id" oerdc:email="owner email"
             tal:repeat="maintainer context/maintainers"
             tal:content="python:view.fullname(maintainer)"
             tal:attributes="oerdc:id maintainer;
-                            oerdc:email python:view.email(maintainer)">
+                            oerdc:email python:view.email(maintainer);
+                            oerdc:pending python:view.is_pending(maintainer)">
         Maintainer full name  
     </oerdc:maintainer>
     <dcterms:rightsHolder oerdc:id="rightsholder id" oerdc:email="rightsholder email"
             tal:repeat="rightsholder context/licensors"
             tal:content="python:view.fullname(rightsholder)"
             tal:attributes="oerdc:id rightsholder;
-                            oerdc:email python:view.email(rightsholder)">
+                            oerdc:email python:view.email(rightsholder);
+                            oerdc:pending python:view.is_pending(rightsholder)">
         Rights holder full name  
     </dcterms:rightsHolder>
     <oerdc:translator oerdc:id="translator id" oerdc:email="translator email"
             tal:repeat="translator context/translators|python:()"
             tal:content="python:view.fullname(translator)"
             tal:attributes="oerdc:id translator;
-                            oerdc:email python:view.email(translator)">
+                            oerdc:email python:view.email(translator);
+                            oerdc:pending python:view.is_pending(translator)">
         Translator full name  
     </oerdc:translator>
     <oerdc:editor oerdc:id="editor id" oerdc:email="editor email"
             tal:repeat="editor context/editors|python:()"
             tal:content="python:view.fullname(editor)"
             tal:attributes="oerdc:id editor;
-                            oerdc:email python:view.email(editor)">
+                            oerdc:email python:view.email(editor);
+                            oerdc:pending python:view.is_pending(editor)">
         Editor full name  
     </oerdc:editor>
     
