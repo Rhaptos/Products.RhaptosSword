@@ -551,13 +551,17 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                 for element in dom.getElementsByTagNameNS(namespace, atom_role):
                     ids = newRoles.get(cnx_role, [])
                     userid = element.getAttribute('oerdc:id')
-                    if userid and self.userExists(userid):
-                        ids.append(userid.encode(self.encoding))
+                    userid = userid.encode(self.encoding)
+                    if self.userExists(userid):
+                        ids.append(userid)
                         newRoles[cnx_role] = ids
+                    else:
+                        raise Exception('The user (%s) does not exist.' %userid)
         return newRoles
 
     
     def userExists(self, userid):
+        if userid is None: return False
         return self.pmt.getMemberById(userid)
 
 
