@@ -12,14 +12,16 @@
     <dcterms:identifier xsi:type="oerdc:Version">**new**</dcterms:identifier> 
     <dcterms:identifier xsi:type="oerdc:ContentId">zipfile</dcterms:identifier> 
     <dcterms:title>(Untitled)</dcterms:title>
-    <dcterms:created>2011/09/11 18:24:32.449 GMT+2</dcterms:created> 
-    <dcterms:modified>2011/09/11 18:24:32.449 GMT+2</dcterms:modified> 
-    <dcterms:creator oerdc:email="" oerdc:id="test_user_1_"/>
-    <oerdc:maintainer oerdc:email="" oerdc:id="test_user_1_"/>
-    <dcterms:rightsHolder oerdc:email="" oerdc:id="test_user_1_"/>
+    <dcterms:created>2011/09/27 11:04:25.804 GMT+2</dcterms:created> 
+    <dcterms:modified>2011/09/27 11:04:25.804 GMT+2</dcterms:modified> 
+    <dcterms:creator oerdc:email="" oerdc:id="test_user_1_" oerdc:pending="False"/>
+    <oerdc:maintainer oerdc:email="" oerdc:id="test_user_1_" oerdc:pending="False"/>
+    <dcterms:rightsHolder oerdc:email="" oerdc:id="test_user_1_" oerdc:pending="False"/>
     
     <!-- CNX-Supported but not in MDML -->
-     
+    <oerdc:descriptionOfChanges>
+        Created module
+    </oerdc:descriptionOfChanges> 
 
     <oerdc:oer-subject/>
 
@@ -37,14 +39,18 @@
         Module '(Untitled)' was imported via the SWORD API.
         You can <a href="http://nohost/plone/workspace/zipfile/module_view">preview your module here</a> to see what it will look like once it is published.
         
+        The current description of the changes you have made for this version of the module: Created module
+        
 
         
         Publication requirements:
         
-            1. You (, account:test_user_1_), will need to <a href="http://nohost/plone/workspace/zipfile/module_publish">sign the license here.</a>
+            1. Author (, account:test_user_1_), will need to <a href="http://nohost/plone/workspace/zipfile/module_publish">sign the license here.</a>
         
         
-            2. You must <a href="http://nohost/plone/workspace/zipfile/module_description_of_changes">describe the changes that you have made to this version</a> before publishing.
+            2. PUBLISH BLOCKED: This object has an invalid title. You will not be able to
+publish until you enter a title on the <a href="http://nohost/plone/workspace/zipfile/module_metadata">metadata
+page</a>.
         
         
     </sword:treatment>
