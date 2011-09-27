@@ -609,6 +609,14 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
 
 
 class RhaptosEditMedia(EditMedia):
+
+    def __init__(self, context, request):
+        """ we override init in order to add DELETE as a legitemate
+            call in RhaptosSword land.
+        """
+        EditMedia.__init__(self, context, request)
+        self.callmap.update({'DELETE': self.DELETE,})
+
     def GET(self):
         return self.context.module_export(format='zip')
         
