@@ -74,7 +74,7 @@ METADATA_MAPPING =\
          'language': 'language',
          'subject': 'keywords',
          'oer-subject': 'subject',
-         'descriptionOfChanges': 'description_of_changes',
+         'descriptionOfChanges': 'message',
          'analyticsCode': 'GoogleAnalyticsTrackingCode',
         }
 
@@ -84,13 +84,8 @@ METADATA_DEFAULTS = \
          'language': 'en',
          'keywords': [],
          'subject': [],
-         'description_of_changes': 'Created Module',
+         'message': 'Created Module',
          'GoogleAnalyticsTrackingCode': '',
-        }
-
-DESCRIPTION_OF_CHANGES =\
-        {'derive': 'Derived a copy.',
-         'checkout': 'Checked out a copy.'
         }
 
 DESCRIPTION_OF_TREATMENT =\
@@ -152,8 +147,6 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
     
     # the action currently being taken
     action = None
-    # keep a handle on what changed during the process
-    description_of_changes = ''
     # keep a handle on the treatment of the object
     treatment = ''
     
@@ -222,9 +215,10 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         # if none of the above is the case we let the ancestor to its thing
         # we set the action to 'create' since there is no more info to work
         # with.
-        self.setActionMetadata(obj, 'create', None)
-        return super(RhaptosWorkspaceSwordAdapter, self).createObject(
+        obj = super(RhaptosWorkspaceSwordAdapter, self).createObject(
             context, name, content_type, request)
+        self.setActionMetadata(obj, 'create', None)
+        return obj
 
 
     def deriveModule(self, url):
@@ -351,9 +345,6 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                     current_value = list(metadata.get(cnx_name, []))
                     current_value.extend(old_value)
                     metadata[cnx_name] = current_value
-            # these ones we cannot pass on to the update_metadata script
-            if cnx_name in ['description_of_changes', ]:
-                self.description_of_changes = metadata.pop(cnx_name, None)
         props['treatment'] = self.treatment
         obj.manage_changeProperties(props)
         if metadata:
@@ -383,7 +374,6 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                         if value not in current_values:
                             current_values.extend(value)
                     metadata[cnx_name] = new_values
-        self.description_of_changes = metadata.pop(cnx_name, None)
         props['treatment'] = self.treatment
         obj.manage_changeProperties(props)
         if metadata:
@@ -411,8 +401,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         # the dom.
         metadata = copy(METADATA_DEFAULTS)
         metadata.update(self.getMetadata(dom, METADATA_MAPPING))
-        self.description_of_changes = metadata.pop('description_of_changes', None)
-        self.setActionMetadata(obj, 'save', self.description_of_changes)
+        self.setActionMetadata(obj, 'save', obj.message)
         if metadata:
             obj.update_metadata(**metadata)
         # we set GoogleAnalyticsTrackingCode explicitly, since the script
@@ -497,8 +486,8 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             self.updateMetadata(obj, atom_dom)
             self.updateContent(obj, StringIO(payload), cksum)
 
-        self.setActionMetadata(obj, self.action, self.description_of_changes)
-        obj.logAction(self.action, self.description_of_changes)
+        self.setActionMetadata(obj, self.action, obj.message)
+        obj.logAction(self.action, obj.message)
         return obj
 
 
@@ -615,7 +604,6 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
     
     def setActionMetadata(self, obj, action, message):
         self.action = action
-        self.description_of_changes = message
         self.treatment = DESCRIPTION_OF_TREATMENT[action]
         return obj
 
