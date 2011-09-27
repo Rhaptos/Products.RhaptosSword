@@ -102,6 +102,7 @@ ROLE_MAPPING = {'creator': 'Author',
                 'translator': 'Translator',
                }
 
+REQUIRED_ROLES = ['Author', 'Maintainer', 'Licensor']
 
 class IRhaptosWorkspaceSwordAdapter(ISWORDContentUploadAdapter):
     """ Marker interface for SWORD service specific to the Rhaptos 
@@ -371,6 +372,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         if metadata:
             obj.update_metadata(**metadata)
         self.addRoles(obj, dom)
+        self.setDefaultRoles(obj, dom)
         obj.reindexObject(idxs=metadata.keys())
 
     
@@ -403,6 +405,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         self.deleteRoles(obj, dom)
         # now add any new roles
         self.addRoles(obj, dom)
+        self.setDefaultRoles(obj, dom)
         obj.reindexObject(idxs=metadata.keys())
 
 
@@ -558,8 +561,14 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
 
     def addRoles(self, obj, dom):
         newRoles = self._getNewRoles(dom)
+        self._addRoles(obj, newRoles) 
+    
+
+    def _addRoles(self, obj, roles):
+        """ Generalised method for reuse.
+        """
         user_role_delta = obj.generateCollaborationRequests(
-                newUser=True, newRoles=newRoles)
+                newUser=True, newRoles=roles)
         for p in user_role_delta.keys():
             collabs = list(obj.getCollaborators())
             if p not in collabs:
@@ -593,6 +602,27 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                          cancelRoles = cancelRoles)
 
     
+    def setDefaultRoles(self, obj, dom):
+        """ According to the specification:
+            If the metadata included in the atom entry contains NO contributor
+            information (author, maintainer, licensor, translator, editor)
+            Then the depositor should receive all of the required roles
+            (author, maintainer, and licensor)
+        """
+        # run through all the roles to see if there is any user data in the dom
+        # if there is, we stop the process immediately.
+        for atom_role in ROLE_MAPPING.keys():
+            if len(dom.getElementsByTagName(atom_role)) > 0:
+                return
+
+        # we have no dom data for roles
+        user_id = obj.Creator()
+        defaultRoles = {}
+        for role in REQUIRED_ROLES:
+            defaultRoles[role] = [user_id]
+        self._addRoles(obj, defaultRoles)
+
+        
 class RhaptosEditMedia(EditMedia):
 
     def __init__(self, context, request):
