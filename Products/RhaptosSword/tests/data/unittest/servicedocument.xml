@@ -26,7 +26,7 @@
         
         
                 
-            <collection href="http://nohost/plone/http://link.example.com/sword/sword">
+            <collection href="http://nohost/plone/GroupWorkspaces/wg0/sword">
                 <atom:title>Workgroup1</atom:title>
                 <accept>*/*</accept>
                 <accept alternate="multipart/related"/>
