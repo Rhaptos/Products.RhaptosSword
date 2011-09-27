@@ -324,7 +324,6 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         assert isinstance(view, ServiceDocument)
         xml = view()
         assert "<sword:error" not in xml
-        import pdb;pdb.set_trace()
         assert xml == reference_servicedoc, 'Result does not match reference doc,'
         
         uploadrequest = self.createUploadRequest(
