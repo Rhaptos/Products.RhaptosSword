@@ -347,6 +347,15 @@ class EditIRI(BaseEditIRI, SWORDTreatmentMixin, Explicit):
                 # in the process all fields not on the request will be reset
                 # on the module (see METADATA_DEFAULTS) for the values used.
                 adapter.replaceMetadata(self.context, body)
+
+            # response code of 200 as required by SWORD spec:
+            #   6.5.2. Replacing the Metadata of a Resource
+            self.request.response.setStatus(200)
+            # set the location header
+            self.request.response.setHeader(
+                'Location',
+                '%s/sword' %self.context.absolute_url())
+
             view = self.__of__(self.context)
             pt = self.depositreceipt.__of__(view)
             return pt()
