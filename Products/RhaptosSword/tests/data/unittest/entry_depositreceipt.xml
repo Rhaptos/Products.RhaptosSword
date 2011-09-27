@@ -12,14 +12,16 @@
     <dcterms:identifier xsi:type="oerdc:Version">**new**</dcterms:identifier> 
     <dcterms:identifier xsi:type="oerdc:ContentId">entry.xml</dcterms:identifier> 
     <dcterms:title>Box Plots Statistics for Non Majors</dcterms:title>
-    <dcterms:created>2011/09/11 19:33:25.634 GMT+2</dcterms:created> 
-    <dcterms:modified>2011/09/11 19:33:25.811 GMT+2</dcterms:modified> 
-    <dcterms:creator oerdc:email="" oerdc:id="test_user_1_"/>
-    <oerdc:maintainer oerdc:email="" oerdc:id="test_user_1_"/>
-    <dcterms:rightsHolder oerdc:email="" oerdc:id="test_user_1_"/>
+    <dcterms:created>2011/09/27 10:52:57.786 GMT+2</dcterms:created> 
+    <dcterms:modified>2011/09/27 10:52:58.026 GMT+2</dcterms:modified> 
+    <dcterms:creator oerdc:email="" oerdc:id="test_user_1_" oerdc:pending="False"/>
+    <oerdc:maintainer oerdc:email="" oerdc:id="test_user_1_" oerdc:pending="False"/>
+    <dcterms:rightsHolder oerdc:email="" oerdc:id="test_user_1_" oerdc:pending="False"/>
     
     <!-- CNX-Supported but not in MDML -->
-     
+    <oerdc:descriptionOfChanges>
+        Created module
+    </oerdc:descriptionOfChanges> 
 
     <oerdc:oer-subject>Mathematics and Statistics</oerdc:oer-subject>
 
@@ -41,14 +43,24 @@
         Module 'Box Plots Statistics for Non Majors' was imported via the SWORD API.
         You can <a href="http://nohost/plone/workspace/entry.xml/module_view">preview your module here</a> to see what it will look like once it is published.
         
+        The current description of the changes you have made for this version of the module: Created module
+        
 
         
         Publication requirements:
         
-            1. You (, account:test_user_1_), will need to <a href="http://nohost/plone/workspace/entry.xml/module_publish">sign the license here.</a>
+            1. Author (, account:test_user_1_), will need to <a href="http://nohost/plone/workspace/entry.xml/module_publish">sign the license here.</a>
         
         
-            2. You must <a href="http://nohost/plone/workspace/entry.xml/module_description_of_changes">describe the changes that you have made to this version</a> before publishing.
+            2. 
+This item will be submitted for publication.<br/>
+NOTE: Due to an increase of spam on our site:
+<ul>
+<li>The first publish of a new author is held to ensure it does not violate the Site User Agreement.</li>
+<li>Once your content is accepted and published, subsequent publishes will not have to be held.</li>
+<li>We appreciate your patience with this policy.</li>
+</ul>
+
         
         
     </sword:treatment>
