@@ -147,8 +147,6 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
     
     # the action currently being taken
     action = None
-    # keep a handle on the treatment of the object
-    treatment = ''
     
     # the basic default encoding.
     # we change it to that set on the site a little later.
@@ -176,7 +174,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                 module_id = \
                     elements[0].firstChild.toxml().encode(self.encoding)
                 obj = self.checkoutModule(module_id)
-                self.setActionMetadata(obj, 'checkout', None)
+                self.action = 'checkout'
                 return obj
             elements = dom.getElementsByTagNameNS(
                 "http://purl.org/dc/terms/", 'source')
@@ -185,7 +183,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                 module_id = \
                     elements[0].firstChild.toxml().encode(self.encoding)
                 obj = self.deriveModule(module_id)
-                self.setActionMetadata(obj, 'derive', None)
+                self.action = 'derive'
                 return obj
 
         if content_type in ATOMPUB_CONTENT_TYPES:
@@ -217,7 +215,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         # with.
         obj = super(RhaptosWorkspaceSwordAdapter, self).createObject(
             context, name, content_type, request)
-        self.setActionMetadata(obj, 'create', None)
+        self.action = 'create'
         return obj
 
 
@@ -257,7 +255,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         # Delete temporary copy
         if to_delete_id:
             area.manage_delObjects(ids=[to_delete_id])
-        self.setActionMetadata(obj, 'create', None)
+        self.action = 'create'
         return forked_obj
 
 
@@ -332,7 +330,6 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             For more current info see: 
             - Google doc: SWORD V2 Spec for Publishing Modules in Connexions
         """        
-        props = {}
         dom = parse(fp)
         # create a metadata dict that has all the values from obj, overridden
         # by the current dom values.
@@ -345,8 +342,6 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                     current_value = list(metadata.get(cnx_name, []))
                     current_value.extend(old_value)
                     metadata[cnx_name] = current_value
-        props['treatment'] = self.treatment
-        obj.manage_changeProperties(props)
         if metadata:
             obj.update_metadata(**metadata)
         self.addRoles(obj, dom)
@@ -358,7 +353,6 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             SWORD V2 Spec for Publishing Modules in Connexions
             Section: Metadata
         """
-        props = {}
         metadata = {}
         metadata.update(self.getMetadata(dom, METADATA_MAPPING))
         for oerdc_name, cnx_name in METADATA_MAPPING.items():
@@ -374,8 +368,6 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                         if value not in current_values:
                             current_values.extend(value)
                     metadata[cnx_name] = new_values
-        props['treatment'] = self.treatment
-        obj.manage_changeProperties(props)
         if metadata:
             obj.update_metadata(**metadata)
         self.addRoles(obj, dom)
@@ -394,14 +386,13 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             TODO: Checkout the _reset method in ModuleEditor. It might be
                   better to use that than do our own thing here.
         """
-        props = {}
         dom = parse(fp)
         # create a metadata dict that has all the defaults, overridden by the
         # current dom values. This way we will 'clear' the properties not in
         # the dom.
         metadata = copy(METADATA_DEFAULTS)
         metadata.update(self.getMetadata(dom, METADATA_MAPPING))
-        self.setActionMetadata(obj, 'save', obj.message)
+        self.action = 'save'
         if metadata:
             obj.update_metadata(**metadata)
         # we set GoogleAnalyticsTrackingCode explicitly, since the script
@@ -462,7 +453,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         obj.getDefaultFile().upgrade()
 
         # After updating the content, set status to modified, reindex
-        self.setActionMetadata(obj, 'save', None)
+        self.action = 'save'
 
 
     def updateObject(self, obj, filename, request, response, content_type):
@@ -485,7 +476,6 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             self.updateMetadata(obj, atom_dom)
             self.updateContent(obj, StringIO(payload), cksum)
 
-        self.setActionMetadata(obj, self.action, obj.message)
         obj.logAction(self.action, obj.message)
         return obj
 
@@ -540,11 +530,13 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                     ids = newRoles.get(cnx_role, [])
                     userid = element.getAttribute('oerdc:id')
                     userid = userid.encode(self.encoding)
-                    if self.userExists(userid):
-                        ids.append(userid)
-                        newRoles[cnx_role] = ids
-                    else:
-                        raise Exception('The user (%s) does not exist.' %userid)
+                    if userid not in ids:
+                        if self.userExists(userid):
+                            ids.append(userid)
+                            newRoles[cnx_role] = ids
+                        else:
+                            raise Exception(
+                                'The user (%s) does not exist.' %userid)
         return newRoles
 
     
@@ -601,12 +593,6 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                          cancelRoles = cancelRoles)
 
     
-    def setActionMetadata(self, obj, action, message):
-        self.action = action
-        self.treatment = DESCRIPTION_OF_TREATMENT[action]
-        return obj
-
-
 class RhaptosEditMedia(EditMedia):
 
     def __init__(self, context, request):
