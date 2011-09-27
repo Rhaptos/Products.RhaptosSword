@@ -462,7 +462,6 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         obj.getDefaultFile().upgrade()
 
         # After updating the content, set status to modified, reindex
-        #obj.logAction('save')
         self.setActionMetadata(obj, 'save', None)
 
 
@@ -642,6 +641,7 @@ class RhaptosEditMedia(EditMedia):
         body.seek(0)
         adapter.updateContent(self.context, body, cksum,
             merge is not None and merge.lower()=='merge')
+        self.context.logAction(adapter.action, self.context.message)
 
     def addFile(self, context, filename, f):
         # These files may never be uploaded, because we cannot process
