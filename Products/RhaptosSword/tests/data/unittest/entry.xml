@@ -6,6 +6,8 @@
        xmlns:oerdc="http://cnx.org/aboutus/technology/schemas/oerdc">
 
   <!-- <md:title> -->
+  <dcterms:title>Box Plots Statistics for Majors</dcterms:title>
+  <!-- Deliberately duplicate title -->
   <dcterms:title>Box Plots Statistics for Non Majors</dcterms:title>
 
   <!-- <md:created> -->
