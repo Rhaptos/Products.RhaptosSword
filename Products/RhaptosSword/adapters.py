@@ -513,7 +513,11 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             self.updateMetadata(obj, atom_dom)
             self.updateContent(obj, StringIO(payload), cksum)
 
-        obj.logAction(self.action, obj.message)
+        # blank the message on derive or checkout - see ticket 11879
+        if self.action in ('derive', 'checkout'):
+            obj.logAction(self.action, '')
+        else:
+            obj.logAction(self.action, obj.message)
         return obj
 
 
