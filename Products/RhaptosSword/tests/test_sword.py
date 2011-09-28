@@ -861,6 +861,30 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.assertEqual(module.editors, ())
         self.assertEqual(module.translators, ())
 
+    def test_replaceRolesWithEmptyAtom(self):
+        self._setupRhaptos()
+        self.setRoles(('Manager',))
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        filename = 'creatoronly.xml'
+        module = self._createModule(self.folder.workspace, filename)
+
+        # this request should give the user all the default roles
+        uploadrequest = self.createUploadRequest(
+            'emptyatom.xml',
+            module,
+            REQUEST_METHOD = 'PUT',
+            )
+        adapter = getMultiAdapter(
+                (module, uploadrequest), Interface, 'sword')
+        xml = adapter()
+        dom = parseString(xml)
+        assert "<sword:error" not in xml, xml
+
+        self.assertEqual(module.creators, ('test_user_1_',))
+        self.assertEqual(module.maintainers, ('test_user_1_',))
+        self.assertEqual(module.licensors, ('test_user_1_',))
+        self.assertEqual(module.editors, ())
+        self.assertEqual(module.translators, ())
 
     def test_updateMetadataWithPOSTto_SE_IRI(self):
         """ Testing the merge semantics implementation.
