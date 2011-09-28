@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<entry xmlns="http://www.w3.org/2005/Atom"
+       xmlns:cnxml="http://cnx.rice.edu/cnxml"
+       xmlns:dcterms="http://purl.org/dc/terms/"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:oerdc="http://cnx.org/aboutus/technology/schemas/oerdc">
+
+  <!-- <md:role type="author"> -->
+  <dcterms:creator oerdc:id="test_user_1_" oerdc:email="ananda@mahto.info">Ananda Mahto</dcterms:creator>
+
+</entry>

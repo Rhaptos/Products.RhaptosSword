@@ -809,7 +809,59 @@ class TestSwordService(PloneTestCase.PloneTestCase):
                     msg = 'Role:%s was not set properly.' %role
                     assert element.getAttribute('oerdc:id') in ids, msg
 
-    
+    def test_defaultRoles(self):
+        self._setupRhaptos()
+        self.setRoles(('Manager',))
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        filename = 'emptyatom.xml'
+        module = self._createModule(self.folder.workspace, filename)
+
+        self.assertEqual(module.creators, ('test_user_1_',))
+        self.assertEqual(module.maintainers, ('test_user_1_',))
+        self.assertEqual(module.licensors, ('test_user_1_',))
+        self.assertEqual(module.editors, ())
+        self.assertEqual(module.translators, ())
+
+    def test_creatorRoleOnly(self):
+        self._setupRhaptos()
+        self.setRoles(('Manager',))
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        filename = 'creatoronly.xml'
+        module = self._createModule(self.folder.workspace, filename)
+
+        self.assertEqual(module.creators, ('test_user_1_',))
+        self.assertEqual(module.maintainers, ())
+        self.assertEqual(module.licensors, ())
+        self.assertEqual(module.editors, ())
+        self.assertEqual(module.translators, ())
+
+    def test_maintainerRoleOnly(self):
+        self._setupRhaptos()
+        self.setRoles(('Manager',))
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        filename = 'creatoronly.xml'
+        module = self._createModule(self.folder.workspace, filename)
+
+        self.assertEqual(module.creators, ())
+        self.assertEqual(module.maintainers, ('test_user_1_'))
+        self.assertEqual(module.licensors, ())
+        self.assertEqual(module.editors, ())
+        self.assertEqual(module.translators, ())
+
+    def test_rightsHolderRolyOnly(self):
+        self._setupRhaptos()
+        self.setRoles(('Manager',))
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        filename = 'rightsholderonly.xml'
+        module = self._createModule(self.folder.workspace, filename)
+
+        self.assertEqual(module.creators, ())
+        self.assertEqual(module.maintainers, ())
+        self.assertEqual(module.licensors, ('test_user_1_'))
+        self.assertEqual(module.editors, ())
+        self.assertEqual(module.translators, ())
+
+
     def test_updateMetadataWithPOSTto_SE_IRI(self):
         """ Testing the merge semantics implementation.
         """
