@@ -502,7 +502,9 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
 
                 # format values
                 if cnxname not in ('keywords', 'subject'):
-                    value = ''.join(value)
+                    # pick the last value in the atom entry for string
+                    # properties
+                    value = value and value[-1] or ''
 
                 if value and not metadata.has_key(cnxname):
                     metadata[cnxname] = value
