@@ -208,8 +208,8 @@ class SWORDTreatmentMixin(object):
 
         # Item 4
         # Hard-coding of 0.7. Its already done in too many places :-(
-        doc = context.getDefaultFile()
-        if float(doc.getVersion()) < 0.7:
+        cnxmlversion = context.getDefaultFile().getVersion()
+        if cnxmlversion is not None and float(cnxmlversion) < 0.7:
             requirements.append(unicode(
                 CNXML_VERSION_WARNING % context.absolute_url(), encoding))
 
