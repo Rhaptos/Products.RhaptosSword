@@ -39,6 +39,8 @@
 
   <!-- <md:subject> -->
   <oerdc:oer-subject>Mathematics and Statistics</oerdc:oer-subject>
+  <oerdc:oer-subject>Arts</oerdc:oer-subject>
+  <oerdc:oer-subject>Humanities</oerdc:oer-subject>
 
   <!-- include in general keywords as well as in our special element -->
   <!-- <md:subject> -->

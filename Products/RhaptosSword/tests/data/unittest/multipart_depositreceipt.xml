@@ -23,9 +23,7 @@
         Frobnicate the Bar
     </oerdc:descriptionOfChanges> 
 
-    <oerdc:oer-subject/>
 
-    <dcterms:subject xsi:type="oerdc:Subject"/>
     
 
 

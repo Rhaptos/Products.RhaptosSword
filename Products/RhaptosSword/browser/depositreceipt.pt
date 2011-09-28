@@ -83,11 +83,11 @@
         <tal:description_of_changes replace="treatment/description_of_changes" />
     </oerdc:descriptionOfChanges> 
 
-    <oerdc:oer-subject tal:content="view/subject">
+    <oerdc:oer-subject tal:repeat="subject context/subject" tal:content="subject" tal:condition="context/subject">
         Mathematics and Statistics
     </oerdc:oer-subject>
 
-    <dcterms:subject xsi:type="oerdc:Subject" tal:content="view/subject">
+    <dcterms:subject xsi:type="oerdc:Subject" tal:repeat="subject context/subject" tal:content="subject" tal:condition="context/subject">
         Mathematics and Statistics
     </dcterms:subject>
     
