@@ -21,6 +21,7 @@ from Products.CMFCore.interfaces import IFolderish
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from Products.CNXMLTransforms.helpers import OOoImportError, doTransform, makeContent
 from Products.CNXMLDocument.XMLService import XMLParserError
+from Products.CNXMLDocument.XMLService import validate
 
 from rhaptos.atompub.plone.exceptions import PreconditionFailed
 from rhaptos.atompub.plone.browser.atompub import ATOMPUB_CONTENT_TYPES
@@ -344,6 +345,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                     current_value.extend(old_value)
                     metadata[cnx_name] = current_value
         if metadata:
+            self.validate_metadata(metadata)
             obj.update_metadata(**metadata)
         self.addRoles(obj, dom)
         obj.reindexObject(idxs=metadata.keys())
@@ -370,6 +372,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                             current_values.extend(value)
                     metadata[cnx_name] = new_values
         if metadata:
+            self.validate_metadata(metadata)
             obj.update_metadata(**metadata)
         self.addRoles(obj, dom)
         self.setDefaultRoles(obj, dom)
@@ -396,6 +399,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         metadata.update(self.getMetadata(dom, METADATA_MAPPING))
         self.action = 'save'
         if metadata:
+            self.validate_metadata(metadata)
             obj.update_metadata(**metadata)
         # we set GoogleAnalyticsTrackingCode explicitly, since the script
         # 'update_metadata' ignores empty strings.
@@ -407,6 +411,36 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         self.addRoles(obj, dom)
         self.setDefaultRoles(obj, dom)
         obj.reindexObject(idxs=metadata.keys())
+
+    def validate_metadata(self, metadata):
+        trackingcode = metadata.get('GoogleAnalyticsTrackingCode')
+        if trackingcode:
+            parts = trackingcode.split('-')
+            valid = len(parts) == 3 and \
+                    parts[0] == 'UA' and \
+                    parts[1].isdigit() and \
+                    parts[2].isdigit()
+            if not valid:
+                raise ValidationError(
+                    "Invalid Google Analytics Tracking Code: %s" % trackingcode)
+
+        abstract = metadata.get('abstract')
+        if abstract:
+            # validate CNXML pieces
+            wrappedabstract = """\
+<md:abstract
+    xmlns="http://cnx.rice.edu/cnxml"
+    xmlns:bib="http://bibtexml.sf.net/"
+    xmlns:m="http://www.w3.org/1998/Math/MathML"
+    xmlns:md="http://cnx.rice.edu/mdml"
+    xmlns:q="http://cnx.rice.edu/qml/1.0">%s</md:abstract>""" % abstract
+            results = validate(wrappedabstract, "http://cnx.rice.edu/technology/cnxml/schema/rng/0.7/cnxml-fragment.rng")
+            if results:
+                error = ""
+                for line, msg in results:
+                    error += "line %s: %s\n" % (line, msg)
+                raise ValidationError(
+                    "Invalid abstract:\n%s" % error)
 
 
     def updateContent(self, obj, fp, cksum, merge=False):

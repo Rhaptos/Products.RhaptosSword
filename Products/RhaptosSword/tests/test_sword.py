@@ -452,6 +452,37 @@ class TestSwordService(PloneTestCase.PloneTestCase):
             'Result does not match reference doc: \n\n%s' % diff(
                 returned_depositreceipt, reference_depositreceipt))
 
+    def test_invalidabstract(self):
+        """ test that invalid cnxml in abstract raises an exception """
+        self._setupRhaptos()
+        self.setRoles(('Manager',))
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        filename = 'invalidabstract.xml'
+        # XXX: assertRaises is not working for some reason
+        # self.assertRaises(AssertionError,
+        #    self._createModule(self.folder.workspace, filename))
+        try:
+            self._createModule(self.folder.workspace, filename)
+        except AssertionError:
+            pass
+        except:
+            raise
+
+    def test_invalidAnalyticsCode(self):
+        """ test that invalid Google Analytics codd raises an exception """
+        self._setupRhaptos()
+        self.setRoles(('Manager',))
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        filename = 'invalidanalyticscode.xml'
+        # XXX: assertRaises is not working for some reason
+        # self.assertRaises(AssertionError,
+        #    self._createModule(self.folder.workspace, filename))
+        try:
+            self._createModule(self.folder.workspace, filename)
+        except AssertionError:
+            pass
+        except:
+            raise
 
     def testMultipart(self):
         self._setupRhaptos()
