@@ -4,6 +4,7 @@ if __name__ == '__main__':
 
 import zipfile as zf
 import tempfile
+import difflib
 from StringIO import StringIO
 from base64 import decodestring
 from DateTime import DateTime
@@ -247,6 +248,11 @@ def getEditIRI(dom):
     return [l for l in links if l.getAttribute('rel')=='edit'][0].getAttribute(
         'href')
 
+def diff(a, b):
+    return '\n'.join(
+        difflib.unified_diff(a.splitlines(), b.splitlines())
+        )
+
 class TestSwordService(PloneTestCase.PloneTestCase):
     def afterSetup(self):
         pass
@@ -374,7 +380,8 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         returned_depositreceipt = parseString(xml).toxml()
         self.assertTrue(bool(xml), "Upload view does not return a result")
         self.assertEqual(returned_depositreceipt, reference_depositreceipt,
-            'Result does not match reference doc')
+            'Result does not match reference doc: \n\n%s' % diff(
+                returned_depositreceipt, reference_depositreceipt))
 
 
     def testFoldersAreFolderish(self):
@@ -442,7 +449,8 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         assert bool(xml), "Upload view does not return a result"
         assert "<sword:error" not in xml, xml
         self.assertEqual(returned_depositreceipt, reference_depositreceipt,
-            'Result does not match reference doc')
+            'Result does not match reference doc: \n\n%s' % diff(
+                returned_depositreceipt, reference_depositreceipt))
 
 
     def testMultipart(self):
@@ -488,7 +496,8 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         assert bool(xml), "Upload view does not return a result"
         assert "<sword:error" not in xml, xml
         self.assertEqual(returned_depositreceipt, reference_depositreceipt,
-            'Result does not match reference doc')
+            'Result does not match reference doc: \n\n%s' % diff(
+                returned_depositreceipt, reference_depositreceipt))
 
     def _testUploadAndPublish(self):
         """ Upload a module
@@ -661,7 +670,9 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         reference_statement = dom.toxml()
         reference_statement = reference_statement.replace('__MODULE_ID__', module.id)
         self.assertEqual(returned_statement, reference_statement,
-            'Returned statement and reference statement are not identical.')
+            'Returned statement and reference statement '
+            'are not identical: \n\n%s' % diff(
+                returned_statement, reference_statement))
 
 
     def _testDeriveModule(self):
