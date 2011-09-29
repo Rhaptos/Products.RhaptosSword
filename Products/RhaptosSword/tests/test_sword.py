@@ -929,6 +929,23 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.assertEqual(module.editors, ())
         self.assertEqual(module.translators, ())
 
+
+    def test_depositReceipt_multipleCreators(self):
+        self._setupRhaptos()
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        acl_users = getToolByName(self.portal, 'acl_users')
+        acl_users.userFolderAddUser('user1', 'user1', ['Member'], [])
+        acl_users.userFolderAddUser('user2', 'user2', ['Member'], [])
+        acl_users.userFolderAddUser('user85', 'user85', ['Member'], [])
+         
+        filename = 'multiple_authors.xml'
+        module = self._createModule(self.folder.workspace, filename)
+        view = module.restrictedTraverse('/'.join(module.getPhysicalPath())+'/sword')
+        dom = parseString(view())
+        creator_elements = dom.getElementsByTagName('dcterms:creator')
+        self.assertEqual(
+            len(creator_elements), 4, 'All creator/authors where not returned')
+
     def test_replaceRolesWithEmptyAtom(self):
         self._setupRhaptos()
         self.setRoles(('Manager',))

@@ -395,7 +395,14 @@ class EditIRI(BaseEditIRI, SWORDTreatmentMixin, Explicit):
 
     
     def creators(self, module):
-        return module.creators + module.authors
+        creator_set = set(module.creators)
+        author_set = set(module.authors)
+
+        # all those in either set but not in both
+        diff = author_set.symmetric_difference(creator_set)
+        # all those in both sets
+        same = author_set.intersection(creator_set)
+        return list(diff) + list(same)
 
     
     def subject(self):
