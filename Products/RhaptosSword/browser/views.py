@@ -394,6 +394,10 @@ class EditIRI(BaseEditIRI, SWORDTreatmentMixin, Explicit):
         return True
 
     
+    def creators(self, module):
+        return module.creators + module.authors
+
+    
     def subject(self):
         return ', '.join(self.context.subject) 
 
