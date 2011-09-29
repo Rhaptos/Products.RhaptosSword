@@ -403,10 +403,6 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         # we set GoogleAnalyticsTrackingCode explicitly, since the script
         # 'update_metadata' ignores empty strings.
         obj.GoogleAnalyticsTrackingCode = metadata.get('GoogleAnalyticsTrackingCode')
-        # first delete all the pending collab request for which we have
-        # no data in the request dom.
-        self.deleteRoles(obj, dom)
-        # now add any new roles
         self.updateRoles(obj, dom)
         obj.reindexObject(idxs=metadata.keys())
 
@@ -609,34 +605,6 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         return defaultRoles
 
 
-    def deleteRoles(self, obj, dom):
-        """ Compare the roles in the dom to all the pending collab requests on obj.
-            Delete the pending collabs not listed in the dom.
-        """
-        pending_collaborations = obj.getPendingCollaborations()
-        roles = self.getRolesFromDOM(dom)
-        for user_id, collab_request in pending_collaborations.items():
-            if user_id not in roles.keys() and user_id != obj.Creator():
-                obj.reverseCollaborationRequest(collab_request.id)
-        
-
-    def addRoles(self, obj, dom):
-        newRoles = self.getRolesFromDOM(dom)
-        self._addRoles(obj, newRoles) 
-    
-
-    def _addRoles(self, obj, roles):
-        """ Generalised method for reuse.
-        """
-        user_role_delta = obj.generateCollaborationRequests(
-                newUser=True, newRoles=roles)
-        for p in user_role_delta.keys():
-            collabs = list(obj.getCollaborators())
-            if p not in collabs:
-                obj.addCollaborator(p)
-                obj.requestCollaboration(p, user_role_delta[p])
-
-
     def updateRoles(self, obj, dom):
         """
         Compute the updated roles
@@ -655,8 +623,6 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         
         # updating metadata
         if self.action == 'create':
-            # if there are no roles in the dom we give the depositor the
-            # default roles
             if len(domRoles.keys()) == 0:
                 updateRoles.update(moduleRoles)
             else:
@@ -717,27 +683,6 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                 obj.removeCollaborator(c)
 
     
-    def setDefaultRoles(self, obj, dom):
-        """ According to the specification:
-            If the metadata included in the atom entry contains NO contributor
-            information (author, maintainer, licensor, translator, editor)
-            Then the depositor should receive all of the required roles
-            (author, maintainer, and licensor)
-        """
-        # run through all the roles to see if there is any user data in the dom
-        # if there is, we stop the process immediately.
-        for atom_role in ROLE_MAPPING.keys():
-            if len(dom.getElementsByTagName(atom_role)) > 0:
-                return
-
-        # we have no dom data for roles
-        user_id = obj.Creator()
-        defaultRoles = {}
-        for role in REQUIRED_ROLES:
-            defaultRoles[role] = [user_id]
-        self._addRoles(obj, defaultRoles)
-
-        
 class RhaptosEditMedia(EditMedia):
 
     def __init__(self, context, request):
