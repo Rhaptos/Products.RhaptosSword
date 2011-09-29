@@ -103,7 +103,7 @@ ROLE_MAPPING = {'creator': 'Author',
                 'translator': 'Translator',
                }
 
-REQUIRED_ROLES = ['Author', 'Maintainer', 'Licensor']
+DEFAULT_ROLES = ['Author', 'Maintainer', 'Licensor']
 
 class IRhaptosWorkspaceSwordAdapter(ISWORDContentUploadAdapter):
     """ Marker interface for SWORD service specific to the Rhaptos 
@@ -606,7 +606,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
 
     def getDefaultRoles(self, user_id):
         defaultRoles = {}
-        for role in REQUIRED_ROLES:
+        for role in DEFAULT_ROLES:
             defaultRoles[role] = [user_id]
         return defaultRoles
 
@@ -627,12 +627,20 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         deleteRoles = []
         cancelRoles = []
         
-        # updating metadata
         if self.action == 'create' or self.update_semantics == 'replace':
+            # set default roles only if the dom contains no roles
             if len(domRoles.keys()) == 0:
-                updateRoles.update(moduleRoles)
+                updateRoles = self.getDefaultRoles(
+                    self.pmt.getAuthenticatedMember().getId())
             else:
                 updateRoles.update(domRoles)
+
+        if self.update_semantics == 'merge':
+            updateRoles.update(moduleRoles)
+            for role, userids in domRoles.items():
+                userids = set(userids)
+                userids.union(updateRoles.get(role, []))
+                updateRoles[role] = list(userids)
 
         if self.update_semantics == 'replace':
             currentUsers = set()
