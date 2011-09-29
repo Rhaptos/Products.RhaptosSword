@@ -602,6 +602,13 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         return self.pmt.getMemberById(userid)
 
 
+    def getDefaultRoles(self, user_id):
+        defaultRoles = {}
+        for role in REQUIRED_ROLES:
+            defaultRoles[role] = [user_id]
+        return defaultRoles
+
+
     def deleteRoles(self, obj, dom):
         """ Compare the roles in the dom to all the pending collab requests on obj.
             Delete the pending collabs not listed in the dom.
@@ -648,14 +655,72 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         
         # updating metadata
         if self.action == 'create':
-            for role, user_ids in domRoles.items():
-                current_ids = moduleRoles.get(role, [])
-                new_roles = set(user_ids).difference(current_ids)
-                updateRoles[role] = list(new_roles)
+            # if there are no roles in the dom we give the depositor the
+            # default roles
+            if len(domRoles.keys()) == 0:
+                updateRoles = self.getDefaultRoles(obj.Creator())
+            else:
+                for role, user_ids in domRoles.items():
+                    current_ids = moduleRoles.get(role, [])
+                    new_roles = set(user_ids).difference(current_ids)
+                    updateRoles[role] = list(new_roles)
 
-        obj.update_roles(updateRoles = updateRoles,
-                         deleteRoles = deleteRoles,
-                         cancelRoles = cancelRoles)
+        self._updateRoles(obj, updateRoles, deleteRoles, cancelRoles)
+    
+    
+    def _updateRoles(self, obj, updateRoles={}, deleteRoles=[], cancelRoles=[]):
+        delete = []
+        portal_status_message = ''
+
+        #user_role_delta = {}
+        pending = obj.getPendingCollaborations()
+
+        collabs = obj.getCollaborators()
+
+        user_role_delta = obj.generateCollaborationRequests(
+            newUser=False, newRoles=updateRoles, deleteRoles=deleteRoles)
+                
+        for p in user_role_delta.keys():
+            if p in pending.keys():
+                new_changes = pending[p].roles.copy()
+                for role in user_role_delta[p]:
+                    delta = user_role_delta[p][role]
+                    if role in new_changes:
+                        if new_changes[role] != delta:
+                            new_changes.pop(role)
+                        elif new_changes[role] == delta:
+                            #Shouldn't happen
+                            pass
+                    else:
+                        new_changes[role] = delta
+                if not new_changes:
+                    obj.manage_delObjects(pending[p].id)
+                else:
+                    obj.editCollaborationRequest(pending[p].id, new_changes)
+            else:
+                obj.requestCollaboration(p, user_role_delta[p])
+
+        for u in cancelRoles:
+            if u in obj.getPendingCollaborations():
+                # Revert the new roles back to the published version
+                obj.reverseCollaborationRequest(pending[u].id)
+                # Delete the collaboration request
+                obj.manage_delObjects(pending[u].id)
+
+        #Get the collaborators again if they have changed
+        all_roles = {}
+        for rolename in obj.default_roles + getattr(obj, 'optional_roles', {}).keys():
+            for r in getattr(obj,rolename.lower()+'s',[]):
+                all_roles[r]=None
+            for r in getattr(obj, 'pub_'+rolename.lower()+'s', []):
+                all_roles[r]=None
+            
+        collabs = obj.getCollaborators()
+        for c in collabs:
+            if c not in all_roles.keys():
+                obj.removeCollaborator(c)
+            
+        obj.logAction('save')
 
     
     def setDefaultRoles(self, obj, dom):
