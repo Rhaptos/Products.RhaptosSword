@@ -23,6 +23,7 @@ from Products.Five import BrowserView
 from Products.CMFCore.interfaces import IFolderish
 from Products.CMFCore.PortalFolder import PortalFolder
 from Products.CMFCore.utils import _checkPermission
+from Products.CMFCore.utils import getToolByName
 
 from Products.PloneTestCase import PloneTestCase
 
@@ -907,6 +908,23 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.assertEqual(module.licensors, ())
         self.assertEqual(module.editors, ('test_user_1_',))
         self.assertEqual(module.translators, ('test_user_1_',))
+
+    def test_multipleCreators(self):
+        """ creator in the atom/sword sense translate to authors on modules.
+        """
+        self._setupRhaptos()
+        self.setRoles(('Manager',))
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        acl_users = getToolByName(self.portal, 'acl_users')
+        acl_users.userFolderAddUser('user1', 'user1', ['Member'], [])
+        acl_users.userFolderAddUser('user2', 'user2', ['Member'], [])
+        acl_users.userFolderAddUser('user85', 'user85', ['Member'], [])
+        
+        filename = 'multiple_authors.xml'
+        module = self._createModule(self.folder.workspace, filename)
+
+        self.assertEqual(module.creators, ('test_user_1_',))
+        self.assertEqual(module.authors, ('user85', 'user1', 'user2'))
 
     def test_replaceRolesWithEmptyAtom(self):
         self._setupRhaptos()
