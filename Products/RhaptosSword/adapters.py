@@ -704,8 +704,7 @@ class RhaptosEditMedia(EditMedia):
         merge = self.request.get_header('Update-Semantics')
 
         body.seek(0)
-        adapter.updateContent(self.context, body, cksum,
-            merge is not None and merge.lower()=='merge')
+        adapter.updateContent(self.context, body, cksum, merge is not None)
         self.context.logAction(adapter.action, self.context.message)
 
     def addFile(self, context, filename, f):
