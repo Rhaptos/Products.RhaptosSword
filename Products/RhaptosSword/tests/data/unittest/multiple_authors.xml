@@ -15,8 +15,6 @@
     <dcterms:creator oerdc:id="user85"/>
     <dcterms:creator oerdc:id="user1"/>
     <dcterms:creator oerdc:id="user2"/>
-    <oerdc:maintainer oerdc:id="user85" />
-    <dcterms:rightsHolder oerdc:id="user85" />
 
     <oerdc:oer-subject>Arts</oerdc:oer-subject>
     <dcterms:subject></dcterms:subject>
