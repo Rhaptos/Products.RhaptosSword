@@ -364,7 +364,17 @@ class EditIRI(BaseEditIRI, SWORDTreatmentMixin, Explicit):
             raise ValueError(
                 "%s is not a valid content type for this request" % content_type)
 
-    
+
+    def getLinkBase(self, module):
+        # would prefer to use module.isPublic, but not sure it's checking for the
+        # correct state. Probably should be checking for 'published' not 'public'.
+        if module.state == 'published':
+            content_tool = getToolByName(self.context, 'content')
+            base_url = content_tool.absolute_url()
+            return '%s/%s/%s' %(base_url, module.id, module.version)
+        return module.absolute_url()
+
+
     def pending_collaborations(self):
         return self.context.getPendingCollaborations()
 
