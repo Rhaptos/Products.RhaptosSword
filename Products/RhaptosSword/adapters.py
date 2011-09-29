@@ -669,9 +669,8 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
     
     
     def _updateRoles(self, obj, updateRoles={}, deleteRoles=[], cancelRoles=[]):
-        delete = []
-        portal_status_message = ''
-
+        """ Basic copy of RhaptosModuleEditor skins script update_roles.
+        """
         #user_role_delta = {}
         pending = obj.getPendingCollaborations()
 
@@ -719,8 +718,6 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         for c in collabs:
             if c not in all_roles.keys():
                 obj.removeCollaborator(c)
-            
-        obj.logAction('save')
 
     
     def setDefaultRoles(self, obj, dom):
