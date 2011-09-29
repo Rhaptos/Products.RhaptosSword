@@ -565,22 +565,18 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         return metadata
 
 
-    def _getNewRoles(self, dom):
-        newRoles = {}
+    def getRolesFromDOM(self, dom):
+        roles = {}
         for atom_role, cnx_role in ROLE_MAPPING.items():
             for namespace in [DCTERMS_NAMESPACE, OERDC_NAMESPACE]:
                 for element in dom.getElementsByTagNameNS(namespace, atom_role):
-                    ids = newRoles.get(cnx_role, [])
+                    ids = roles.get(cnx_role, [])
                     userid = element.getAttribute('oerdc:id')
                     userid = userid.encode(self.encoding)
                     if userid not in ids:
-                        if self.userExists(userid):
-                            ids.append(userid)
-                            newRoles[cnx_role] = ids
-                        else:
-                            raise Exception(
-                                'The user (%s) does not exist.' %userid)
-        return newRoles
+                        ids.append(userid)
+                        roles[cnx_role] = ids
+        return roles
 
     
     def userExists(self, userid):
@@ -593,14 +589,14 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             Delete the pending collabs not listed in the dom.
         """
         pending_collaborations = obj.getPendingCollaborations()
-        roles = self._getNewRoles(dom)
+        roles = self.getRolesFromDOM(dom)
         for user_id, collab_request in pending_collaborations.items():
             if user_id not in roles.keys() and user_id != obj.Creator():
                 obj.reverseCollaborationRequest(collab_request.id)
         
 
     def addRoles(self, obj, dom):
-        newRoles = self._getNewRoles(dom)
+        newRoles = self.getRolesFromDOM(dom)
         self._addRoles(obj, newRoles) 
     
 
@@ -625,7 +621,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         Compute the cancelled roles
         - pending collaboration request for which there are no roles in the xml
         """
-        updateRoles = self._getNewRoles(dom)
+        updateRoles = self.getRolesFromDOM(dom)
         deleteRoles = []
         cancelRoles = []
 
