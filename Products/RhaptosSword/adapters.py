@@ -641,6 +641,8 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             domUsers = set()
             for userids in domRoles.values():
                 domUsers.update(userids)
+            for userids in updateRoles.values():
+                domUsers.update(userids)
             deleteRoles = currentUsers.difference(domUsers)
 
         self._updateRoles(obj, updateRoles, deleteRoles, cancelRoles)
