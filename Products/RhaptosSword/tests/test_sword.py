@@ -913,18 +913,21 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         """ creator in the atom/sword sense translate to authors on modules.
         """
         self._setupRhaptos()
-        self.setRoles(('Manager',))
         self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
         acl_users = getToolByName(self.portal, 'acl_users')
         acl_users.userFolderAddUser('user1', 'user1', ['Member'], [])
         acl_users.userFolderAddUser('user2', 'user2', ['Member'], [])
         acl_users.userFolderAddUser('user85', 'user85', ['Member'], [])
-        
+         
         filename = 'multiple_authors.xml'
         module = self._createModule(self.folder.workspace, filename)
 
         self.assertEqual(module.creators, ('test_user_1_',))
         self.assertEqual(module.authors, ('user85', 'user1', 'user2'))
+        self.assertEqual(module.maintainers, ())
+        self.assertEqual(module.licensors, ())
+        self.assertEqual(module.editors, ())
+        self.assertEqual(module.translators, ())
 
     def test_replaceRolesWithEmptyAtom(self):
         self._setupRhaptos()
