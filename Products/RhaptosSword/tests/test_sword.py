@@ -870,11 +870,12 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self._setupRhaptos()
         self.setRoles(('Manager',))
         self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
-        filename = 'creatoronly.xml'
+        filename = 'maintaineronly.xml'
         module = self._createModule(self.folder.workspace, filename)
 
-        self.assertEqual(module.creators, ())
-        self.assertEqual(module.maintainers, ('test_user_1_'))
+        self.assertEqual(module.creators, ('test_user_1_',))
+        self.assertEqual(module.authors, ())
+        self.assertEqual(module.maintainers, ('test_user_1_',))
         self.assertEqual(module.licensors, ())
         self.assertEqual(module.editors, ())
         self.assertEqual(module.translators, ())
@@ -886,9 +887,10 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         filename = 'rightsholderonly.xml'
         module = self._createModule(self.folder.workspace, filename)
 
-        self.assertEqual(module.creators, ())
+        self.assertEqual(module.creators, ('test_user_1_',))
+        self.assertEqual(module.authors, ())
         self.assertEqual(module.maintainers, ())
-        self.assertEqual(module.licensors, ('test_user_1_'))
+        self.assertEqual(module.licensors, ('test_user_1_',))
         self.assertEqual(module.editors, ())
         self.assertEqual(module.translators, ())
 
@@ -899,11 +901,12 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         filename = 'editortranslator.xml'
         module = self._createModule(self.folder.workspace, filename)
 
-        self.assertEqual(module.creators, ())
+        self.assertEqual(module.creators, ('test_user_1_',))
+        self.assertEqual(module.authors, ())
         self.assertEqual(module.maintainers, ())
         self.assertEqual(module.licensors, ())
-        self.assertEqual(module.editors, ('test_user_1_'))
-        self.assertEqual(module.translators, ('test_user_1_'))
+        self.assertEqual(module.editors, ('test_user_1_',))
+        self.assertEqual(module.translators, ('test_user_1_',))
 
     def test_replaceRolesWithEmptyAtom(self):
         self._setupRhaptos()
