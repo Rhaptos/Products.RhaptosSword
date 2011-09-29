@@ -588,6 +588,14 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         moduleRoles.update(module.getRolesDict())
         return moduleRoles
 
+
+    def validateRoles(self, roles):
+        for role, user_ids in roles.items():
+            for u_id in user_ids:
+                if not self.userExists(u_id):
+                    raise ValidationError('The user (%s) does not exist.' %u_id)
+        return roles
+
     
     def userExists(self, userid):
         if userid is None: return False
@@ -631,20 +639,19 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         Compute the cancelled roles
         - pending collaboration request for which there are no roles in the xml
         """
-        domRoles = self.getRolesFromDOM(dom)
-        moduleRoles = self.getRolesFromModule(obj)
+        domRoles = self.validateRoles(self.getRolesFromDOM(dom))
+        moduleRoles = self.validateRoles(self.getRolesFromModule(obj))
 
         updateRoles = {}
         deleteRoles = []
         cancelRoles = []
-
-        pending_collaborations = obj.getPendingCollaborations()
-        for user_id in pending_collaborations.keys():
-            if user_id not in updateRoles.keys() and user_id != obj.Creator():
-                cancelRoles.append(user_id)
-        for user_id in obj.getCollaborators():
-            if user_id not in updateRoles.keys() and user_id != obj.Creator():
-                deleteRoles.append(user_id)
+        
+        # updating metadata
+        if self.action == 'create':
+            for role, user_ids in domRoles.items():
+                current_ids = moduleRoles.get(role, [])
+                new_roles = set(user_ids).difference(current_ids)
+                updateRoles[role] = list(new_roles)
 
         obj.update_roles(updateRoles = updateRoles,
                          deleteRoles = deleteRoles,
