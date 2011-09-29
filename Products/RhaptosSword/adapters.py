@@ -745,7 +745,8 @@ class RhaptosEditMedia(EditMedia):
         merge = self.request.get_header('Update-Semantics')
 
         body.seek(0)
-        adapter.updateContent(self.context, body, content_type, cksum, merge is not None)
+        adapter.updateContent(self.context, body, content_type, cksum,
+            merge == 'http://purl.org/oerpub/semantics/Merge')
         self.context.logAction(adapter.action, self.context.message)
 
     def addFile(self, context, filename, f):
