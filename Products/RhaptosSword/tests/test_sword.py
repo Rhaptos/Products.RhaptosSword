@@ -950,7 +950,12 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self._setupRhaptos()
         self.setRoles(('Manager',))
         self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
-        filename = 'creatoronly.xml'
+        acl_users = self.portal.acl_users
+        acl_users.userFolderAddUser('user1', 'user1', ['Member'], [])
+        acl_users.userFolderAddUser('user2', 'user2', ['Member'], [])
+        acl_users.userFolderAddUser('user85', 'user85', ['Member'], [])
+
+        filename = 'multiple_authors.xml'
         module = self._createModule(self.folder.workspace, filename)
 
         # this request should give the user all the default roles
