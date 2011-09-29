@@ -347,7 +347,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         if metadata:
             self.validate_metadata(metadata)
             obj.update_metadata(**metadata)
-        self.addRoles(obj, dom)
+        self.updateRoles(obj, dom)
         obj.reindexObject(idxs=metadata.keys())
 
 
@@ -374,8 +374,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         if metadata:
             self.validate_metadata(metadata)
             obj.update_metadata(**metadata)
-        self.addRoles(obj, dom)
-        self.setDefaultRoles(obj, dom)
+        self.updateRoles(obj, dom)
         obj.reindexObject(idxs=metadata.keys())
 
     
@@ -408,8 +407,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         # no data in the request dom.
         self.deleteRoles(obj, dom)
         # now add any new roles
-        self.addRoles(obj, dom)
-        self.setDefaultRoles(obj, dom)
+        self.updateRoles(obj, dom)
         obj.reindexObject(idxs=metadata.keys())
 
     def validate_metadata(self, metadata):
@@ -566,17 +564,29 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
 
 
     def getRolesFromDOM(self, dom):
-        roles = {}
+        domRoles = {}
         for atom_role, cnx_role in ROLE_MAPPING.items():
             for namespace in [DCTERMS_NAMESPACE, OERDC_NAMESPACE]:
                 for element in dom.getElementsByTagNameNS(namespace, atom_role):
-                    ids = roles.get(cnx_role, [])
+                    ids = domRoles.get(cnx_role, [])
                     userid = element.getAttribute('oerdc:id')
                     userid = userid.encode(self.encoding)
                     if userid not in ids:
                         ids.append(userid)
-                        roles[cnx_role] = ids
-        return roles
+                        domRoles[cnx_role] = ids
+        return domRoles
+
+
+    def getRolesFromModule(self, module):
+        moduleRoles = {}
+        for cnx_role in ROLE_MAPPING.values():
+            role_name = cnx_role.lower() + 's'
+            ids = getattr(module, role_name, [])
+            roles = moduleRoles.get(cnx_role, [])
+            roles.extend(ids)
+            moduleRoles[cnx_role] = roles
+        moduleRoles.update(module.getRolesDict())
+        return moduleRoles
 
     
     def userExists(self, userid):
@@ -621,7 +631,10 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         Compute the cancelled roles
         - pending collaboration request for which there are no roles in the xml
         """
-        updateRoles = self.getRolesFromDOM(dom)
+        domRoles = self.getRolesFromDOM(dom)
+        moduleRoles = self.getRolesFromModule(obj)
+
+        updateRoles = {}
         deleteRoles = []
         cancelRoles = []
 
