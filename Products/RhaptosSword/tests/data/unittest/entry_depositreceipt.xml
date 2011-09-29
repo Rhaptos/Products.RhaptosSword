@@ -17,6 +17,8 @@
     <dcterms:creator oerdc:email="" oerdc:id="test_user_1_" oerdc:pending="False"/>
     <oerdc:maintainer oerdc:email="" oerdc:id="test_user_1_" oerdc:pending="False"/>
     <dcterms:rightsHolder oerdc:email="" oerdc:id="test_user_1_" oerdc:pending="False"/>
+    <oerdc:translator oerdc:email="" oerdc:id="test_user_1_" oerdc:pending="False"/>
+    <oerdc:editor oerdc:email="" oerdc:id="test_user_1_" oerdc:pending="False"/>
     
     <!-- CNX-Supported but not in MDML -->
     <oerdc:descriptionOfChanges>
