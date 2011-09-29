@@ -150,6 +150,9 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
     # the action currently being taken
     action = None
     
+    # help us remember what metadata semantics were chosen
+    update_semantics = 'created'
+    
     # the basic default encoding.
     # we change it to that set on the site a little later.
     encoding = 'utf-8'
@@ -332,6 +335,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             For more current info see: 
             - Google doc: SWORD V2 Spec for Publishing Modules in Connexions
         """        
+        self.update_semantics = 'merge'
         dom = parse(fp)
         # create a metadata dict that has all the values from obj, overridden
         # by the current dom values.
@@ -356,6 +360,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             SWORD V2 Spec for Publishing Modules in Connexions
             Section: Metadata
         """
+        self.update_semantics = 'update'
         metadata = {}
         metadata.update(self.getMetadata(dom, METADATA_MAPPING))
         for oerdc_name, cnx_name in METADATA_MAPPING.items():
@@ -390,6 +395,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             TODO: Checkout the _reset method in ModuleEditor. It might be
                   better to use that than do our own thing here.
         """
+        self.update_semantics = 'replace'
         dom = parse(fp)
         # create a metadata dict that has all the defaults, overridden by the
         # current dom values. This way we will 'clear' the properties not in
@@ -622,7 +628,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         cancelRoles = []
         
         # updating metadata
-        if self.action == 'create':
+        if self.update_semantics == 'created':
             if len(domRoles.keys()) == 0:
                 updateRoles.update(moduleRoles)
             else:
