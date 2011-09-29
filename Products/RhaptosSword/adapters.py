@@ -658,12 +658,9 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             # if there are no roles in the dom we give the depositor the
             # default roles
             if len(domRoles.keys()) == 0:
-                updateRoles = self.getDefaultRoles(obj.Creator())
+                updateRoles.update(moduleRoles)
             else:
-                for role, user_ids in domRoles.items():
-                    current_ids = moduleRoles.get(role, [])
-                    new_roles = set(user_ids).union(current_ids)
-                    updateRoles[role] = list(new_roles)
+                updateRoles.update(domRoles)
 
         self._updateRoles(obj, updateRoles, deleteRoles, cancelRoles)
     
