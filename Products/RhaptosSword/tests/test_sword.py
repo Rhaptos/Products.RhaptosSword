@@ -892,6 +892,19 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.assertEqual(module.editors, ())
         self.assertEqual(module.translators, ())
 
+    def test_creatorAsEditorAndTranslator(self):
+        self._setupRhaptos()
+        self.setRoles(('Manager',))
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        filename = 'editortranslator.xml'
+        module = self._createModule(self.folder.workspace, filename)
+
+        self.assertEqual(module.creators, ())
+        self.assertEqual(module.maintainers, ())
+        self.assertEqual(module.licensors, ())
+        self.assertEqual(module.editors, ('test_user_1_'))
+        self.assertEqual(module.translators, ('test_user_1_'))
+
     def test_replaceRolesWithEmptyAtom(self):
         self._setupRhaptos()
         self.setRoles(('Manager',))
