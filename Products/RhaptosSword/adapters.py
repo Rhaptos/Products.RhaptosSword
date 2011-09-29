@@ -125,10 +125,11 @@ def splitMultipartRequest(request):
     # Call get_payload with decode=True, so it can handle the transfer
     # encoding for us, if any.
     atom = atom.get_payload(decode=True)
+    content_type = payload.get_content_type()
     payload = payload.get_payload(decode=True)
     dom = parse(StringIO(atom))
 
-    return dom, payload
+    return dom, payload, content_type
 
 
 def checkUploadSize(context, fp):
@@ -209,7 +210,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         elif content_type.startswith('multipart/'):
             # Check upload size
             checkUploadSize(context, request.stdin)
-            atom_dom, payload = splitMultipartRequest(request)
+            atom_dom, payload, payload_type = splitMultipartRequest(request)
             obj = _deriveOrCheckout(atom_dom)
             if obj is not None:
                 return obj
@@ -443,7 +444,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                     "Invalid abstract:\n%s" % error)
 
 
-    def updateContent(self, obj, fp, cksum, merge=False):
+    def updateContent(self, obj, fp, content_type, cksum, merge=False):
         kwargs = {
             'original_file_name': 'sword-import-file',
             'user_name': getSecurityManager().getUser().getUserName()
@@ -457,8 +458,12 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                 raise ErrorChecksumMismatch("Checksum does not match",
                     "Calculated Checksum %s does not match %s" % (h, cksum))
 
+        transform = "sword_to_folder"
+        if content_type.lower().startswith("application/msword"):
+            transform = "oo_to_cnxml"
+
         try:
-            text, subobjs, meta = doTransform(obj, "sword_to_folder",
+            text, subobjs, meta = doTransform(obj, transform,
                 content, meta=1, **kwargs)
         except (OOoImportError, BadZipfile), e:
             raise TransformFailed(str(e))
@@ -506,12 +511,12 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             body = request.get('BODYFILE')
             cksum = request.get_header('Content-MD5')
             body.seek(0)
-            self.updateContent(obj, body, cksum)
+            self.updateContent(obj, body, content_type, cksum)
         elif content_type.startswith('multipart/'):
             cksum = request.get_header('Content-MD5')
-            atom_dom, payload = splitMultipartRequest(request)
+            atom_dom, payload, payload_type = splitMultipartRequest(request)
             self.updateMetadata(obj, atom_dom)
-            self.updateContent(obj, StringIO(payload), cksum)
+            self.updateContent(obj, StringIO(payload), payload_type, cksum)
 
         # blank the message on derive or checkout - see ticket 11879
         if self.action in ('derive', 'checkout'):
@@ -740,7 +745,7 @@ class RhaptosEditMedia(EditMedia):
         merge = self.request.get_header('Update-Semantics')
 
         body.seek(0)
-        adapter.updateContent(self.context, body, cksum, merge is not None)
+        adapter.updateContent(self.context, body, content_type, cksum, merge is not None)
         self.context.logAction(adapter.action, self.context.message)
 
     def addFile(self, context, filename, f):
