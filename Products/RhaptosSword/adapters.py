@@ -482,8 +482,8 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                     file=text, idprefix='zip-')
             else:
                 # Create an empty index.cnxml
-                obj.invokeFactory('CNXML Document', obj.default_file,
-                    idprefix='zip-')
+                obj.createTemplate()
+
             makeContent(obj, subobjs)
 
         # make sure that the cnxml is the latest version
