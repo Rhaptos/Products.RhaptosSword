@@ -662,7 +662,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             else:
                 for role, user_ids in domRoles.items():
                     current_ids = moduleRoles.get(role, [])
-                    new_roles = set(user_ids).difference(current_ids)
+                    new_roles = set(user_ids).union(current_ids)
                     updateRoles[role] = list(new_roles)
 
         self._updateRoles(obj, updateRoles, deleteRoles, cancelRoles)
