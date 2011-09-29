@@ -628,11 +628,20 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         cancelRoles = []
         
         # updating metadata
-        if self.update_semantics == 'created':
+        if self.action == 'create' or self.update_semantics == 'replace':
             if len(domRoles.keys()) == 0:
                 updateRoles.update(moduleRoles)
             else:
                 updateRoles.update(domRoles)
+
+        if self.update_semantics == 'replace':
+            currentUsers = set()
+            for userids in moduleRoles.values():
+                currentUsers.update(userids)
+            domUsers = set()
+            for userids in domRoles.values():
+                domUsers.update(userids)
+            deleteRoles = currentUsers.difference(domUsers)
 
         self._updateRoles(obj, updateRoles, deleteRoles, cancelRoles)
     
