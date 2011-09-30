@@ -249,7 +249,7 @@ class SWORDTreatmentMixin(object):
         # Item 10
         if not context.message:
             desc_of_changes_link = \
-                context_url + '/module_description_of_changes'
+                context_url + '/module_metadata#description_of_changes'
             requirements.append(
                 DESCRIPTION_CHANGES_WARNING % desc_of_changes_link)
 
