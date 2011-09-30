@@ -32,6 +32,7 @@ from rhaptos.swordservice.plone.interfaces import ISWORDEditIRI
 from rhaptos.swordservice.plone.interfaces import ISWORDEMIRI
 from rhaptos.swordservice.plone.interfaces import ISWORDListCollection
 from Products.RhaptosSword.browser.views import ServiceDocument
+from Products.RhaptosSword.adapters import ValidationError
 from Products.RhaptosRepository.interfaces.IVersionStorage import IVersionStorage
 from Products.RhaptosRepository.VersionFolder import incrementMinor
 from Products.RhaptosModuleStorage.ModuleVersionFolder import ModuleVersionStorage
@@ -1166,6 +1167,91 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         adapter = getMultiAdapter((module, get_request), ISWORDEMIRI)
         adapter()
         assert('index.cnxml' in module.objectIds(), 'Module has no index.cnxml')
+
+    
+    def test_duplicateTitle(self):
+        self._setupRhaptos()
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        filename = 'duplicate_title.xml'
+        uploadrequest = self.createUploadRequest(
+            filename, 
+            self.folder.workspace,
+            CONTENT_DISPOSITION='attachment; filename=%s' %filename,
+        )
+
+        # Call the sword view on this request to perform the upload
+        adapter = getMultiAdapter(
+                (self.folder.workspace, uploadrequest), Interface, 'sword')
+        xml = adapter()
+        assert 'ValidationError: More than one title.' in xml, xml
+
+
+    def test_duplicateAbstract(self):
+        self._setupRhaptos()
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        filename = 'duplicate_abstract.xml'
+        uploadrequest = self.createUploadRequest(
+            filename, 
+            self.folder.workspace,
+            CONTENT_DISPOSITION='attachment; filename=%s' %filename,
+        )
+
+        # Call the sword view on this request to perform the upload
+        adapter = getMultiAdapter(
+                (self.folder.workspace, uploadrequest), Interface, 'sword')
+        xml = adapter()
+        assert 'ValidationError: More than one abstract.' in xml, xml
+
+
+    def test_duplicateLanguage(self):
+        self._setupRhaptos()
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        filename = 'duplicate_language.xml'
+        uploadrequest = self.createUploadRequest(
+            filename, 
+            self.folder.workspace,
+            CONTENT_DISPOSITION='attachment; filename=%s' %filename,
+        )
+
+        # Call the sword view on this request to perform the upload
+        adapter = getMultiAdapter(
+                (self.folder.workspace, uploadrequest), Interface, 'sword')
+        xml = adapter()
+        assert 'ValidationError: More than one language.' in xml, xml
+
+
+    def test_duplicateDescriptionOfChanges(self):
+        self._setupRhaptos()
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        filename = 'duplicate_description_of_changes.xml'
+        uploadrequest = self.createUploadRequest(
+            filename, 
+            self.folder.workspace,
+            CONTENT_DISPOSITION='attachment; filename=%s' %filename,
+        )
+
+        # Call the sword view on this request to perform the upload
+        adapter = getMultiAdapter(
+                (self.folder.workspace, uploadrequest), Interface, 'sword')
+        xml = adapter()
+        assert 'ValidationError: More than one descriptionOfChanges.' in xml, xml
+
+
+    def test_duplicateAnalyticsCode(self):
+        self._setupRhaptos()
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        filename = 'duplicate_analytics_code.xml'
+        uploadrequest = self.createUploadRequest(
+            filename, 
+            self.folder.workspace,
+            CONTENT_DISPOSITION='attachment; filename=%s' %filename,
+        )
+
+        # Call the sword view on this request to perform the upload
+        adapter = getMultiAdapter(
+                (self.folder.workspace, uploadrequest), Interface, 'sword')
+        xml = adapter()
+        assert 'ValidationError: More than one analyticsCode.' in xml, xml
 
 
     def _createModule(self, context, filename):

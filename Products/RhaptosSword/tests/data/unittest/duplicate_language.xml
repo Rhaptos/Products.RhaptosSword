@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<entry xmlns="http://www.w3.org/2005/Atom"
+       xmlns:cnxml="http://cnx.rice.edu/cnxml"
+       xmlns:dcterms="http://purl.org/dc/terms/"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:oerdc="http://cnx.org/aboutus/technology/schemas/oerdc">
+
+  <!-- <md:title> -->
+  <dcterms:title>Box Plots Statistics for Majors</dcterms:title>
+
+  <!-- <md:created> -->
+  <dcterms:created>2010/08/10 11:41:00.383 GMT-5</dcterms:created>
+
+  <!-- <md:revised> -->
+  <dcterms:modified>2010/08/10 12:47:45.522 GMT-5</dcterms:modified>
+
+  <author><name>John Doe</name></author>
+  <!-- some embedded metadata -->
+
+  <!-- <md:role type="author"> -->
+  <dcterms:creator oerdc:id="test_user_1_" oerdc:email="ananda@mahto.info">Ananda Mahto</dcterms:creator>
+
+  <!-- <md:role type="maintainer"> -->
+  <oerdc:maintainer oerdc:id="test_user_1_" oerdc:email="ananda@mahto.info">Ananda Mahto</oerdc:maintainer>
+
+  <!-- <md:role type="licensor"> -->
+  <dcterms:rightsHolder oerdc:id="test_user_1_" oerdc:email="ananda@mahto.info">Ananda Mahto</dcterms:rightsHolder>
+
+  <!-- <md:role type="translator"> -->
+  <oerdc:translator oerdc:id="test_user_1_" oerdc:email="ananda@mahto.info">Ananda Mahto</oerdc:translator>
+
+  <!-- <md:role type="editor"> -->
+  <oerdc:editor oerdc:pending="true" oerdc:id="test_user_1_" oerdc:email="ananda@mahto.info">Ananda Mahto</oerdc:editor>
+
+  <!-- Translator editor, & illustrator would appear also as dcterms:contributor if the person were different from the creator which is a supported dc element. Illustrator isn't a supported dcterms element and so the illustrator is listed both as a contributor and as an oerdc refinement of contributor called 'illustrator' -->
+  <dcterms:contributor oerdc:role="illustrator" oerdc:id="aduerer" oerdc:email="albrecht@duerer.info">Albrecht Drer</dcterms:contributor>
+
+  <!-- <md:subject> -->
+  <oerdc:oer-subject>Mathematics and Statistics</oerdc:oer-subject>
+  <oerdc:oer-subject>Arts</oerdc:oer-subject>
+  <oerdc:oer-subject>Humanities</oerdc:oer-subject>
+
+  <!-- include in general keywords as well as in our special element -->
+  <!-- <md:subject> -->
+  <dcterms:subject xsi:type="oerdc:Subject">Mathematics and Statistics</dcterms:subject>
+
+  <!-- <md:keyword> -->
+  <dcterms:subject>box</dcterms:subject>
+  <dcterms:subject>median</dcterms:subject>
+  <dcterms:subject>quartiles</dcterms:subject>
+
+  <!-- <md:abstract> -->
+  <dcterms:abstract>All you wanted to know about Box Plots and more.</dcterms:abstract>
+
+  <!-- <md:language> -->
+  <dcterms:language xsi:type="ISO639-1">en</dcterms:language>
+  <!-- Deliberate duplicate -->
+  <dcterms:language xsi:type="ISO639-1">en-za</dcterms:language>
+
+  <!-- <md:license> -->
+  <dcterms:license xsi:type="dcterms:URI">http://creativecommons.org/licenses/by/3.0/</dcterms:license>
+
+  <!-- CNX-Supported but not in MDML -->
+  <oerdc:analyticsCode>UA-4688042-1</oerdc:analyticsCode>
+</entry>
