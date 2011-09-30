@@ -78,6 +78,7 @@ METADATA_MAPPING =\
          'oer-subject': 'subject',
          'descriptionOfChanges': 'message',
          'analyticsCode': 'GoogleAnalyticsTrackingCode',
+         'license': 'license',
         }
 
 METADATA_DEFAULTS = \
