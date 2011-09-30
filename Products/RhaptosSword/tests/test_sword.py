@@ -173,7 +173,10 @@ class StubLanuageTool(SimpleItem):
         self.id = 'language_tool'
 
     def getAvailableLanguages(self):
-        return {'en': 'English', 'af': 'Afrikaans'}
+        return {'af': 'Afrikaans',
+                'en': 'English',
+                'en-za': 'South African English',
+               }
 
     def getLanguageBindings(self):
         return ('en', 'en', [])
@@ -1255,6 +1258,15 @@ class TestSwordService(PloneTestCase.PloneTestCase):
                 (self.folder.workspace, uploadrequest), Interface, 'sword')
         xml = adapter()
         assert 'ValidationError: More than one analyticsCode.' in xml, xml
+
+
+    def test_regionalLanguage(self):
+        self._setupRhaptos()
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        filename = 'language_variant.xml'
+        module = self._createModule(self.folder.workspace, filename)
+        self.assertEqual(
+            module.language, 'en-za', 'Regional language not set.')
 
 
     def _createModule(self, context, filename):
