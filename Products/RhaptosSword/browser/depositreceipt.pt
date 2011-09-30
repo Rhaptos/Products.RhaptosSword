@@ -8,6 +8,7 @@
        xmlns:oerdc="http://cnx.org/aboutus/technology/schemas/oerdc"
        tal:define="pending_collaborations view/pending_collaborations;
                    treatment view/treatment;
+                   is_published python:context.state == 'published';
                    link_base python:view.getLinkBase(context);">
 
     <!-- SWORD deposit receipt -->
@@ -125,12 +126,19 @@
         </tal:publication_requirements>
     </sword:treatment>
 
-    <link rel="alternate" href="http://cnx.org/Members/kef/m10000/module_view?format=html"
+    <tal:not_published condition="not:is_published">
+    <link rel="alternate" href="http://cnx.org/Members/kef/module.2006-04-07/module_view?format=html"
     tal:attributes="href string:${link_base}/module_view?format=html" />
-
-    <content type="application/zip" src="http://cnx.org/Members/kef/m10000/sword/editmedia"
-    tal:attributes="src string:${link_base}/sword/editmedia" />
     
+    <content type="application/zip" src="http://cnx.org/Members/kef/m10000/sword/editmedia"
+        tal:attributes="src string:${link_base}/sword/editmedia" />
+    </tal:not_published>
+    
+    <tal:if_published condition="is_published">
+    <content type="application/zip" src="http://cnx.org/Members/kef/m10000/module_export?format=zip"
+        tal:attributes="src string:${link_base}/module_export?format=zip" />
+    </tal:if_published>
+
     <link rel="edit-media" href="edit-media-iri"
     tal:attributes="href string:${link_base}/sword/editmedia" />
 
@@ -138,18 +146,27 @@
           tal:attributes="href string:${link_base}/sword" />
           
     <link rel="http://purl.org/net/sword/terms/add"
-          href="http://www.swordserver.ac.uk/col1/mydeposit.atom"
-          tal:attributes="href string:${link_base}/sword" />
+           href="http://cnx.org/Members/kef/m9000/sword"
+           tal:attributes="href string:${link_base}/sword" />
+
+    <link rel="http://purl.org/net/sword/terms/statement" 
+           type="application/atom+xml;type=feed" 
+           href="http://cnx.org/Members/kef/m10000/sword/statement"
+           tal:attributes="href string:${link_base}/sword/statement" />
 
     <sword:packaging>http://purl.org/net/sword/package/SimpleZip</sword:packaging>
 
     <link rel="http://purl.org/net/sword/terms/derivedResource" 
-            type="application/pdf" href="http://cnx.org/Members/kef/m10000/module_view?format=pdf"
-            tal:attributes="href string:${link_base}/module_view?format=pdf" />
-            
-    <link rel="http://purl.org/net/sword/terms/derivedResource" 
             href="http://cnx.org/Members/kef/m10000/module_view?format=html"
             tal:attributes="href string:${link_base}/module_view?format=html" />
+            
+    <link rel="http://purl.org/net/sword/terms/derivedResource" 
+           href="http://cnx.org/Members/kef/m10000"
+           tal:attributes="href string:${link_base}/" />
+
+    <link rel="http://purl.org/net/sword/terms/derivedResource" 
+            type="application/pdf" href="http://cnx.org/Members/kef/m10000/module_view?format=pdf"
+            tal:attributes="href string:${link_base}/module_view?format=pdf" />
             
     <link rel="http://purl.org/net/sword/terms/derivedResource" 
             type="application/zip" href="http://cnx.org/Members/kef/m10000/module_export?format=zip"
@@ -158,19 +175,6 @@
     <link rel="http://purl.org/net/sword/terms/derivedResource" 
             type="application/xml" href="http://cnx.org/Members/kef/m10000/module_export?format=plain"
             tal:attributes="href string:${link_base}/module_export?format=plain" />
-
-    <link rel="http://purl.org/net/sword/terms/statement" 
-           type="application/atom+xml;type=feed" 
-           href="http://cnx.org/Members/kef/m10000/sword/statement"
-           tal:attributes="href string:${link_base}/sword/statement" />
-
-    <link rel="http://purl.org/net/sword/terms/derivedResource" 
-           href="http://cnx.org/Members/kef/m10000"
-           tal:attributes="href string:${link_base}/" />
-
-    <link rel="http://purl.org/net/sword/terms/add"
-           href="http://cnx.org/Members/kef/m9000/sword"
-           tal:attributes="href string:${link_base}/sword" />
 
     <oerdc:analyticsCode tal:condition="context/getGoogleAnalyticsTrackingCode"
            tal:content="context/getGoogleAnalyticsTrackingCode">UA-4688042-1</oerdc:analyticsCode>
