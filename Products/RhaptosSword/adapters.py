@@ -471,6 +471,12 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         except XMLParserError, e:
             raise DepositFailed(str(e))
 
+        # Set by mets.xml inside ZIP
+        props = meta['properties']
+        obj.updateProperties(props)
+        # Make sure the metadata gets into the cnxml
+        obj.editMetadata()
+
         if merge:
             if text:
                 # Replace index.cnxml
