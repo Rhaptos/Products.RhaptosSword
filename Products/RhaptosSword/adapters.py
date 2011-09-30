@@ -80,6 +80,10 @@ METADATA_MAPPING =\
          'analyticsCode': 'GoogleAnalyticsTrackingCode',
         }
 
+XSI_METADATA_TYPES_MAP = \
+        {'subject-oerdc:subject': 'subject',
+        }
+
 METADATA_DEFAULTS = \
         {'title': '(Untitled)',
          'abstract': '',
@@ -443,7 +447,22 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                     error += "line %s: %s\n" % (line, msg)
                 raise ValidationError(
                     "Invalid abstract:\n%s" % error)
+        
+        # validate language
+        lang = metadata.get('language', None)
+        if lang:
+            lang_codes = lang_tool.languages.keys() + lang_tool.combined.keys()
+            if lang not in lang_codes:
+                raise ValidationError('The language %s is not valid.' % value)
 
+        # validate subject
+        mdt = getToolByName(self.context, 'portal_moduledb')
+        subjects = mdt.sqlGetTags(scheme='ISKME subject').tuples()
+        subjects = [tup[1].lower() for tup in subjects]
+        for subject in metadata.get('subject', []):
+            if subject.lower() not in subjects:
+                raise ValidationError(
+                    'The subject %s is invalid.' % subject)
 
     def updateContent(self, obj, fp, content_type, cksum, merge=False):
         kwargs = {
@@ -536,7 +555,6 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
     def getMetadata(self, dom, mapping):
         """ Get metadata from DOM
         """
-        mdt = getToolByName(self.context, 'portal_moduledb')
         metadata = {}
         for ns in METADATA_NAMESPACES:
             for metaname, cnxname in mapping.items():
@@ -552,28 +570,15 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
 
                 # format values
                 if cnxname not in ('keywords', 'subject'):
+                    # there can be only one!
+                    if cnxname == 'title' and len(value) > 1:
+                        raise ValidationError('More than one title.')
                     # pick the last value in the atom entry for string
                     # properties
                     value = value and value[-1] or ''
 
                 if value and not metadata.has_key(cnxname):
                     metadata[cnxname] = value
-
-        # validate language
-        lang = metadata.get('language', None)
-        if lang:
-            lang_codes = lang_tool.languages.keys() + lang_tool.combined.keys()
-            if lang not in lang_codes:
-                raise ValidationError('The language %s is not valid.' % value)
-
-        # validate subject
-        subjects = mdt.sqlGetTags(scheme='ISKME subject').tuples()
-        subjects = [tup[1].lower() for tup in subjects]
-        for subject in metadata.get('subject', []):
-            if subject.lower() not in subjects:
-                raise ValidationError(
-                    'The subject %s is invalid.' % subject)
-
         return metadata
 
 
