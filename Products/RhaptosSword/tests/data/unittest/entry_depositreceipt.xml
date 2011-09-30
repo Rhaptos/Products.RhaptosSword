@@ -2,15 +2,15 @@
 
     <!-- SWORD deposit receipt -->
     <title>Box Plots Statistics for Non Majors</title>
-    <id>entry.xml</id>
+    <id>__MODULE_ID__</id>
     <updated>2011/09/11 19:33:25.811 GMT+2</updated>
     <summary type="text">All you wanted to know about Box Plots and more.</summary>
     <generator uri="rhaptos.swordservice.plone" version="1.0"/>
 
     <!-- The metadata begins -->
-    <dcterms:identifier xsi:type="dcterms:URI">http://nohost/plone/workspace/entry.xml</dcterms:identifier> 
+    <dcterms:identifier xsi:type="dcterms:URI">http://nohost/plone/workspace/__MODULE_ID__</dcterms:identifier> 
     <dcterms:identifier xsi:type="oerdc:Version">**new**</dcterms:identifier> 
-    <dcterms:identifier xsi:type="oerdc:ContentId">entry.xml</dcterms:identifier> 
+    <dcterms:identifier xsi:type="oerdc:ContentId">__MODULE_ID__</dcterms:identifier> 
     <dcterms:title>Box Plots Statistics for Non Majors</dcterms:title>
     <dcterms:created>2011/09/27 10:52:57.786 GMT+2</dcterms:created> 
     <dcterms:modified>2011/09/27 10:52:58.026 GMT+2</dcterms:modified> 
@@ -47,7 +47,7 @@
 
     <sword:treatment>
         Module 'Box Plots Statistics for Non Majors' was imported via the SWORD API.
-        You can <a href="http://nohost/plone/workspace/entry.xml/module_view">preview your module here</a> to see what it will look like once it is published.
+        You can <a href="http://nohost/plone/workspace/__MODULE_ID__/module_view">preview your module here</a> to see what it will look like once it is published.
         
         The current description of the changes you have made for this version of the module: Created module
         
@@ -55,7 +55,7 @@
         
         Publication requirements:
         
-            1. Author (, account:test_user_1_), will need to <a href="http://nohost/plone/workspace/entry.xml/module_publish">sign the license here.</a>
+            1. Author (, account:test_user_1_), will need to <a href="http://nohost/plone/workspace/__MODULE_ID__/module_publish">sign the license here.</a>
         
         
             2. 
@@ -74,29 +74,29 @@ NOTE: Due to an increase of spam on our site:
     
     <!-- For all UNPUBLISHED modules -->
 
-    <link href="http://nohost/plone/workspace/module.2011-09-30.4953728648/module_view?format=html" rel="alternate"/>
+    <link href="http://nohost/plone/workspace/__MODULE_ID__/module_view?format=html" rel="alternate"/>
     
-    <content src="http://nohost/plone/workspace/module.2011-09-30.4953728648/sword/editmedia" type="application/zip"/>
+    <content src="http://nohost/plone/workspace/__MODULE_ID__/sword/editmedia" type="application/zip"/>
 
-    <link href="http://nohost/plone/workspace/module.2011-09-30.4953728648/sword/editmedia" rel="edit-media"/>
+    <link href="http://nohost/plone/workspace/__MODULE_ID__/sword/editmedia" rel="edit-media"/>
 
-    <link href="http://nohost/plone/workspace/module.2011-09-30.4953728648/sword" rel="edit"/>
+    <link href="http://nohost/plone/workspace/__MODULE_ID__/sword" rel="edit"/>
           
-    <link href="http://nohost/plone/workspace/module.2011-09-30.4953728648/sword" rel="http://purl.org/net/sword/terms/add"/>
+    <link href="http://nohost/plone/workspace/__MODULE_ID__/sword" rel="http://purl.org/net/sword/terms/add"/>
 
-    <link href="http://nohost/plone/workspace/module.2011-09-30.4953728648/sword/statement" rel="http://purl.org/net/sword/terms/statement" type="application/atom+xml;type=feed"/>
+    <link href="http://nohost/plone/workspace/__MODULE_ID__/sword/statement" rel="http://purl.org/net/sword/terms/statement" type="application/atom+xml;type=feed"/>
 
     <sword:packaging>http://purl.org/net/sword/package/SimpleZip</sword:packaging>
 
-    <link href="http://nohost/plone/workspace/module.2011-09-30.4953728648/module_view?format=html" rel="http://purl.org/net/sword/terms/derivedResource"/>
+    <link href="http://nohost/plone/workspace/__MODULE_ID__/module_view?format=html" rel="http://purl.org/net/sword/terms/derivedResource"/>
             
-    <link href="http://nohost/plone/workspace/module.2011-09-30.4953728648/" rel="http://purl.org/net/sword/terms/derivedResource"/>
+    <link href="http://nohost/plone/workspace/__MODULE_ID__/" rel="http://purl.org/net/sword/terms/derivedResource"/>
 
-    <link href="http://nohost/plone/workspace/module.2011-09-30.4953728648/module_view?format=pdf" rel="http://purl.org/net/sword/terms/derivedResource" type="application/pdf"/>
+    <link href="http://nohost/plone/workspace/__MODULE_ID__/module_view?format=pdf" rel="http://purl.org/net/sword/terms/derivedResource" type="application/pdf"/>
             
-    <link href="http://nohost/plone/workspace/module.2011-09-30.4953728648/module_export?format=zip" rel="http://purl.org/net/sword/terms/derivedResource" type="application/zip"/>
+    <link href="http://nohost/plone/workspace/__MODULE_ID__/module_export?format=zip" rel="http://purl.org/net/sword/terms/derivedResource" type="application/zip"/>
 
-    <link href="http://nohost/plone/workspace/module.2011-09-30.4953728648/module_export?format=plain" rel="http://purl.org/net/sword/terms/derivedResource" type="application/xml"/>
+    <link href="http://nohost/plone/workspace/__MODULE_ID__/module_export?format=plain" rel="http://purl.org/net/sword/terms/derivedResource" type="application/xml"/>
 
     <!-- END for all UNPUBLISHED modules -->
     
