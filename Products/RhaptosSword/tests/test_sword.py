@@ -567,29 +567,39 @@ class TestSwordService(PloneTestCase.PloneTestCase):
             'multipart.txt',
             context=self.portal.workspace,
             CONTENT_TYPE='multipart/related; boundary="===============1338623209=="',
-            IN_PROGRESS='false',
+            IN_PROGRESS='true',
         )
         # Call the sword view on this request to perform the upload
         adapter = getMultiAdapter(
                 (self.portal.workspace, uploadrequest), Interface, 'sword')
-        # We don't really need to be Manager, but I'll be damned if I'm
-        # debugging a permissions issue that only happens when we test. I
-        # already wasted too much time on this. If you know better, please fix
-        # it. The problem is that publishContent.cpy is not allowed to call
-        # manage_renameObjects, although its perfectly fine if you do it
-        # from here, and we even have the Owner role on both the module and the
-        # workspace. Probably something to do with trusted code and what not.
-        self.setRoles(('Member', 'Manager'))
         xml = adapter()
         self.assertTrue("<sword:error" not in xml, xml)
         self.assertTrue("<entry" in xml, "Not a valid deposit receipt")
 
+        # Sign the license, set the title, set maintainer, author, copyright
+        # holder, description of changes.
+        unpubmod = self.portal.workspace.objectValues()[0]
+        unpubmod.license = 'http://creativecommons.org/licenses/by/3.0/'
+        unpubmod.title = 'The Tigger Movie'
+        unpubmod.maintainers = ['test_user_1_']
+        unpubmod.authors = ['test_user_1_']
+        unpubmod.licensors = ['test_user_1_']
+        unpubmod.message = "I will not buy this tobacconist's, it is scratched"
+
+        # Publish it for the first time
+        emptyrequest = self.createUploadRequest(
+            None,
+            context=self.portal.workspace,
+            CONTENT_TYPE='text/plain',
+            IN_PROGRESS='false',
+        )
+        self.setRoles(('Member','Manager'))
+        xml = getMultiAdapter((unpubmod, emptyrequest), ISWORDEditIRI)()
+        self.assertTrue("<sword:error" not in xml, xml)
+        self.assertTrue("<entry" in xml, "Not a valid deposit receipt")
         self.setRoles(('Member',))
+
         pubmod = self.portal.workspace.objectValues()[0]
-        # we set the license in order to continue with the process. 
-        pubmod.license = "http://creativecommons.org/licenses/by/3.0/"
-        pubmod.state = 'published'
-        pubmod.version = "1.1"
         
         file = open(os.path.join(
             DIRNAME, 'data', 'unittest', 'checkout_and_update.txt'), 'r')
@@ -620,14 +630,18 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         editorid = str(editiri).split('/')[-2]
         editor = self.portal.workspace.restrictedTraverse(editorid)
 
+        # Set title et al. Not sure if this should have been inherited from
+        # the module we checked out? Newer versions of the module might
+        # not have the same authors, maintainers and licensors. Perhaps not
+        # even the same title. Assume it needs to be set again?
+        editor.title = 'Yandelavasa grldenwi stravenka'
+        editor.maintainers = ['test_user_1_']
+        editor.authors = ['test_user_1_']
+        editor.licensors = ['test_user_1_']
+        editor.message = 'Our hovercraft is no longer invested by eels'
+
         # Now publish it by posting to the edit-iri
-        uploadrequest = self.createUploadRequest(
-            None,
-            context=self.portal.workspace,
-            CONTENT_TYPE='text/plain',
-            IN_PROGRESS='false',
-        )
-        adapter = getMultiAdapter((editor, uploadrequest), ISWORDEditIRI)
+        adapter = getMultiAdapter((editor, emptyrequest), ISWORDEditIRI)
         xml = adapter()
 
         # Same old checks
