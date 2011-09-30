@@ -630,7 +630,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         moduleRoles = self.validateRoles(self.getRolesFromModule(obj))
 
         updateRoles = {}
-        deleteRoles = []
+        deleteUsers = []
         cancelRoles = []
         
         if self.action == 'create' or self.update_semantics == 'replace':
@@ -657,9 +657,18 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                 domUsers.update(userids)
             for userids in updateRoles.values():
                 domUsers.update(userids)
-            deleteRoles = currentUsers.difference(domUsers)
+            deleteUsers = currentUsers.difference(domUsers)
 
-        self._updateRoles(obj, updateRoles, deleteRoles, cancelRoles)
+            # XXX: Workaround for bug in generateCollaborationRequests that
+            # requires a user listed in deleteRoles to be present in
+            # newRoles
+            for role, userids in moduleRoles.items():
+                for user in deleteUsers:
+                    if user in userids:
+                        updateRoles.setdefault(role, [])
+                        updateRoles[role].append(user)
+
+        self._updateRoles(obj, updateRoles, deleteUsers, cancelRoles)
     
     
     def _updateRoles(self, obj, updateRoles={}, deleteRoles=[], cancelRoles=[]):
@@ -691,6 +700,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                 else:
                     obj.editCollaborationRequest(pending[p].id, new_changes)
             else:
+                obj.addCollaborator(p)
                 obj.requestCollaboration(p, user_role_delta[p])
 
         for u in cancelRoles:
