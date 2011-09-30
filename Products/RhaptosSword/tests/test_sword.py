@@ -49,7 +49,17 @@ ZopeTestCase.installProduct('CNXMLDocument')
 ZopeTestCase.installProduct('UniFile')
 ZopeTestCase.installProduct('RhaptosCollaborationTool')
 
-PloneTestCase.setupPloneSite()
+#PloneTestCase.setupPloneSite()
+PloneTestCase.setupPloneSite(products=['RhaptosSword'],
+    extension_profiles=[
+        'Products.RhaptosContent:default',
+        'Products.RhaptosModuleEditor:default',
+        'Products.CNXMLDocument:default',
+        'Products.CNXMLTransforms:default',
+        'Products.UniFile:default',
+        'Products.LinkMapTool:default'
+        ]
+    )
 
 #PloneTestCase.setupPloneSite(extension_profiles=['Products.RhaptosModuleEditor',])
 # setupPloneSite accepts an optional products argument, which allows you to
@@ -265,13 +275,6 @@ class TestSwordService(PloneTestCase.PloneTestCase):
     def _setupRhaptos(self):
         # XXX: This method needs to move to afterSetup, but afterSetup is not
         # being called for some reason.
-        self.addProduct('RhaptosSword')
-        self.addProfile('Products.RhaptosContent:default')
-        self.addProfile('Products.RhaptosModuleEditor:default')
-        self.addProfile('Products.CNXMLDocument:default')
-        self.addProfile('Products.CNXMLTransforms:default')
-        self.addProfile('Products.UniFile:default')
-        self.addProfile('Products.LinkMapTool:default')
         objectIds = self.portal.objectIds()
         if not 'content' in objectIds:
             self.portal.manage_addProduct['RhaptosRepository'].manage_addRepository('content') 
