@@ -366,13 +366,24 @@ class EditIRI(BaseEditIRI, SWORDTreatmentMixin, Explicit):
 
 
     def getLinkBase(self, module):
+        """ This call will figure out what the state of the module is and supply
+            a suggested base url
+        """
         # would prefer to use module.isPublic, but not sure it's checking for the
         # correct state. Probably should be checking for 'published' not 'public'.
         if module.state == 'published':
-            content_tool = getToolByName(self.context, 'content')
-            base_url = content_tool.absolute_url()
-            return '%s/%s/%s' %(base_url, module.id, module.version)
+            return self.getPublishedLinkBase(module)
+        return self.getUnpublishedLinkBase(module)
+
+
+    def getUnpublishedLinkBase(self, module):
         return module.absolute_url()
+
+
+    def getPublishedLinkBase(self, module):
+        content_tool = getToolByName(self.context, 'content')
+        base_url = content_tool.absolute_url()
+        return '%s/%s/%s' %(base_url, module.id, module.version)
 
 
     def pending_collaborations(self):
