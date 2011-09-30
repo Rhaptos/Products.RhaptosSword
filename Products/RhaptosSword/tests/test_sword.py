@@ -55,6 +55,7 @@ PloneTestCase.setupPloneSite()
 # quickinstaller tool. Since 0.8.2 you can also pass an extension_profiles
 # argument to import GS extension profiles.
 
+DEBUG = True
 DIRNAME = os.path.dirname(__file__)
 BAD_FILE = 'bad_entry.xml'
 GOOD_FILE = 'entry.xml'
@@ -331,6 +332,9 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         assert isinstance(view, ServiceDocument)
         xml = view()
         assert "<sword:error" not in xml
+        if DEBUG == True:
+            if xml != reference_servicedoc:
+                self.writecontents(xml, 'returned_servicedocument.xml')
         assert xml == reference_servicedoc, 'Result does not match reference doc,'
         
         uploadrequest = self.createUploadRequest(
@@ -376,10 +380,14 @@ class TestSwordService(PloneTestCase.PloneTestCase):
             if identifier.getAttribute('xsi:type') == "dcterms:URI":
                 identifier.firstChild.nodeValue = zipfile.absolute_url()
         reference_depositreceipt = dom.toxml()
-        reference_depositreceipt = reference_depositreceipt.replace('zipfile', zipfile.id)
+        reference_depositreceipt = reference_depositreceipt.replace('__MODULE_ID__', zipfile.id)
 
         returned_depositreceipt = parseString(xml).toxml()
         self.assertTrue(bool(xml), "Upload view does not return a result")
+        if DEBUG == True:
+            if returned_depositreceipt != reference_depositreceipt:
+                self.writecontents(
+                    returned_depositreceipt, 'returned_depositreceipt_plain_zipfile.xml')
         self.assertEqual(returned_depositreceipt, reference_depositreceipt,
             'Result does not match reference doc: \n\n%s' % diff(
                 returned_depositreceipt, reference_depositreceipt))
@@ -445,10 +453,14 @@ class TestSwordService(PloneTestCase.PloneTestCase):
                 identifier.firstChild.nodeValue = module.absolute_url()
 
         reference_depositreceipt = dom.toxml()
-        reference_depositreceipt = reference_depositreceipt.replace('entry.xml', module.id)
+        reference_depositreceipt = reference_depositreceipt.replace('__MODULE_ID__', module.id)
 
         assert bool(xml), "Upload view does not return a result"
         assert "<sword:error" not in xml, xml
+        if DEBUG == True:
+            if returned_depositreceipt != reference_depositreceipt:
+                self.writecontents(
+                    returned_depositreceipt, 'returned_entry.xml')
         self.assertEqual(returned_depositreceipt, reference_depositreceipt,
             'Result does not match reference doc: \n\n%s' % diff(
                 returned_depositreceipt, reference_depositreceipt))
@@ -523,10 +535,14 @@ class TestSwordService(PloneTestCase.PloneTestCase):
             if identifier.getAttribute('xsi:type') == "dcterms:URI":
                 identifier.firstChild.nodeValue = module.absolute_url()
         reference_depositreceipt = dom.toxml()
-        reference_depositreceipt = reference_depositreceipt.replace('multipart', module.id)
+        reference_depositreceipt = reference_depositreceipt.replace('__MODULE_ID__', module.id)
 
         assert bool(xml), "Upload view does not return a result"
         assert "<sword:error" not in xml, xml
+        if DEBUG == True:
+            if returned_depositreceipt != reference_depositreceipt:
+                self.writecontents(
+                    returned_depositreceipt, 'returned_multipart_depositreceipt.xml')
         self.assertEqual(returned_depositreceipt, reference_depositreceipt,
             'Result does not match reference doc: \n\n%s' % diff(
                 returned_depositreceipt, reference_depositreceipt))
@@ -656,6 +672,9 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         file.close()
         reference_file = zf.ZipFile(
             os.path.join(DIRNAME, 'data', 'unittest', 'retrievedcontent.zip'))
+        if DEBUG == True:
+            if len(retrieved_file.namelist()) != len(reference_file.namelist()):
+                self.writecontents(retrieved_file, 'returned_content.zip')
         self.assertEqual(len(retrieved_file.namelist()), len(reference_file.namelist()),
             'The files are not the same.')
         retrieved_fl = retrieved_file.filelist
@@ -701,6 +720,9 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         file.close()
         reference_statement = dom.toxml()
         reference_statement = reference_statement.replace('__MODULE_ID__', module.id)
+        if DEBUG == True:
+            if returned_statement != reference_statement:
+                self.writecontents(returned_statement, 'returned_statement.xml')
         self.assertEqual(returned_statement, reference_statement,
             'Returned statement and reference statement '
             'are not identical: \n\n%s' % diff(
