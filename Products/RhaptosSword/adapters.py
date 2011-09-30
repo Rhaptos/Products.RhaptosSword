@@ -723,6 +723,9 @@ class RhaptosEditMedia(EditMedia):
         self.callmap.update({'DELETE': self.DELETE,})
 
     def GET(self):
+        # If the module is published, do a transparent checkout
+        if self.context.state == 'published':
+            self.context.checkout(self.context.objectId)
         return self.context.module_export(format='zip')
         
 
