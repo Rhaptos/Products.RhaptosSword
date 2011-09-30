@@ -181,6 +181,7 @@ class SWORDTreatmentMixin(object):
         context_url = context.absolute_url()
         requirements = []
         # Items 1, 7 and 8
+        import pdb; pdb.set_trace()
         if context.license:
             if context.license != context.getDefaultLicense():
                 req = NEW_LICENSE_WARNING % (context.license, context.absolute_url())

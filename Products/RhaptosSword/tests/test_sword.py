@@ -42,6 +42,7 @@ from Products.RhaptosCollaborationTool.interfaces.portal_collaboration import po
 from Testing import ZopeTestCase
 ZopeTestCase.installProduct('RhaptosSword')
 ZopeTestCase.installProduct('RhaptosModuleEditor')
+ZopeTestCase.installProduct('RhaptosContent')
 ZopeTestCase.installProduct('RhaptosRepository')
 ZopeTestCase.installProduct('CNXMLDocument')
 ZopeTestCase.installProduct('UniFile')
@@ -264,6 +265,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         # XXX: This method needs to move to afterSetup, but afterSetup is not
         # being called for some reason.
         self.addProduct('RhaptosSword')
+        self.addProfile('Products.RhaptosContent:default')
         self.addProfile('Products.RhaptosModuleEditor:default')
         self.addProfile('Products.CNXMLDocument:default')
         self.addProfile('Products.CNXMLTransforms:default')
