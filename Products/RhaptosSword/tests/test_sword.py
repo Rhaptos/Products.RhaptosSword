@@ -977,6 +977,56 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.assertEqual(module.editors, ())
         self.assertEqual(module.translators, ())
 
+    def test_removeAndRestoreRoles(self):
+        self._setupRhaptos()
+        self.setRoles(('Manager',))
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        acl_users = self.portal.acl_users
+        acl_users.userFolderAddUser('user1', 'user1', ['Member'], [])
+        acl_users.userFolderAddUser('user2', 'user2', ['Member'], [])
+        acl_users.userFolderAddUser('user85', 'user85', ['Member'], [])
+
+        filename = 'multiple_authors.xml'
+        module = self._createModule(self.folder.workspace, filename)
+
+        # this request should give the user all the default roles
+        uploadrequest = self.createUploadRequest(
+            'emptyatom.xml',
+            module,
+            REQUEST_METHOD = 'PUT',
+            )
+        adapter = getMultiAdapter(
+                (module, uploadrequest), Interface, 'sword')
+        xml = adapter()
+        dom = parseString(xml)
+        assert "<sword:error" not in xml, xml
+
+        self.assertEqual(module.creators, ('test_user_1_',))
+        self.assertEqual(module.authors, ('test_user_1_',))
+        self.assertEqual(module.maintainers, ('test_user_1_',))
+        self.assertEqual(module.licensors, ('test_user_1_',))
+        self.assertEqual(module.editors, ())
+        self.assertEqual(module.translators, ())
+
+        uploadrequest = self.createUploadRequest(
+            'multiple_authors.xml',
+            module,
+            REQUEST_METHOD = 'PUT',
+            )
+        adapter = getMultiAdapter(
+                (module, uploadrequest), Interface, 'sword')
+        xml = adapter()
+        dom = parseString(xml)
+        assert "<sword:error" not in xml, xml
+
+        self.assertEqual(module.creators, ('test_user_1_',))
+        self.assertEqual(module.authors, ('user85', 'user1', 'user2'))
+        self.assertEqual(module.maintainers, ())
+        self.assertEqual(module.licensors, ())
+        self.assertEqual(module.editors, ())
+        self.assertEqual(module.translators, ())
+
+
     def test_mergeRoles(self):
         self._setupRhaptos()
         self.setRoles(('Manager',))
