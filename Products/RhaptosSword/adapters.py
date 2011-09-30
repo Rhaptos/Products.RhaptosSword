@@ -758,6 +758,10 @@ class RhaptosEditMedia(EditMedia):
         body = self.request.get('BODYFILE')
         checkUploadSize(self.context, body)
 
+        # If the module is published, do a transparent checkout
+        if self.context.state == 'published':
+            self.context.checkout(self.context.objectId)
+
         filename = self.request.get_header(
             'Content-Disposition', self.context.title)
         content_type = self.request.get_header('Content-Type')
@@ -812,6 +816,11 @@ class RhaptosEditMedia(EditMedia):
             converted to other formats, such as OOo or MS Word, will be
             left as is. """
         context = aq_inner(self.context)
+
+        # If the module is published, do a transparent checkout
+        if context.state == 'published':
+            context.checkout(context.objectId)
+
         if self.request.get_header('Content-Type').lower().startswith(
             'application/zip') or self.request.get_header(
             'Packaging', '').endswith('/SimpleZip'):
