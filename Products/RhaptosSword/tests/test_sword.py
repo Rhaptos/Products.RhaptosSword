@@ -707,7 +707,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
                 returned_statement, reference_statement))
 
 
-    def _testDeriveModule(self):
+    def testDeriveModule(self):
         self._setupRhaptos()
         self.setRoles(('Manager',))
         self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
