@@ -15,6 +15,7 @@ from AccessControl import getSecurityManager
 from Acquisition import aq_inner
 from zExceptions import Unauthorized
 
+from Products.PloneLanguageTool import availablelanguages as lang_tool
 from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.interfaces import IFolderish
 
@@ -553,11 +554,11 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                     metadata[cnxname] = value
 
         # validate language
-        plt = getToolByName(self.context, 'portal_languages')
-        languages = plt.getAvailableLanguages()
-        lang = metadata.get('language', 'en')
-        if lang not in languages.keys():
-            raise ValidationError('The language %s is not valid.' % value)
+        lang = metadata.get('language', None)
+        if lang:
+            lang_codes = lang_tool.languages.keys() + lang_tool.combined.keys()
+            if lang not in lang_codes:
+                raise ValidationError('The language %s is not valid.' % value)
 
         # validate subject
         subjects = mdt.sqlGetTags(scheme='ISKME subject').tuples()
