@@ -571,8 +571,8 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                 # format values
                 if cnxname not in ('keywords', 'subject'):
                     # there can be only one!
-                    if cnxname == 'title' and len(value) > 1:
-                        raise ValidationError('More than one title.')
+                    if len(value) > 1:
+                        raise ValidationError('More than one %s.' %metaname)
                     # pick the last value in the atom entry for string
                     # properties
                     value = value and value[-1] or ''
