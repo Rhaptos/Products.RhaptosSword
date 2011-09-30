@@ -531,7 +531,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
             'Result does not match reference doc: \n\n%s' % diff(
                 returned_depositreceipt, reference_depositreceipt))
 
-    def _testUploadAndPublish(self):
+    def testUploadAndPublish(self):
         """ Upload a module
             Set its metadata
             See if we can publish it.
