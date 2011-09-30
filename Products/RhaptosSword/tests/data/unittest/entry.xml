@@ -7,8 +7,6 @@
 
   <!-- <md:title> -->
   <dcterms:title>Box Plots Statistics for Majors</dcterms:title>
-  <!-- Deliberately duplicate title -->
-  <dcterms:title>Box Plots Statistics for Non Majors</dcterms:title>
 
   <!-- <md:created> -->
   <dcterms:created>2010/08/10 11:41:00.383 GMT-5</dcterms:created>

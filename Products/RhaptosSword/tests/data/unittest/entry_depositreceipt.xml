@@ -1,7 +1,7 @@
 <?xml version="1.0" ?><entry xmlns="http://www.w3.org/2005/Atom" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:md="http://cnx.rice.edu/mdml" xmlns:oerdc="http://cnx.org/aboutus/technology/schemas/oerdc" xmlns:sword="http://purl.org/net/sword/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
     <!-- SWORD deposit receipt -->
-    <title>Box Plots Statistics for Non Majors</title>
+    <title>Box Plots Statistics for Majors</title>
     <id>__MODULE_ID__</id>
     <updated>2011/09/11 19:33:25.811 GMT+2</updated>
     <summary type="text">All you wanted to know about Box Plots and more.</summary>
@@ -11,7 +11,7 @@
     <dcterms:identifier xsi:type="dcterms:URI">http://nohost/plone/workspace/__MODULE_ID__</dcterms:identifier> 
     <dcterms:identifier xsi:type="oerdc:Version">**new**</dcterms:identifier> 
     <dcterms:identifier xsi:type="oerdc:ContentId">__MODULE_ID__</dcterms:identifier> 
-    <dcterms:title>Box Plots Statistics for Non Majors</dcterms:title>
+    <dcterms:title>Box Plots Statistics for Majors</dcterms:title>
     <dcterms:created>2011/09/27 10:52:57.786 GMT+2</dcterms:created> 
     <dcterms:modified>2011/09/27 10:52:58.026 GMT+2</dcterms:modified> 
     <dcterms:creator oerdc:email="" oerdc:id="test_user_1_" oerdc:pending="False"/>
@@ -46,7 +46,7 @@
     <dcterms:license xsi:type="dcterms:URI"/>
 
     <sword:treatment>
-        Module 'Box Plots Statistics for Non Majors' was imported via the SWORD API.
+        Module 'Box Plots Statistics for Majors' was imported via the SWORD API.
         You can <a href="http://nohost/plone/workspace/__MODULE_ID__/module_view">preview your module here</a> to see what it will look like once it is published.
         
         The current description of the changes you have made for this version of the module: Created module
