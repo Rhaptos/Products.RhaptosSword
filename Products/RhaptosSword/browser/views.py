@@ -309,10 +309,12 @@ class EditIRI(BaseEditIRI, SWORDTreatmentMixin, Explicit):
         if context.state == 'published':
             raise Unpublishable, "Module already published"
 
-        # We have to commit the transaction, otherwise the object has a blank
-        # _p_jar and cannot be moved. And if it cannot be moved it cannot be
+        # Call transaction.savepoint() to make _p_jar appear on
+        # persistent objects, otherwise the object has a blank _p_jar
+        # and cannot be moved. And if it cannot be moved it cannot be
         # published.
-        transaction.commit()
+        transaction.savepoint(optimistic=True)
+
         requirements = self.get_publication_requirements(context)
         if not requirements:
             context.publishContent(message=context.message)
