@@ -28,13 +28,14 @@
     <oerdc:oer-subject>Mathematics and Statistics</oerdc:oer-subject>
     <oerdc:oer-subject>Arts</oerdc:oer-subject>
     <oerdc:oer-subject>Humanities</oerdc:oer-subject>
+    <oerdc:oer-subject>Business</oerdc:oer-subject>
 
     <dcterms:subject xsi:type="oerdc:Subject">Mathematics and Statistics</dcterms:subject>
     <dcterms:subject xsi:type="oerdc:Subject">Arts</dcterms:subject>
     <dcterms:subject xsi:type="oerdc:Subject">Humanities</dcterms:subject>
+    <dcterms:subject xsi:type="oerdc:Subject">Business</dcterms:subject>
     
     <dcterms:subject>box</dcterms:subject>
-    <dcterms:subject>Mathematics and Statistics</dcterms:subject>
     <dcterms:subject>median</dcterms:subject>
     <dcterms:subject>quartiles</dcterms:subject>
 
