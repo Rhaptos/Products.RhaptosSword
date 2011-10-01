@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<entry xmlns="http://www.w3.org/2005/Atom"
+       xmlns:dcterms="http://purl.org/dc/terms/"
+       xmlns:oerdc="http://cnx.org/aboutus/technology/schemas/oerdc"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <dcterms:title>Metadata subject set test</dcterms:title>
+  <dcterms:subject>keyword 1</dcterms:subject>
+  <dcterms:subject>keyword 2</dcterms:subject>
+  <dcterms:subject xsi:type="oerdc:Subject">Arts</dcterms:subject>
+</entry>
