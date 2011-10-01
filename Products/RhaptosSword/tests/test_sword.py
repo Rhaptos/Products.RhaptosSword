@@ -753,28 +753,14 @@ class TestSwordService(PloneTestCase.PloneTestCase):
 
 
     def testDeriveModule(self):
-        self._setupRhaptos()
-        self.setRoles(('Manager',))
-        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
-
-        uploadrequest = self.createUploadRequest(
-            'multipart.txt',
-            context=self.folder.workspace,
-            CONTENT_TYPE='multipart/related; boundary="===============1338623209=="',
-            CONTENT_DISPOSITION='attachment; filename=multipart')
-        adapter = getMultiAdapter(
-                (self.folder.workspace, uploadrequest), Interface, 'sword')
-        xml = adapter()
-        assert "<sword:error" not in xml, xml
-        editIRI = getEditIRI(parseString(xml))
-        
+        self.testUploadAndPublish()
         filename = 'derive_module.xml'
         file = open(os.path.join(DIRNAME, 'data', 'unittest', filename), 'r')
         dom = parse(file)
         file.close()
         module = self.folder.workspace.objectValues()[0]
         source = dom.getElementsByTagName('dcterms:source')[0]
-        source.firstChild.nodeValue = module.absolute_url()
+        source.firstChild.nodeValue = module.id
         uploadrequest = self.createUploadRequest(
             None, self.folder.workspace, content = dom.toxml())
         adapter = getMultiAdapter(
@@ -989,7 +975,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         dom = parseString(view())
         creator_elements = dom.getElementsByTagName('dcterms:creator')
         self.assertEqual(
-            len(creator_elements), 4, 'All creator/authors where not returned')
+            len(creator_elements), 3, 'All creator/authors where not returned')
 
     def test_replaceRolesWithEmptyAtom(self):
         self._setupRhaptos()
@@ -1282,6 +1268,16 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.assertEqual(
             module.language, 'en-za', 'Regional language not set.')
 
+    
+    def test_oerdcSubject(self):
+        self._setupRhaptos()
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        filename = 'entry_with_oerdc_subject.xml'
+        module = self._createModule(self.folder.workspace, filename)
+        self.assertEqual(module.subject, ('Arts',), 'Subject set incorrectly.')
+        self.assertEqual(
+            module.keywords, ('keyword 1', 'keyword 2'), 'Keywords set incorrectly.')
+    
 
     def _createModule(self, context, filename):
         """ Utility method to setup the environment and create a module.
