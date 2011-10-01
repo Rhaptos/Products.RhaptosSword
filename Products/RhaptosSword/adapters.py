@@ -566,7 +566,11 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                     for child in node.childNodes:
                         content += child.toxml().encode(self.encoding)
                     if content:
-                        value.append(content)
+                        if node.getAttribute('xsi:type') == 'oerdc:Subject':
+                            metadata.setdefault('subject', [])
+                            metadata['subject'].append(content)
+                        else:
+                            value.append(content)
 
                 # format values
                 if cnxname not in ('keywords', 'subject'):
