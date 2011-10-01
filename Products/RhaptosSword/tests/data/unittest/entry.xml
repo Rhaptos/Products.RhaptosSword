@@ -42,7 +42,7 @@
 
   <!-- include in general keywords as well as in our special element -->
   <!-- <md:subject> -->
-  <dcterms:subject xsi:type="oerdc:Subject">Mathematics and Statistics</dcterms:subject>
+  <dcterms:subject xsi:type="oerdc:Subject">Business</dcterms:subject>
 
   <!-- <md:keyword> -->
   <dcterms:subject>box</dcterms:subject>
