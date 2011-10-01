@@ -41,7 +41,7 @@
         2011-06-22T14:27:08Z
     </dcterms:modified> 
     <dcterms:creator oerdc:id="creator id" oerdc:email="owner email"
-            tal:repeat="creator python:view.creators(context)"
+            tal:repeat="creator context/authors"
             tal:content="python:view.fullname(creator)"
             tal:attributes="oerdc:id creator;
                             oerdc:email python:view.email(creator);
