@@ -20,7 +20,7 @@ from Products.CMFCore.utils import getToolByName
 from Products.CMFCore.interfaces import IFolderish
 
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
-from Products.CNXMLTransforms.helpers import OOoImportError, doTransform, makeContent
+from Products.CNXMLTransforms.helpers import CNXImportError, doTransform, makeContent
 from Products.CNXMLDocument.XMLService import XMLParserError
 from Products.CNXMLDocument.XMLService import validate
 
@@ -481,7 +481,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         try:
             text, subobjs, meta = doTransform(obj, transform,
                 content, meta=1, **kwargs)
-        except (OOoImportError, BadZipfile), e:
+        except (CNXImportError, BadZipfile), e:
             raise TransformFailed(str(e))
         except XMLParserError, e:
             raise DepositFailed(str(e))
