@@ -149,7 +149,7 @@
     <link rel="http://purl.org/net/sword/terms/statement" 
            type="application/atom+xml;type=feed" 
            href="http://cnx.org/Members/kef/m10000/sword/statement"
-           tal:attributes="href string:${unpublished_link_base}/sword/statement" />
+           tal:attributes="href string:${unpublished_link_base}/sword/statement.atom" />
 
     <sword:packaging>http://purl.org/net/sword/package/SimpleZip</sword:packaging>
 
