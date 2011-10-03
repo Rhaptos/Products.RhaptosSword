@@ -1,5 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
 <atom:feed xmlns:sword="http://purl.org/net/sword/terms/" 
       xmlns:atom="http://www.w3.org/2005/Atom"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
       tal:define="context nocall:view/context;
                   treatment view/treatment">
 
