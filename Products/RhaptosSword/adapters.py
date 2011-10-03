@@ -751,6 +751,7 @@ class RhaptosEditMedia(EditMedia):
         return self.context.module_export(format='zip')
         
 
+    @show_error_document
     def PUT(self):
         """ PUT against an existing item should update it.
         """
