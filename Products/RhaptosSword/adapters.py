@@ -80,10 +80,6 @@ METADATA_MAPPING =\
          'analyticsCode': 'GoogleAnalyticsTrackingCode',
         }
 
-XSI_METADATA_TYPES_MAP = \
-        {'subject-oerdc:subject': 'subject',
-        }
-
 METADATA_DEFAULTS = \
         {'title': '(Untitled)',
          'abstract': '',
