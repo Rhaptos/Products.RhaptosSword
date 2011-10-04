@@ -352,12 +352,6 @@ class EditIRI(BaseEditIRI, SWORDTreatmentMixin, Explicit):
                     self.request)
                 checkUploadSize(self.context, payload)
 
-                # update Metadata
-                if merge:
-                    adapter.mergeMetadata(self.context, atom_dom)
-                else:
-                    adapter.replaceMetadata(self.context, atom_dom)
-
                 # Update Content
                 cksum = self.request.get_header('Content-MD5')
                 adapter.updateContent(self.context, StringIO(payload),
@@ -366,15 +360,18 @@ class EditIRI(BaseEditIRI, SWORDTreatmentMixin, Explicit):
             else:
                 body = self.request.get('BODYFILE')
                 checkUploadSize(self.context, body)
-                if merge:
-                    # merge the metadata on the request with what is on the
-                    # module (in this case 'self.context')
-                    adapter.mergeMetadata(self.context, parse(body))
-                else:
-                    # replace what is on the module with metadata on the request
-                    # in the process all fields not on the request will be reset
-                    # on the module (see METADATA_DEFAULTS) for the values used.
-                    adapter.replaceMetadata(self.context, parse(body))
+                atom_dom = parse(body)
+
+            # update Metadata
+            if merge:
+                # merge the metadata on the request with what is on the
+                # module (in this case 'self.context')
+                adapter.mergeMetadata(self.context, atom_dom)
+            else:
+                # replace what is on the module with metadata on the request
+                # in the process all fields not on the request will be reset
+                # on the module (see METADATA_DEFAULTS) for the values used.
+                adapter.replaceMetadata(self.context, atom_dom)
 
             # If In-Progress is set to false or omitted, try to publish
             if self.request.get_header('In-Progress', 'false') == 'false':
