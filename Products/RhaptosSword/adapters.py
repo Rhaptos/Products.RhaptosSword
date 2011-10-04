@@ -1,7 +1,6 @@
 from copy import copy
 from xml.dom.minidom import parse
 from zipfile import BadZipfile
-from email import message_from_file
 from StringIO import StringIO
 from types import StringType, ListType, TupleType
 import md5
@@ -31,7 +30,6 @@ from rhaptos.swordservice.plone.browser.sword import EditMedia
 from rhaptos.swordservice.plone.browser.sword import ISWORDContentUploadAdapter 
 from rhaptos.swordservice.plone.browser.sword import show_error_document
 from rhaptos.swordservice.plone.interfaces import ISWORDEMIRI
-from rhaptos.swordservice.plone.exceptions import MaxUploadSizeExceeded
 from rhaptos.swordservice.plone.exceptions import ErrorChecksumMismatch
 from rhaptos.swordservice.plone.exceptions import BadRequest
 
@@ -42,6 +40,7 @@ from Products.RhaptosSword.exceptions import OverwriteNotPermitted
 from Products.RhaptosSword.exceptions import TransformFailed
 from Products.RhaptosSword.exceptions import DepositFailed
 
+from utils import splitMultipartRequest, checkUploadSize
 
 def getSiteEncoding(context):
     """ if we have on return it,
@@ -114,34 +113,6 @@ class IRhaptosWorkspaceSwordAdapter(ISWORDContentUploadAdapter):
 
 class IRhaptosEditMediaAdapter(ISWORDEMIRI):
     """ Marker interface for EM-IRI adapter specific to Rhaptos. """
-
-
-def splitMultipartRequest(request):
-    """ This is only to be used for multipart uploads. The first
-        part is the atompub bit, the second part is the payload. """
-    request.stdin.seek(0)
-    message = message_from_file(request.stdin)
-    atom, payload = message.get_payload()
-
-    # Call get_payload with decode=True, so it can handle the transfer
-    # encoding for us, if any.
-    atom = atom.get_payload(decode=True)
-    content_type = payload.get_content_type()
-    payload = payload.get_payload(decode=True)
-    dom = parse(StringIO(atom))
-
-    return dom, payload, content_type
-
-
-def checkUploadSize(context, fp):
-    """ Check size of file handle. """
-    maxupload = getToolByName(context, 'sword_tool').getMaxUploadSize()
-    fp.seek(0, 2)
-    size = fp.tell()
-    fp.seek(0)
-    if size > maxupload:
-        raise MaxUploadSizeExceeded("Maximum upload size exceeded",
-            "The uploaded content is larger than the allowed %d bytes." % maxupload)
 
 
 class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
