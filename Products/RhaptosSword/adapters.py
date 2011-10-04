@@ -262,7 +262,6 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         # Delete temporary copy
         if to_delete_id:
             area.manage_delObjects(ids=[to_delete_id])
-        self.action = 'create'
         return forked_obj
 
 
@@ -404,7 +403,6 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         # the dom.
         metadata = copy(METADATA_DEFAULTS)
         metadata.update(self.getMetadata(dom, METADATA_MAPPING))
-        self.action = 'save'
         if metadata:
             self.validate_metadata(metadata)
             obj.update_metadata(**metadata)
@@ -517,7 +515,8 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         obj.getDefaultFile().upgrade()
 
         # After updating the content, set status to modified, reindex
-        self.action = 'save'
+        if self.action not in ('create', 'derive', 'checkout'):
+            self.action = 'save'
 
 
     def updateObject(self, obj, filename, request, response, content_type):
@@ -777,7 +776,7 @@ class RhaptosEditMedia(EditMedia):
         body.seek(0)
         adapter.updateContent(self.context, body, content_type, cksum,
             merge == 'http://purl.org/oerpub/semantics/Merge')
-        self.context.logAction(adapter.action, self.context.message)
+        self.context.logAction(adapter.action)
 
     def addFile(self, context, filename, f):
         # These files may never be uploaded, because we cannot process

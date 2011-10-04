@@ -370,6 +370,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
             self.portal.workspace.restrictedTraverse('%s/sword' % moduleid)),
             "Cannot access deposit receipt")
         zipfile = self.portal.workspace._getOb(moduleid)
+        self.assertEqual(zipfile.message, 'Created module')
 
         file = open(os.path.join(
             DIRNAME, 'data', 'unittest', 'depositreceipt_plain_zipfile.xml'), 'r')
@@ -445,6 +446,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         file.close()
 
         module = self.portal.workspace.objectValues()[0]
+        self.assertEqual(module.message, 'Created module')
         mid = dom.getElementsByTagName('id')
         for element in mid:
             element.firstChild.nodeValue = module.id
@@ -527,6 +529,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.assertTrue("<entry" in xml, "Not a valid deposit receipt")
 
         module = self.portal.workspace.objectValues()[0]
+        self.assertEqual(module.message, 'Frobnicate the Bar')
         file = open(os.path.join(DIRNAME, 'data', 'unittest', 'multipart_depositreceipt.xml'), 'r')
         dom = parse(file)
         file.close()
@@ -629,6 +632,9 @@ class TestSwordService(PloneTestCase.PloneTestCase):
 
         editorid = str(editiri).split('/')[-2]
         editor = self.portal.workspace.restrictedTraverse(editorid)
+
+        # make sure the message was cleared after checkout
+        self.assertEqual(editor.message, '')
 
         # Set title et al. Not sure if this should have been inherited from
         # the module we checked out? Newer versions of the module might
