@@ -350,6 +350,11 @@ class EditIRI(BaseEditIRI, SWORDTreatmentMixin, Explicit):
                 # on the module (see METADATA_DEFAULTS) for the values used.
                 adapter.replaceMetadata(self.context, body)
 
+            # If In-Progress is set to false or omitted, try to publish
+            in_progress = self.request.get_header('In-Progress', 'false')
+            if in_progress == 'false':
+                self._handlePublish()
+
             # response code of 200 as required by SWORD spec:
             #   6.5.2. Replacing the Metadata of a Resource
             self.request.response.setStatus(200)

@@ -659,6 +659,54 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.assertTrue(pubmod.version == "1.2",
             "Version did not increment")
 
+    def testPublishOnPostToSEIRI(self):
+        self._setupRhaptos()
+        self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        # try publish immediately with In-Progress set to false
+        uploadrequest = self.createUploadRequest(
+            'entry.xml',
+            self.portal.workspace,
+            CONTENT_DISPOSITION='attachment; filename=entry.xml',
+            IN_PROGRESS='false',
+        )
+
+        # Call the sword view on this request to perform the upload
+        adapter = getMultiAdapter(
+                (self.portal.workspace, uploadrequest), Interface, 'sword')
+        xml = adapter()
+
+        # We should receive an error that confirms that an attempt was
+        # made to publish the module
+        self.assertTrue("<sword:error" in xml, xml)
+        self.assertTrue(
+            "http://purl.org/oerpub/error/PublishUnauthorized" in xml, xml)
+
+    def testPublishOnPUTToSEIRI(self):
+        self._setupRhaptos()
+        # without the manager role we can't publish
+        self.setRoles(('Manager',))
+        self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        # try publish on PUT with In-Progress set to false
+        filename = 'entry.xml'
+        module = self._createModule(self.portal.workspace, filename)
+
+        # this request should give the user all the default roles
+        uploadrequest = self.createUploadRequest(
+            'entry.xml',
+            module,
+            REQUEST_METHOD = 'PUT',
+            IN_PROGRESS = 'false',
+            )
+        adapter = getMultiAdapter(
+                (module, uploadrequest), Interface, 'sword')
+        xml = adapter()
+
+        # We should receive an error that confirms that an attempt was
+        # made to publish the module
+        self.assertTrue("<sword:error" in xml, xml)
+        self.assertTrue(
+            "http://purl.org/oerpub/error/PublishUnauthorized" in xml, xml)
+
 
     def testSwordServiceRetrieveContent(self):
         self._setupRhaptos()
