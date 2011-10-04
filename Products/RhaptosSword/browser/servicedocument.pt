@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding='utf-8'?>
+<service xmlns="http://www.w3.org/2007/app"
+         xmlns:atom="http://www.w3.org/2005/Atom"
+         xmlns:sword="http://purl.org/net/sword/terms/"
+         xmlns:dcterms="http://purl.org/dc/terms/"
+         xmlns:tal="http://xml.zope.org/namespaces/tal" >
+
+    <sword:version>2.0</sword:version>
+    <sword:maxuploadsize tal:content="view/maxuploadsize">60000</sword:maxuploadsize>
+
+    <workspace>
+
+        <atom:title tal:content="view/portal_title" >Plone</atom:title>
+        <tal:collections tal:repeat="collection view/collections" >
+                
+            <collection tal:attributes="href string:${collection/url}/sword">
+                <atom:title tal:content="collection/title"> Folder Title </atom:title>
+                <accept>*/*</accept>
+                <accept alternate="multipart/related"></accept>
+                <sword:acceptPackaging>http://purl.org/net/sword/package/SimpleZip</sword:acceptPackaging>
+                <sword:mediation>false</sword:mediation>
+                <sword:treatment>Upload a word processing document, LaTeX document, or Connexions XML to create a module.</sword:treatment>
+                <sword:collectionPolicy tal:condition="collection/members|nothing">The following Connexions members can create and edit modules in this workgroup: <tal:members tal:replace="collection/members"/></sword:collectionPolicy>
+                <dcterms:abstract tal:content="collection/description"> </dcterms:abstract>
+            </collection>
+            
+        </tal:collections>
+
+    </workspace>
+
+</service>

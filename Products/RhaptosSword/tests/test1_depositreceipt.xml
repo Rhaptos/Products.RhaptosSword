@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<entry xmlns="http://www.w3.org/2005/Atom"
+       xmlns:sword="http://purl.org/net/sword/"
+       xmlns:dcterms="http://purl.org/dc/terms/"
+       xmlns:md="http://cnx.rice.edu/mdml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:oerdc="http://cnx.org/aboutus/technology/schemas/oerdc">
+
+    <!-- SWORD deposit receipt -->
+    <title>Basic Math</title>
+    <id>module.2011-09-08.8189898791</id>
+    <updated>2011/09/08 05:33:39.091 GMT+2</updated>
+    <summary type="text">The latest and greatest.</summary>
+    <generator uri="rhaptos.swordservice.plone" version="1.0"/>
+
+    <!-- The metadata begins -->
+    <dcterms:identifier xsi:type="dcterms:URI">http://localhost:8080/site/Members/roche/module.2011-09-08.8189898791</dcterms:identifier> 
+    <dcterms:identifier xsi:type="oerdc:Version">**new**</dcterms:identifier> 
+    <dcterms:identifier xsi:type="oerdc:ContentId">module.2011-09-08.8189898791</dcterms:identifier> 
+    <dcterms:title>Basic Math</dcterms:title>
+    <dcterms:created>2011/09/08 05:33:39.013 GMT+2</dcterms:created> 
+    <dcterms:modified>2011/09/08 05:33:39.091 GMT+2</dcterms:modified> 
+    <dcterms:creator oerdc:id="roche"
+                     oerdc:email="rijk.stofberg@gmail.com">Roché Compaan</dcterms:creator>
+    <dcterms:maintainer oerdc:id="roche"
+                        oerdc:email="rijk.stofberg@gmail.com">Roché Compaan</dcterms:maintainer>
+    <dcterms:maintainer oerdc:id=""></dcterms:maintainer>
+    <dcterms:rightsHolder oerdc:id="roche"
+                          oerdc:email="rijk.stofberg@gmail.com">Roché Compaan</dcterms:rightsHolder>
+    
+    <!-- CNX-Supported but not in MDML -->
+    <oerdc:descriptionOfChanges>
+        * The current description of the changes you have made for this version of the module:
+        
+    </oerdc:descriptionOfChanges> 
+
+    <oerdc:oer-subject>Mathematics and Statistics</oerdc:oer-subject>
+
+    <dcterms:subject xsi:type="oerdc:Subject">Mathematics and Statistics</dcterms:subject>
+    
+    <dcterms:subject>addition</dcterms:subject>
+    <dcterms:subject>subtraction</dcterms:subject>
+
+
+    <dcterms:abstract>The latest and greatest.</dcterms:abstract>
+
+    <dcterms:language xsi:type="ISO639-1">en</dcterms:language> 
+
+    <dcterms:license xsi:type="dcterms:URI">http://creativecommons.org/licenses/by/3.0/</dcterms:license>
+
+    <sword:treatment>Module 'Basic Math' was imported via the SWORD API.
+        * You can preview your module here to see what it will look like once it is published.
+        * The current description of the changes you have made for this version of the module: ""
+        Publication Requirements:The following contributors must agree to be listing on the module and sign the license agreement here.You must describe the changes that you have made to this version before publishing.</sword:treatment>
+
+    <link rel="alternate"
+          href="http://localhost:8080/site/Members/roche/module.2011-09-08.8189898791/module_view?format=html"/>
+
+    <content type="application/zip"
+             src="http://localhost:8080/site/Members/roche/module.2011-09-08.8189898791/sword/editmedia"/>
+    
+    <link rel="edit-media"
+          href="http://localhost:8080/site/Members/roche/module.2011-09-08.8189898791/sword/editmedia"/>
+
+    <link rel="edit"
+          href="http://localhost:8080/site/Members/roche/module.2011-09-08.8189898791/sword"/>
+          
+    <link rel="http://purl.org/net/sword/terms/add"
+          href="http://localhost:8080/site/Members/roche/module.2011-09-08.8189898791/sword/edit"/>
+
+    <sword:packaging>http://purl.org/net/sword/package/SimpleZip</sword:packaging>
+
+    <link rel="http://purl.org/net/sword/terms/derivedResource"
+          type="application/pdf"
+          href="http://localhost:8080/site/Members/roche/module.2011-09-08.8189898791/module_view?format=pdf"/>
+            
+    <link rel="http://purl.org/net/sword/terms/derivedResource"
+          href="http://localhost:8080/site/Members/roche/module.2011-09-08.8189898791/module_view?format=html"/>
+            
+    <link rel="http://purl.org/net/sword/terms/derivedResource"
+          type="application/zip"
+          href="http://localhost:8080/site/Members/roche/module.2011-09-08.8189898791/module_export?format=zip"/>
+
+    <link rel="http://purl.org/net/sword/terms/derivedResource"
+          type="application/xml"
+          href="http://localhost:8080/site/Members/roche/module.2011-09-08.8189898791/module_export?format=plain"/>
+
+    <link rel="http://purl.org/net/sword/terms/statement"
+          type="application/atom+xml;type=feed"
+          href="http://localhost:8080/site/Members/roche/module.2011-09-08.8189898791/sword/statement"/>
+
+    <link rel="http://purl.org/net/sword/terms/derivedResource"
+          href="http://localhost:8080/site/Members/roche/module.2011-09-08.8189898791/"/>
+
+    <link rel="http://purl.org/net/sword/terms/add"
+          href="http://localhost:8080/site/Members/roche/module.2011-09-08.8189898791/sword"/>
+</entry>

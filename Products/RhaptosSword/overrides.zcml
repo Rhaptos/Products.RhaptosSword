@@ -1,0 +1,10 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope">
+
+    <adapter
+        for="Products.CMFPlone.interfaces.IPloneSiteRoot
+             zope.publisher.interfaces.http.IHTTPRequest"
+        provides="rhaptos.swordservice.plone.interfaces.ISWORDServiceDocument"
+        factory=".browser.views.ServiceDocument" />
+
+</configure>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<atom:feed xmlns:sword="http://purl.org/net/sword/terms/" 
+      xmlns:atom="http://www.w3.org/2005/Atom"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      tal:define="context nocall:view/context;
+                  treatment view/treatment">
+
+    <!-- SWORD statement atom feed representation -->
+    <atom:category scheme="http://purl.org/net/sword/terms/state"
+        term="http://purl.org/net/sword/terms/[created\|published]"
+        tal:attributes="term python:'http://purl.org/net/sword/terms/%s' %context.state"
+        label="State">
+            The work has passed through review and is now in the archive
+    </atom:category>
+    
+    <atom:entry tal:repeat="entry view/entries">
+        <link rel="edit-media"
+            href="http://cnx.org/Members/roche/m9000/index.cnxml"
+            tal:attributes="href entry/absolute_url"
+        />
+    </atom:entry>
+
+    <sword:treatment>
+        <tal:actions replace="treatment/actions" />
+        <tal:preview_link replace="treatment/preview_link" />
+        <tal:description_of_changes replace="treatment/description_of_changes" />
+        <tal:publication_requirements condition="treatment/publication_requirements">
+            Publication requirements:\n
+            <tal:requirements repeat="requirement treatment/publication_requirements">
+                <tal:requirement replace="string:${repeat/requirement/number}. ${requirement}" />
+            </tal:requirements>
+        </tal:publication_requirements>
+    </sword:treatment>
+
+</atom:feed>

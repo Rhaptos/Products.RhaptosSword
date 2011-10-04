@@ -1,0 +1,54 @@
+<?xml version="1.0" ?><atom:feed xmlns:atom="http://www.w3.org/2005/Atom" xmlns:sword="http://purl.org/net/sword/terms/">
+
+    <!-- SWORD statement atom feed representation -->
+    <atom:category label="State" scheme="http://purl.org/net/sword/terms/state" term="http://purl.org/net/sword/terms/created">
+            The work has passed through review and is now in the archive
+    </atom:category>
+    
+    <atom:entry>
+        <link href="http://nohost/plone/workspace/__MODULE_ID__/index.cnxml" rel="edit-media"/>
+    </atom:entry>
+    <atom:entry>
+        <link href="http://nohost/plone/workspace/__MODULE_ID__/index_auto_generated.cnxml" rel="edit-media"/>
+    </atom:entry>
+    <atom:entry>
+        <link href="http://nohost/plone/workspace/__MODULE_ID__/h_allpass.png" rel="edit-media"/>
+    </atom:entry>
+    <atom:entry>
+        <link href="http://nohost/plone/workspace/__MODULE_ID__/h_lowpass.png" rel="edit-media"/>
+    </atom:entry>
+    <atom:entry>
+        <link href="http://nohost/plone/workspace/__MODULE_ID__/index.cnxml.pre-v07" rel="edit-media"/>
+    </atom:entry>
+    <atom:entry>
+        <link href="http://nohost/plone/workspace/__MODULE_ID__/h_bandstop.png" rel="edit-media"/>
+    </atom:entry>
+    <atom:entry>
+        <link href="http://nohost/plone/workspace/__MODULE_ID__/h_bandpass.png" rel="edit-media"/>
+    </atom:entry>
+    <atom:entry>
+        <link href="http://nohost/plone/workspace/__MODULE_ID__/idealFilters.m" rel="edit-media"/>
+    </atom:entry>
+    <atom:entry>
+        <link href="http://nohost/plone/workspace/__MODULE_ID__/h_highpass.png" rel="edit-media"/>
+    </atom:entry>
+    <atom:entry>
+        <link href="http://nohost/plone/workspace/__MODULE_ID__/notchFilter.m" rel="edit-media"/>
+    </atom:entry>
+    <atom:entry>
+        <link href="http://nohost/plone/workspace/__MODULE_ID__/h_notch.png" rel="edit-media"/>
+    </atom:entry>
+
+    <sword:treatment>
+        Module 'My Title' was imported via the SWORD API.
+        You can &lt;a href=&quot;http://nohost/plone/workspace/__MODULE_ID__/module_view&quot;&gt;preview your module here&lt;/a&gt; to see what it will look like once it is published.
+        Frobnicate the Bar
+        
+            Publication requirements:\n
+            
+                1. Author (, account:test_user_1_), will need to &lt;a href=&quot;http://nohost/plone/workspace/__MODULE_ID__/module_publish&quot;&gt;sign the license here.&lt;/a&gt;
+            
+        
+    </sword:treatment>
+
+</atom:feed>

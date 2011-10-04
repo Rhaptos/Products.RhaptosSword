@@ -55,6 +55,17 @@ def install(self):
 
     # setup tool "teardown"
     setup_tool.setImportContext(prevcontext)
+    ctr = getToolByName(self, 'content_type_registry')
+    ids = ctr.predicate_ids
+    predicate_id = 'atom+xml'
+    for predicate_id in ['atom+xml', 'atom+xml;type=entry', 'zip']:
+        if predicate_id not in ids:
+            ctr.addPredicate(predicate_id, 'major_minor')
+            predicate = ctr.getPredicate(predicate_id)
+            predicate.major = ['application',]
+            predicate.minor = [predicate_id,]
+            ctr.assignTypeName(predicate_id, 'Module')
+        ctr.reorderPredicate(predicate_id, 0)
 
     log("Successfully installed %s." % PROJECTNAME, out)
     return out.getvalue()

@@ -14,28 +14,67 @@
       provides="Products.GenericSetup.interfaces.EXTENSION"
       />
 
-   <browser:page
-       for="Products.RhaptosWorkgroup.interfaces.IWorkgroup"
-       name="atompub"
-       class=".browser.atom.AtomAddModule"
-       template="service_discovery.pt"
-       permission="zope2.View"
-    /> 
+    <include package=".browser"/>              
 
-   <browser:page
-       for="OFS.interfaces.IFolder"
-       name="atompub"
-       class=".browser.atom.AtomAddModule"
-       template="service_discovery.pt"
-       permission="zope2.View"
-    />
+    <!-- Because we have no z3c.autoinclude in plone2.5 land -->
+    <include package="rhaptos.swordservice.plone" />
+    <include package="rhaptos.atompub.plone" />
+    
+    <five:implements                                                              
+        class="Products.ATContentTypes.content.folder.ATFolder"
+        interface="Products.CMFCore.interfaces.IFolderish"
+        /> 
 
-   <browser:page
-       for="Products.RhaptosModuleEditor.interfaces.IModule"
-       name="atompub"
-       class=".browser.atom.AtomEditModule"
-       template="service_discovery.pt"
-       permission="zope2.View"
-   />
+    <five:implements                                                              
+        class="Products.ATContentTypes.content.file.ATFile"
+        interface="Products.ATContentTypes.interface.file.IATFile"
+        /> 
+
+    <!-- Make sure we can reach the sword adapters from our workspaces -->
+    <five:implements                                                              
+        class="Products.CMFPlone.PloneFolder.PloneFolder"
+        interface="Products.RhaptosSword.interfaces.IRhaptosSwordWorkspace"
+        />
+
+    <five:implements                                                              
+       class="Products.Archetypes.public.OrderedBaseFolder"
+       interface="Products.RhaptosSword.interfaces.IRhaptosSwordWorkspace"
+       />
+
+    <five:implements                                                              
+        class="Products.RhaptosWorkgroup.Workgroup.Workgroup"
+        interface="Products.RhaptosSword.interfaces.IRhaptosSwordWorkspace"
+        /> 
+
+    <five:implements                                                              
+        class="Products.RhaptosModuleEditor.ModuleEditor.ModuleEditor"
+        interface="Products.RhaptosSword.interfaces.IRhaptosSwordCollection"
+        /> 
+
+    <!-- Mark collaboration requests -->
+    <five:implements
+        class="Products.RhaptosCollaborationTool.CollaborationFolder.CollabRequest"
+        interface="Products.RhaptosSword.interfaces.ICollabRequest"
+        />
+
+    <adapter
+        for="Products.RhaptosSword.interfaces.IRhaptosSwordWorkspace
+             zope.publisher.interfaces.http.IHTTPRequest"
+        provides="Products.RhaptosSword.adapters.IRhaptosWorkspaceSwordAdapter"
+        factory=".adapters.RhaptosWorkspaceSwordAdapter"
+        />
+
+    <adapter
+        for="Products.RhaptosSword.interfaces.IRhaptosSwordCollection
+             zope.publisher.interfaces.http.IHTTPRequest"
+        provides="Products.RhaptosSword.adapters.IRhaptosEditMediaAdapter"
+        factory=".adapters.RhaptosEditMedia"
+        />
+
+    <adapter
+        for="Products.RhaptosSword.interfaces.IRhaptosSwordWorkspace
+             zope.publisher.interfaces.http.IHTTPRequest"
+        provides="rhaptos.swordservice.plone.interfaces.ISWORDListCollection"
+        factory="rhaptos.swordservice.plone.browser.sword.ListCollection" />
 
 </configure>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<entry xmlns="http://www.w3.org/2005/Atom" xmlns:sword="http://purl.org/net/sword/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:md="http://cnx.rice.edu/mdml" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:oerdc="http://cnx.org/aboutus/technology/schemas/oerdc">
+  <!-- SWORD deposit receipt -->
+  <title>My Title 2</title>
+  <id>module_id</id>
+  <updated>2011/09/16 00:09:45.569 GMT+2</updated>
+  <generator uri="rhaptos.swordservice.plone" version="1.0"/>
+  <!-- The metadata begins -->
+  <dcterms:identifier xsi:type="dcterms:URI">http://nohost/plone/Members/test_user_1_/workspace/module_id</dcterms:identifier>
+  <dcterms:identifier xsi:type="oerdc:Version">**new**</dcterms:identifier>
+  <dcterms:identifier xsi:type="oerdc:ContentId">module_id</dcterms:identifier>
+  <dcterms:title>My Title 2</dcterms:title>
+  <dcterms:created>2011/09/16 00:09:36.106 GMT+2</dcterms:created>
+  <dcterms:modified>2011/09/16 00:09:45.569 GMT+2</dcterms:modified>
+  <dcterms:creator oerdc:id="test_user_1_" oerdc:email=""/>
+  <oerdc:maintainer oerdc:id="test_user_1_" oerdc:email=""/>
+  <dcterms:rightsHolder oerdc:id="test_user_1_" oerdc:email=""/>
+  <!-- CNX-Supported but not in MDML -->
+  <oerdc:descriptionOfChanges>        Frobnicate the Bar    </oerdc:descriptionOfChanges>
+  <oerdc:oer-subject/>
+  <dcterms:subject xsi:type="oerdc:Subject"/>
+  <dcterms:abstract/>
+  <dcterms:language xsi:type="ISO639-1">en</dcterms:language>
+  <dcterms:license xsi:type="dcterms:URI"/>
+  <sword:treatment>
+      Module 'My Title 2' was imported via the SWORD API.
+      You can <a href="http://nohost/plone/Members/test_user_1_/workspace/module_id/module_view">preview your module here</a> to see what it will look like once it is published.
+      The current description of the changes you have made for this version of the module: Frobnicate the Bar
+      Publication requirements:
+      1. You (, account:test_user_1_), will need to <a href="http://nohost/plone/Members/test_user_1_/workspace/module_id/module_publish">sign the license here.</a>
+  </sword:treatment>
+  <link rel="alternate" href="http://nohost/plone/Members/test_user_1_/workspace/module_id/module_view?format=html"/>
+  <content type="application/zip" src="http://nohost/plone/Members/test_user_1_/workspace/module_id/sword/editmedia"/>
+  <link rel="edit-media" href="http://nohost/plone/Members/test_user_1_/workspace/module_id/sword/editmedia"/>
+  <link rel="edit" href="http://nohost/plone/Members/test_user_1_/workspace/module_id/sword"/>
+  <link rel="http://purl.org/net/sword/terms/add" href="http://nohost/plone/Members/test_user_1_/workspace/module_id/sword"/>
+  <sword:packaging>http://purl.org/net/sword/package/SimpleZip</sword:packaging>
+  <link rel="http://purl.org/net/sword/terms/derivedResource" type="application/pdf" href="http://nohost/plone/Members/test_user_1_/workspace/module_id/module_view?format=pdf"/>
+  <link rel="http://purl.org/net/sword/terms/derivedResource" href="http://nohost/plone/Members/test_user_1_/workspace/module_id/module_view?format=html"/>
+  <link rel="http://purl.org/net/sword/terms/derivedResource" type="application/zip" href="http://nohost/plone/Members/test_user_1_/workspace/module_id/module_export?format=zip"/>
+  <link rel="http://purl.org/net/sword/terms/derivedResource" type="application/xml" href="http://nohost/plone/Members/test_user_1_/workspace/module_id/module_export?format=plain"/>
+  <link rel="http://purl.org/net/sword/terms/statement" type="application/atom+xml;type=feed" href="http://nohost/plone/Members/test_user_1_/workspace/module_id/sword/statement.atom"/>
+  <link rel="http://purl.org/net/sword/terms/derivedResource" href="http://nohost/plone/Members/test_user_1_/workspace/module_id/"/>
+  <link rel="http://purl.org/net/sword/terms/add" href="http://nohost/plone/Members/test_user_1_/workspace/module_id/sword"/>
+</entry>

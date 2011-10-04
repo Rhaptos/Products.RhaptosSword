@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding='utf-8'?>
+<entry xmlns="http://www.w3.org/2005/Atom"
+       xmlns:sword="http://purl.org/net/sword/"
+       xmlns:dcterms="http://purl.org/dc/terms/"
+       xmlns:md="http://cnx.rice.edu/mdml">
+
+    <link rel="edit"
+          href="http://localhost:8080/Members/admin/module.2011-08-12.8601632078/sword/edit"/>
+    <link rel="edit-media"
+          href="http://localhost:8080/Members/admin/module.2011-08-12.8601632078"/>
+    <link rel="http://purl.org/net/sword/terms/add"
+          href="http://localhost:8080/Members/admin/module.2011-08-12.8601632078/sword/edit"/>
+    
+
+
+    <sword:treatment>Stored as module.2011-08-12.8601632078</sword:treatment>
+    <title>Atom-Powered Robots Run Amok</title>
+    <id>http://localhost:8080/Members/admin/module.2011-08-12.8601632078</id>
+    <updated>2011/08/12 10:14:20.175 GMT+2</updated>
+    <author><name>('admin', 'rijk')</name></author>
+    <dcterms:available>2011/08/12 10:14:24.759 GMT+2</dcterms:available>
+    <dcterms:description>the summary</dcterms:description>
+    <dcterms:title>Atom-Powered Robots Run Amok</dcterms:title>
+    
+    <sword:requested-roles>
+        <md:actors>
+        
+            <md:person userid="rijk">
+                <md:firstname>Rijk</md:firstname>
+                <md:surname>Stofberg</md:surname>
+                <md:fullname>Rijk Stofberg</md:fullname>
+                <md:email>rijk.stofberg@gmail.com</md:email>
+            </md:person>
+        
+        </md:actors>
+
+        <md:roles>
+        
+            <md:role type="Licensor">rijk</md:role>
+            <md:role type="Maintainer">rijk</md:role>
+            <md:role type="Author">rijk</md:role>
+        
+        </md:roles>
+    </sword:requested-roles>
+    
+    <sword:has_metadata>False</sword:has_metadata>
+</entry>

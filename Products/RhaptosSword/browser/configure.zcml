@@ -1,0 +1,42 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    xmlns:zcml="http://namespaces.zope.org/zcml"
+    xmlns:five="http://namespaces.zope.org/five">
+
+    <browser:page
+        for="Products.RhaptosSword.interfaces.IRhaptosSwordCollection"
+        name="rhaptos-deposit-receipt"
+        class=".views.EditIRI"
+        permission="zope2.View"
+        />
+
+    <browser:page
+        for="Products.RhaptosModuleEditor.interfaces.IModule"
+        name="atom"
+        class=".views.AtomFeed"
+        template="atom.pt"
+        permission="zope2.View"
+        />
+
+    <adapter
+        for="Products.RhaptosSword.interfaces.IRhaptosSwordCollection
+             zope.publisher.interfaces.http.IHTTPRequest"
+        provides="rhaptos.swordservice.plone.interfaces.ISWORDEditIRI"
+        factory=".views.EditIRI" />
+
+    <adapter
+        for="Products.RhaptosSword.interfaces.IRhaptosSwordCollection
+             zope.publisher.interfaces.http.IHTTPRequest"
+        provides="rhaptos.swordservice.plone.interfaces.ISWORDStatement"
+        factory=".views.RhaptosSWORDStatement"
+        />
+
+    <adapter
+        for="Products.RhaptosSword.interfaces.IRhaptosSwordCollection
+             zope.publisher.interfaces.http.IHTTPRequest"
+        provides="rhaptos.swordservice.plone.interfaces.ISWORDStatementAtomAdapter"
+        factory=".views.RhaptosSWORDStatementAtom"
+        />
+
+</configure>

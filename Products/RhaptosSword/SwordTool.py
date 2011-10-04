@@ -55,17 +55,19 @@ class SwordTool(UniqueObject, SimpleItem):
     security = AccessControl.ClassSecurityInfo()
 
     acceptingSwordRequests = True
+    maxUploadSize = 10 * 1024 * 1024 # 10 Megabyte
 
     def __init__(self):
         """Initialize (singleton!) tool object."""
         # user configurable
         self.acceptingSwordRequests = True
+        self.maxUploadSize = 10 * 1024 * 1024 # 10 Megabyte
         # unknown to the user
         log('__init__ completed.') # this no workeee
 
 
     security.declareProtected(ManagePermission, 'manage_sword_tool')
-    def manage_sword_tool(self, acceptingSwordRequests=None):
+    def manage_sword_tool(self, acceptingSwordRequests=None, maxUploadSize=None):
         """
         Post creation configuration.  See manage_configure_sword_tool.zpt
         """
@@ -75,6 +77,9 @@ class SwordTool(UniqueObject, SimpleItem):
         acceptingSwordRequests = acceptingSwordRequests is not None
         self.acceptingSwordRequests = acceptingSwordRequests
 
+        if maxUploadSize is not None:
+            self.maxUploadSize = int(maxUploadSize)
+
 
     security.declareProtected(ManagePermission, 'getAcceptingRequests')
     def getAcceptingRequests(self):
@@ -82,10 +87,21 @@ class SwordTool(UniqueObject, SimpleItem):
         return self.acceptingSwordRequests
 
 
+    security.declareProtected(ManagePermission, 'getMaxUploadSize')
+    def getMaxUploadSize(self):
+        """ Get maximum upload size for sword POST/PUT requests. """
+        return self.maxUploadSize
+
+
     security.declareProtected(ManagePermission, 'setAcceptingRequests')
     def setAcceptingRequests(self, acceptingSwordRequests):
         """Turn sword processing on and off."""
         self.acceptingSwordRequests = acceptingSwordRequests
+
+
+    def setMaxUploadSize(self, maxUploadSize):
+        """ Set the maximum upload size. """
+        self.maxUploadSize = int(maxUploadSize)
 
     security.declarePublic('cnxml2json')
     def cnxml2json(self, content):

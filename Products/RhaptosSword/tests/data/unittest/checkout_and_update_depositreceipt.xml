@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<entry xmlns="http://www.w3.org/2005/Atom"
+       xmlns:sword="http://purl.org/net/sword/"
+       xmlns:dcterms="http://purl.org/dc/terms/"
+       xmlns:md="http://cnx.rice.edu/mdml"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:oerdc="http://cnx.org/aboutus/technology/schemas/oerdc">
+
+    <!-- SWORD deposit receipt -->
+    <title>(Untitled)</title>
+    <id>http://nohost/plone/workspace/multipart</id>
+    <updated>2011/08/25 15:21:12.561 GMT+2</updated>
+    <summary type="text">The summary</summary>
+    <generator uri="rhaptos.swordservice.plone" version="1.0"/>
+
+    <!-- The metadata begins -->
+    <dcterms:identifier xsi:type="dcterms:URI">http://nohost/plone/workspace/multipart</dcterms:identifier> 
+    <dcterms:identifier xsi:type="oerdc:Version">**new**</dcterms:identifier> 
+    <dcterms:identifier xsi:type="oerdc:ContentId">http://nohost/plone/workspace/multipart</dcterms:identifier> 
+    <dcterms:title>(Untitled)</dcterms:title>
+    <dcterms:created>2011/08/25 15:21:10.591 GMT+2</dcterms:created> 
+    <dcterms:modified>2011/08/25 15:21:12.561 GMT+2</dcterms:modified> 
+    <dcterms:creator oerdc:id="test_user_1_" oerdc:email=""></dcterms:creator>
+    <dcterms:maintainer oerdc:id="test_user_1_"
+                        oerdc:email=""></dcterms:maintainer>
+    <dcterms:rightsHolder oerdc:id="test_user_1_"
+                          oerdc:email=""></dcterms:rightsHolder>
+
+    <oerdc:oer-subject></oerdc:oer-subject>
+
+    <dcterms:subject xsi:type="oerdc:Subject"></dcterms:subject>
+    
+
+
+    <dcterms:abstract></dcterms:abstract>
+
+    <dcterms:language xsi:type="ISO639-1">en</dcterms:language> 
+
+    <dcterms:license xsi:type="dcterms:URI"></dcterms:license>
+
+    <sword:treatment>Module '(Untitled)' was imported via the SWORD API.
+        * You can preview your module here to see what it will look like once it is published.
+        * The current description of the changes you have made for this version of the module: ""
+        Publication Requirements: (account:test_user_1_), will need to sign the license.
+You must describe the changes that you have made to this version before publishing.</sword:treatment>
+
+    <link rel="alternate"
+          href="http://nohost/plone/workspace/multipart/module_view?format=html"/>
+
+    <content type="application/zip"
+             src="http://nohost/plone/workspace/multipart/sword/edit"/>
+    
+    <link rel="edit-media"
+          href="http://nohost/plone/workspace/multipart"/>
+
+    <link rel="edit"
+          href="http://nohost/plone/workspace/multipart/sword/edit"/>
+          
+    <link rel="http://purl.org/net/sword/terms/add"
+          href="http://nohost/plone/workspace/multipart/sword/edit"/>
+
+    <sword:packaging>http://purl.org/net/sword/package/SimpleZip</sword:packaging>
+
+    <link rel="http://purl.org/net/sword/terms/derivedResource"
+          type="application/pdf"
+          href="http://nohost/plone/workspace/multipart/module_view?format=pdf"/>
+            
+    <link rel="http://purl.org/net/sword/terms/derivedResource"
+          href="http://nohost/plone/workspace/multipart/module_view?format=html"/>
+            
+    <link rel="http://purl.org/net/sword/terms/derivedResource"
+          type="application/zip"
+          href="http://nohost/plone/workspace/multipart/module_export?format=zip"/>
+
+    <link rel="http://purl.org/net/sword/terms/derivedResource"
+          type="application/xml"
+          href="http://nohost/plone/workspace/multipart/module_export?format=plain"/>
+
+    <link rel="http://purl.org/net/sword/terms/statement" type="application/atom+xml;type=feed" href="http://cnx.org/Members/kef/m10000/sword/statement.atom"/>
+
+</entry>

@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<entry xmlns="http://www.w3.org/2005/Atom"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dcterms="http://purl.org/dc/terms/"
+       xmlns:oerdc="http://cnx.org/aboutus/technology/schemas/oerdc">
+
+    <title>Sound Reasoning</title>
+    <author oerdc:id="roche">Roché Compaan</author>
+    <summary type="text">First version</summary>
+
+    <!-- some embedded metadata -->
+    <dcterms:title>Sound Reasoning</dcterms:title>
+    <dcterms:abstract>First version</dcterms:abstract>
+    <dcterms:creator oerdc:id="roche">roche</dcterms:creator>
+    <oerdc:maintainer oerdc:id="roche">roche</oerdc:maintainer>
+    <dcterms:rightsHolder oerdc:id="roche">roche</dcterms:rightsHolder>
+
+    <oerdc:oer-subject>Arts</oerdc:oer-subject>
+    <dcterms:subject>music</dcterms:subject>
+    <dcterms:language xsi:type="ISO639-1">en</dcterms:language>
+    <oerdc:analyticsCode>UA-4688042-1</oerdc:analyticsCode>
+    <oerdc:descriptionOfChanges>First version</oerdc:descriptionOfChanges>
+
+</entry>

@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<entry xmlns="http://www.w3.org/2005/Atom"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dcterms="http://purl.org/dc/terms/"
+       xmlns:oerdc="http://cnx.org/aboutus/technology/schemas/oerdc">
+
+    <title>Atom-Powered Robots Run Amok - new</title>
+    <author>Roch?? Compaan</author>
+    <summary type="text">The latest and greatest.</summary>
+
+    <!-- some embedded metadata -->
+    <dcterms:title>Basic Math - new</dcterms:title>
+    <dcterms:abstract>The latest and greatest - new.</dcterms:abstract>
+    <dcterms:creator>roche</dcterms:creator>
+    <dcterms:creator>rijk</dcterms:creator>
+    <oerdc:maintainer>roche</oerdc:maintainer>
+    <oerdc:maintainer>rijk</oerdc:maintainer>
+    <dcterms:rightsHolder>roche</dcterms:rightsHolder>
+    <dcterms:rightsHolder>rijk</dcterms:rightsHolder>
+
+    <oerdc:oer-subject>Mathematics and Statistics</oerdc:oer-subject>
+    <oerdc:oer-subject>Science and Technology</oerdc:oer-subject>
+    <dcterms:subject>addition</dcterms:subject>
+    <dcterms:subject>subtraction</dcterms:subject>
+    <dcterms:subject>multiplication</dcterms:subject>
+    <dcterms:language xsi:type="ISO639-1">af</dcterms:language>
+    <oerdc:analyticsCode>UA-4688042-1-999</oerdc:analyticsCode>
+    <dcterms:license xsi:type="dcterms:URI">http://creativecommons.org/licenses/by/3.0/</dcterms:license>
+    <!-- some embedded metadata -->
+    <dcterms:sub>The abstract - new</dcterms:sub>
+    <dcterms:publisher>Publisher - new</dcterms:publisher>
+    <dcterms:description>Description - new</dcterms:description>
+    <dcterms:contributors>The contributurs - new</dcterms:contributors>
+    <dcterms:creators>The creators - new</dcterms:creators>
+    <dcterms:effective_date>03/08/2011</dcterms:effective_date>
+    <dcterms:expiration_date>03/08/2011</dcterms:expiration_date>
+    <dcterms:type>Type - new</dcterms:type>
+    <dcterms:format></dcterms:format>
+    <dcterms:alternative>Alternative Title - new</dcterms:alternative>
+    <dcterms:available>Date Available</dcterms:available>
+    <dcterms:bibliographicCitation>Bibliographic Citation - new</dcterms:bibliographicCitation>
+    <dcterms:contributor>Contributor</dcterms:contributor>
+    <dcterms:references>References</dcterms:references>
+</entry>

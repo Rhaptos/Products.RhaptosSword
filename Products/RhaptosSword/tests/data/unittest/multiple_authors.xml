@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<entry xmlns="http://www.w3.org/2005/Atom"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dcterms="http://purl.org/dc/terms/"
+       xmlns:oerdc="http://cnx.org/aboutus/technology/schemas/oerdc">
+
+    <title>Multiple authors test</title>
+    <author>user 1</author>
+    <summary type="text">Testing multiple authors</summary>
+
+    <!-- some embedded metadata -->
+    <dcterms:title>Three creators: </dcterms:title>
+    <dcterms:abstract>Three creators test</dcterms:abstract>
+
+    <dcterms:creator oerdc:id="user85"/>
+    <dcterms:creator oerdc:id="user1"/>
+    <dcterms:creator oerdc:id="user2"/>
+
+    <oerdc:oer-subject>Arts</oerdc:oer-subject>
+    <dcterms:subject></dcterms:subject>
+    <dcterms:subject></dcterms:subject>
+    <dcterms:language xsi:type="ISO639-1">en</dcterms:language>
+    <oerdc:analyticsCode>UA-4688042-1</oerdc:analyticsCode>
+
+</entry>

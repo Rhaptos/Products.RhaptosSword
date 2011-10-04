@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<entry xmlns="http://www.w3.org/2005/Atom" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:oerdc="http://cnx.org/aboutus/technology/schemas/oerdc">
+  <title>Test with multiple rights holders</title>
+  <author>
+    <name>Daniel Williamson</name>
+  </author>
+  <author>
+    <name>Roche Compaan</name>
+  </author>
+  <summary type="text">The latest and greatest.</summary>
+  <!-- some embedded metadata -->
+  <dcterms:title>Test with multiple rights holders</dcterms:title>
+  <dcterms:abstract>The latest and greatest.</dcterms:abstract>
+  <dcterms:creator oerdc:id="dcwill"/>
+  <oerdc:maintainer oerdc:id="dcwill"/>
+  <dcterms:rightsHolder oerdc:id="dcwill"/>
+  <dcterms:rightsHolder oerdc:id="dcwill"/>
+  <dcterms:translator oerdc:id="roche"/>
+  <oerdc:oer-subject>Mathematics and Statistics</oerdc:oer-subject>
+  <dcterms:subject>addition</dcterms:subject>
+  <dcterms:subject>subtraction</dcterms:subject>
+  <dcterms:language xsi:type="ISO639-1">af</dcterms:language>
+  <oerdc:analyticsCode>UA-4688042-1</oerdc:analyticsCode>
+</entry>
