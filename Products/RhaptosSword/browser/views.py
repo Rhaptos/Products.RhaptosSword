@@ -1,3 +1,5 @@
+from StringIO import StringIO
+from xml.dom.minidom import parse
 from zope.interface import implements
 from Acquisition import aq_inner
 from Acquisition import Explicit
@@ -25,6 +27,7 @@ from Products.RhaptosSword.adapters import getSiteEncoding
 from Products.RhaptosSword.adapters import METADATA_MAPPING
 
 from Products.RhaptosSword.exceptions import PublishUnauthorized
+from Products.RhaptosSword.utils import splitMultipartRequest, checkUploadSize
 
 
 # TODO: move all these strings to the relevant templates; make macros as required.
@@ -332,31 +335,52 @@ class EditIRI(BaseEditIRI, SWORDTreatmentMixin, Explicit):
             raise BadRequest("You have no Content-Type header in your request")
         content_type = getContentType(content_type)
 
-        if content_type in ATOMPUB_CONTENT_TYPES:
+        if content_type in ATOMPUB_CONTENT_TYPES or \
+          content_type.startswith('multipart/'):
+            # If the module is published, do a transparent checkout
+            if self.context.state == 'published':
+                self.context.checkout(self.context.objectId)
+
+            merge = self.request.get_header(
+                'Update-Semantics') and True or False
             parent = self.context.aq_inner.aq_parent
             adapter = getMultiAdapter(
                 (parent, self.request), IRhaptosWorkspaceSwordAdapter)
-            body = self.request.get('BODYFILE')
-            body.seek(0)
-            merge = self.request.get_header(
-                'Update-Semantics') and True or False
-            if merge:
-                # merge the metadata on the request with what is on the
-                # module (in this case 'self.context')
-                adapter.mergeMetadata(self.context, body)
+
+            if content_type.startswith('multipart/'):
+                atom_dom, payload, payload_type = splitMultipartRequest(
+                    self.request)
+                checkUploadSize(self.context, payload)
+
+                # update Metadata
+                if merge:
+                    adapter.mergeMetadata(self.context, atom_dom)
+                else:
+                    adapter.replaceMetadata(self.context, atom_dom)
+
+                # Update Content
+                cksum = self.request.get_header('Content-MD5')
+                adapter.updateContent(self.context, StringIO(payload),
+                    payload_type, cksum, merge)
+                self.context.logAction(adapter.action)
             else:
-                # replace what is on the module with metadata on the request
-                # in the process all fields not on the request will be reset
-                # on the module (see METADATA_DEFAULTS) for the values used.
-                adapter.replaceMetadata(self.context, body)
+                body = self.request.get('BODYFILE')
+                checkUploadSize(self.context, body)
+                if merge:
+                    # merge the metadata on the request with what is on the
+                    # module (in this case 'self.context')
+                    adapter.mergeMetadata(self.context, parse(body))
+                else:
+                    # replace what is on the module with metadata on the request
+                    # in the process all fields not on the request will be reset
+                    # on the module (see METADATA_DEFAULTS) for the values used.
+                    adapter.replaceMetadata(self.context, parse(body))
 
             # If In-Progress is set to false or omitted, try to publish
-            in_progress = self.request.get_header('In-Progress', 'false')
-            if in_progress == 'false':
+            if self.request.get_header('In-Progress', 'false') == 'false':
                 self._handlePublish()
 
             # response code of 200 as required by SWORD spec:
-            #   6.5.2. Replacing the Metadata of a Resource
             self.request.response.setStatus(200)
             # set the location header
             self.request.response.setHeader(

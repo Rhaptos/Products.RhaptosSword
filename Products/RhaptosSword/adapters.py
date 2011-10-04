@@ -291,9 +291,9 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         return metadata
 
 
-    def mergeMetadata(self, obj, fp):
+    def mergeMetadata(self, obj, dom):
         """        
-            Merge the metadata on the obj (module) with whatever is in the fp
+            Merge the metadata on the obj (module) with whatever is in the dom
             parameter. From the spec. what should be replaced and what we should
             just add to.
             - title (dcterms:title) : Replace
@@ -308,7 +308,6 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             - Google doc: SWORD V2 Spec for Publishing Modules in Connexions
         """        
         self.update_semantics = 'merge'
-        dom = parse(fp)
         # create a metadata dict that has all the values from obj, overridden
         # by the current dom values.
         metadata = self.getModuleMetadata(obj, {})
@@ -355,7 +354,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         obj.reindexObject(idxs=metadata.keys())
 
     
-    def replaceMetadata(self, obj, fp):
+    def replaceMetadata(self, obj, dom):
         """ We replace the module metadata with the values from the request.
             We use METADATA_DEFAULTS to reset those values we don't have
             on the request back to what they would be for a new module.
@@ -368,7 +367,6 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                   better to use that than do our own thing here.
         """
         self.update_semantics = 'replace'
-        dom = parse(fp)
         # create a metadata dict that has all the defaults, overridden by the
         # current dom values. This way we will 'clear' the properties not in
         # the dom.
@@ -496,7 +494,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             body = request.get('BODYFILE')
             body.seek(0)
             if self.action in ['derive', 'checkout']:
-                self.mergeMetadata(obj, body)
+                self.mergeMetadata(obj, parse(body))
             else:
                 self.updateMetadata(obj, parse(body))
         elif content_type == 'application/zip':
