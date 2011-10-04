@@ -659,7 +659,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.assertTrue(pubmod.version == "1.2",
             "Version did not increment")
 
-    def testPublishOnPostToSEIRI(self):
+    def testPublishOnCreate(self):
         self._setupRhaptos()
         self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
         # try publish immediately with In-Progress set to false
@@ -681,6 +681,30 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.assertTrue(
             "http://purl.org/oerpub/error/PublishUnauthorized" in xml, xml)
 
+    def testPublishOnPostToSEIRI(self):
+        self._setupRhaptos()
+        self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        filename = 'entry.xml'
+        module = self._createModule(self.portal.workspace, filename)
+
+        # try publish on Post with In-Progress set to false
+        uploadrequest = self.createUploadRequest(
+            'entry.xml',
+            module,
+            REQUEST_METHOD = 'POST',
+            IN_PROGRESS = 'false',
+            )
+        adapter = getMultiAdapter(
+                (module, uploadrequest), Interface, 'sword')
+        xml = adapter()
+
+        # We should receive an error that confirms that an attempt was
+        # made to publish the module
+        self.assertTrue("<sword:error" in xml, xml)
+        self.assertTrue(
+            "http://purl.org/oerpub/error/PublishUnauthorized" in xml, xml)
+
+
     def testPublishOnPUTToSEIRI(self):
         self._setupRhaptos()
         # without the manager role we can't publish
@@ -690,7 +714,6 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         filename = 'entry.xml'
         module = self._createModule(self.portal.workspace, filename)
 
-        # this request should give the user all the default roles
         uploadrequest = self.createUploadRequest(
             'entry.xml',
             module,
