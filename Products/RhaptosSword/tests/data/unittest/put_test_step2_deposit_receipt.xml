@@ -39,7 +39,7 @@
   <link rel="http://purl.org/net/sword/terms/derivedResource" href="http://nohost/plone/Members/test_user_1_/workspace/module_id/module_view?format=html"/>
   <link rel="http://purl.org/net/sword/terms/derivedResource" type="application/zip" href="http://nohost/plone/Members/test_user_1_/workspace/module_id/module_export?format=zip"/>
   <link rel="http://purl.org/net/sword/terms/derivedResource" type="application/xml" href="http://nohost/plone/Members/test_user_1_/workspace/module_id/module_export?format=plain"/>
-  <link rel="http://purl.org/net/sword/terms/statement" type="application/atom+xml;type=feed" href="http://nohost/plone/Members/test_user_1_/workspace/module_id/sword/statement"/>
+  <link rel="http://purl.org/net/sword/terms/statement" type="application/atom+xml;type=feed" href="http://nohost/plone/Members/test_user_1_/workspace/module_id/sword/statement.atom"/>
   <link rel="http://purl.org/net/sword/terms/derivedResource" href="http://nohost/plone/Members/test_user_1_/workspace/module_id/"/>
   <link rel="http://purl.org/net/sword/terms/add" href="http://nohost/plone/Members/test_user_1_/workspace/module_id/sword"/>
 </entry>

@@ -76,6 +76,6 @@ You must describe the changes that you have made to this version before publishi
           type="application/xml"
           href="http://nohost/plone/workspace/multipart/module_export?format=plain"/>
 
-    <link rel="http://purl.org/net/sword/terms/statement" type="application/atom+xml;type=feed" href="http://cnx.org/Members/kef/m10000/sword/statement"/>
+    <link rel="http://purl.org/net/sword/terms/statement" type="application/atom+xml;type=feed" href="http://cnx.org/Members/kef/m10000/sword/statement.atom"/>
 
 </entry>

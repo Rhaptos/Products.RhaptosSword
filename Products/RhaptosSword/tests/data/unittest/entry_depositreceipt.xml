@@ -85,7 +85,7 @@ NOTE: Due to an increase of spam on our site:
           
     <link href="http://nohost/plone/workspace/__MODULE_ID__/sword" rel="http://purl.org/net/sword/terms/add"/>
 
-    <link href="http://nohost/plone/workspace/__MODULE_ID__/sword/statement" rel="http://purl.org/net/sword/terms/statement" type="application/atom+xml;type=feed"/>
+    <link href="http://nohost/plone/workspace/__MODULE_ID__/sword/statement.atom" rel="http://purl.org/net/sword/terms/statement" type="application/atom+xml;type=feed"/>
 
     <sword:packaging>http://purl.org/net/sword/package/SimpleZip</sword:packaging>
 
