@@ -730,6 +730,42 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.assertTrue(
             "http://purl.org/oerpub/error/PublishUnauthorized" in xml, xml)
 
+    def testPUTOnStub(self):
+        self.testUploadAndPublish()
+        pubmod = self.portal.workspace.objectValues()[0]
+        
+        file = open(os.path.join(
+            DIRNAME, 'data', 'unittest', 'checkout_and_update.txt'), 'r')
+        content = file.read()
+        file.close()
+        content = content.replace('module_url', pubmod.absolute_url())
+        # Now check it out again, and replace the content with PUT
+        uploadrequest = self.createUploadRequest(
+            None,
+            content=content,
+            context=self.portal.workspace,
+            CONTENT_TYPE='multipart/related; boundary="===============1338623209=="',
+            IN_PROGRESS='true',
+            REQUEST_METHOD='PUT'
+        )
+        # Call the sword view on this request to perform the upload
+        adapter = getMultiAdapter((pubmod, uploadrequest), Interface, 'sword')
+        xml = adapter()
+
+        # Do the usual checks
+        self.assertTrue("<sword:error" not in xml, xml)
+        self.assertTrue("<entry" in xml, "Not a valid deposit receipt")
+
+        # Get the edit-iri of this item
+        dr = parseString(xml)
+        editiri = getEditIRI(dr)
+
+        editorid = str(editiri).split('/')[-2]
+        editor = self.portal.workspace.restrictedTraverse(editorid)
+
+        # make sure the message was cleared after checkout
+        self.assertEqual(editor.message, '')
+
 
     def testSwordServiceRetrieveContent(self):
         self._setupRhaptos()
