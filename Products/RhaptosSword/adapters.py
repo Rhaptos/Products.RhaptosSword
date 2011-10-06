@@ -85,6 +85,7 @@ METADATA_DEFAULTS = \
          'language': 'en',
          'keywords': [],
          'subject': [],
+         'message': '',
          'GoogleAnalyticsTrackingCode': '',
         }
 
