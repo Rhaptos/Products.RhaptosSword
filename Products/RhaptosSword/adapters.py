@@ -85,7 +85,6 @@ METADATA_DEFAULTS = \
          'language': 'en',
          'keywords': [],
          'subject': [],
-         'message': 'Created Module',
          'GoogleAnalyticsTrackingCode': '',
         }
 
