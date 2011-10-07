@@ -766,6 +766,46 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         # make sure the message was cleared after checkout
         self.assertEqual(editor.message, '')
 
+    def testPUTOnCreatedModule(self):
+        self._setupRhaptos()
+        self.setRoles(('Manager',))
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        filename = 'entry.xml'
+        module = self._createModule(self.folder.workspace, filename)
+        self.assertEqual(module.message, 'Created module')
+
+        file = open(os.path.join(
+            DIRNAME, 'data', 'unittest', 'checkout_and_update.txt'), 'r')
+        content = file.read()
+        file.close()
+        content = content.replace('module_url', module.absolute_url())
+        # Now check it out again, and replace the content with PUT
+        uploadrequest = self.createUploadRequest(
+            None,
+            content=content,
+            context=self.folder.workspace,
+            CONTENT_TYPE='multipart/related; boundary="===============1338623209=="',
+            IN_PROGRESS='true',
+            REQUEST_METHOD='PUT'
+        )
+        # Call the sword view on this request to perform the upload
+        adapter = getMultiAdapter((module, uploadrequest), Interface, 'sword')
+        xml = adapter()
+
+        # Do the usual checks
+        self.assertTrue("<sword:error" not in xml, xml)
+        self.assertTrue("<entry" in xml, "Not a valid deposit receipt")
+
+        # Get the edit-iri of this item
+        dr = parseString(xml)
+        editiri = getEditIRI(dr)
+
+        editorid = str(editiri).split('/')[-2]
+        editor = self.folder.workspace.restrictedTraverse(editorid)
+
+        # make sure the message was cleared after checkout
+        self.assertEqual(editor.message, '')
+
 
     def testSwordServiceRetrieveContent(self):
         self._setupRhaptos()
