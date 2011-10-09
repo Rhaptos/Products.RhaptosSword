@@ -453,10 +453,11 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             raise DepositFailed(str(e))
 
         # Set by mets.xml inside ZIP
-        props = meta['properties']
-        obj.updateProperties(props)
-        # Make sure the metadata gets into the cnxml
-        obj.editMetadata()
+        if meta.has_key('propertіes'):
+            props = meta['properties']
+            obj.updateProperties(props)
+            # Make sure the metadata gets into the cnxml
+            obj.editMetadata()
 
         if merge:
             if text:
