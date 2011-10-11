@@ -458,7 +458,9 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             obj.updateProperties(props)
             # Make sure the metadata gets into the cnxml
             obj.editMetadata()
-
+        elif meta.has_key('featured_links'):
+            for link in meta.get('featured_links'):
+                obj.doAddLink(link)
         if merge:
             if text:
                 # Replace index.cnxml

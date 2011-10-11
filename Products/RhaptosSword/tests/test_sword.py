@@ -1410,6 +1410,41 @@ class TestSwordService(PloneTestCase.PloneTestCase):
             module.keywords, ('keyword 1', 'keyword 2'), 'Keywords set incorrectly.')
     
 
+    def test_one_featured_link(self):
+        self._setupRhaptos()
+        self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        uploadrequest = self.createUploadRequest(
+            'one_featured_link.txt',
+            context=self.portal.workspace,
+            CONTENT_TYPE='multipart/related; boundary="===============1338623209=="'
+        )
+        # Call the sword view on this request to perform the upload
+        adapter = getMultiAdapter(
+                (self.portal.workspace, uploadrequest), Interface, 'sword')
+        xml = adapter()
+        drdom = parseString(xml)
+        module = self.folder.workspace.objectValues()[0]
+        links = module.getLinks()
+        assert len(links) == 1, 'Links where not created correctly'
+        link = links[0]
+        self.assertEqual(
+            link.title,
+            'Test feature link',
+            'Link title incorrect')
+        self.assertEqual(
+            link.category,
+            'example',
+            'Link category incorrect')
+        self.assertEqual(
+            link.target,
+            'http://localhost:8080/featured_module',
+            'Link target incorrect')
+        self.assertEqual(
+            link.source,
+            'http://nohost/plone/workspace/%s' %module.id,
+            'Link source incorrect')
+
+
     def _createModule(self, context, filename):
         """ Utility method to setup the environment and create a module.
         """
