@@ -1,0 +1,47 @@
+Content-Type: multipart/related; boundary="===============1338623209=="
+MIME-Version: 1.0
+
+--===============1338623209==
+Content-Type: application/atom+xml
+MIME-Version: 1.0
+Content-Disposition: attachment; name=atom
+
+<?xml version="1.0"?>
+<entry xmlns="http://www.w3.org/2005/Atom"
+       xmlns:dcterms="http://purl.org/dc/terms/">
+    <title>My Module with featured links</title>
+    <id>urn:uuid:1225c695-cfb8-4ebb-aaaa-80da344efa6a</id>
+    <updated>2005-10-07T17:17:08Z</updated>
+    <author><name>user1</name></author>
+    <summary type="text">The abstract</summary>
+    <license>http://creativecommons.org/licenses/by/3.0/</license>
+    <descriptionOfChanges>Link it!</descriptionOfChanges>
+</entry>
+
+--===============1338623209==
+Content-Type: application/zip
+MIME-Version: 1.0
+Content-Disposition: attachment; name=payload; filename=payload.zip
+Content-Transfer-Encoding: base64
+
+UEsDBBQAAAAIAOqjSz9tMbcXnwMAAF0KAAAoAAAAbW9kdWxlLTIwMTEtMTAtMTEtODE0MDIyODY3
+NC9pbmRleC5jbnhtbK1WbW/bNhD+7l9x1T4UyGZRspc1MRR1Q9cWBZoMyDzso0FLZ5srRTokZcf7
+9TtSL5Y7Z+iaGn7hkc+98u6xstePlYQdGiu0uonSOIle56Os1EVdoXJAp8reRBvntjPGCvUYG1Fg
+jGXthUpGDWJWledBVXnELMWyB9HaIW3HdhUrdKy30yP2+328n8barFl6fX3FbrnbhK/bjx344bzP
+h0oynwgICkrhPoIQ6rjPMolfRVDpspY47jD5aJQ54STmrspYsxplFTpecse/JMsR9C8vD91dknmA
+7MV4DH/+cn/34e79C5hvEF529l+CxcIRGoQFg7wEreQhhl81KO0AS+FgiVLv487Lmw1Xa7TgNDiy
+1Afa21Fh3+raFAh7IWWwtKQtvsMyhvE4xFSVM4NbbYXT5pC3yUldcLnR1s2ukquE0SGyQitHHZGx
+U43WRntK5cypmgE02GpBx/r2QnvS1iq/uCDti4sA6PY6D1QWh2U+SdKUpQlLU0gvZ+l0dvljfPXT
+FN7fzr+fNI5bZJ/eTtgnFK9fXQ4UO2SryAvK0Oah4l7eUkBU2dqi8V1jxF+fory9D3++EsY6xSvM
+7+koWDxuDXC2NmHrd6dXSzTrgOw2h/ZqKXtzcILujwZwrLiQuY/q53q7MlR9e7AOKxsXOv6bB70G
+02TE+pRCwuwk41A4LXGQvhfBHbZ4E/HabbSJgrOmclriWST5U44++EVoSQOl7FnLvdCH14ARaiOP
+U+mvXuyw0FWllQ3s0eIsWx7YNE6Ialg/je+0oUlZaVPxMDX07swafKiFQc+CFgjh7x3oh3hDrEQR
+8D/QuCEMAmnHrhtSvtQ7HAabA8pgsp/jMxE0ghNq3QVRAslGLOujUz/cf9x/nB1Z581vd/O3d/MF
+7XbDuvCWvyOqWhQ0wosNEQuaTmO/QYNDLc893uyOyxpha/ROlN51SKLlk+GsU74n+RwZhS+tM9RM
+edNVndRdHDFXzdeYowrnvfx8jgyxfluOpBBbPVqvqL1quo+xFOqTfSLgU9CzqT1Y+b+8ToF5vfHa
+6HrbThc+8mor8chZHnEyPp/xfpfIovmvHP7DAdCdolq7zU00jfI5WgctPAScMf/9tZ4WyeQpZ5Mo
+f9eCgyNIJs/1NX3KV/ovX9Ohr2bdlPibtcJ/dvBXtELGPu/ZrJ3fEPKWGx6ek0oaZKKIqm+PkM0H
+4izj2mcloCc2B4E12lFnXt376E3Sunt2zEf/AFBLAQIUABQAAAAIAOqjSz9tMbcXnwMAAF0KAAAo
+AAAAAAAAAAAAAAAAAAAAAABtb2R1bGUtMjAxMS0xMC0xMS04MTQwMjI4Njc0L2luZGV4LmNueG1s
+UEsFBgAAAAABAAEAVgAAAOUDAAAAAA==
+--===============1338623209==--

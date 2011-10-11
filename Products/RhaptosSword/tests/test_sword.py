@@ -1445,6 +1445,148 @@ class TestSwordService(PloneTestCase.PloneTestCase):
             'Link source incorrect')
 
 
+    def test_multiple_featured_links(self):
+        self._setupRhaptos()
+        self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        uploadrequest = self.createUploadRequest(
+            'multiple_links_one_category.txt',
+            context=self.portal.workspace,
+            CONTENT_TYPE='multipart/related; boundary="===============1338623209=="'
+        )
+        # Call the sword view on this request to perform the upload
+        adapter = getMultiAdapter(
+                (self.portal.workspace, uploadrequest), Interface, 'sword')
+        xml = adapter()
+        drdom = parseString(xml)
+        module = self.folder.workspace.objectValues()[0]
+        links = module.getLinks()
+        assert len(links) == 3, 'All 3 links were not created.'
+        
+        link_reference_data = \
+            [{'title': 'Test feature link',
+              'category': 'example',
+              'target': 'http://localhost:8080/featured_module',
+              'source': 'http://nohost/plone/workspace/%s',
+             },
+             {'title': 'Featured link 02',
+              'category': 'example',
+              'target': 'http://localhost:8080/featured_module_02',
+              'source': 'http://nohost/plone/workspace/%s',
+             },
+             {'title': 'Featured link 03',
+              'category': 'example',
+              'target': 'http://localhost:8080/featured_module_03',
+              'source': 'http://nohost/plone/workspace/%s',
+             },
+            ]
+        
+        for idx in range(0,3):
+            link = links[idx]
+            ref_data = link_reference_data[idx]
+            self.assertEqual(
+                link.title,
+                ref_data['title'],
+                'Link "%s" title incorrect' %idx)
+            self.assertEqual(
+                link.category,
+                ref_data['category'],
+                'Link "%s" category incorrect' %idx)
+            self.assertEqual(
+                link.target,
+                ref_data['target'],
+                'Link "%s" target incorrect' %idx)
+            self.assertEqual(
+                link.source,
+                ref_data['source'] %module.id,
+                'Link "%s" source incorrect' %idx)
+
+
+    def test_multiple_featured_links_different_categories(self):
+        self._setupRhaptos()
+        self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        uploadrequest = self.createUploadRequest(
+            'multiple_links_different_categories.txt',
+            context=self.portal.workspace,
+            CONTENT_TYPE='multipart/related; boundary="===============1338623209=="'
+        )
+        # Call the sword view on this request to perform the upload
+        adapter = getMultiAdapter(
+                (self.portal.workspace, uploadrequest), Interface, 'sword')
+        xml = adapter()
+        drdom = parseString(xml)
+        module = self.folder.workspace.objectValues()[0]
+        links = module.getLinks()
+        assert len(links) == 9, 'All 9 links were not created.'
+        
+        link_reference_data = \
+            [{'title': 'Supplemental featured link 01',
+              'category': 'supplemental',
+              'target': 'http://localhost:8080/featured_module_supplemental_01',
+              'source': 'http://nohost/plone/workspace/%s',
+             },
+             {'title': 'Supplemental featured link 02',
+              'category': 'supplemental',
+              'target': 'http://localhost:8080/featured_module_supplemental_02',
+              'source': 'http://nohost/plone/workspace/%s',
+             },
+             {'title': 'Supplemental featured link 03',
+              'category': 'supplemental',
+              'target': 'http://localhost:8080/featured_module_supplemental_03',
+              'source': 'http://nohost/plone/workspace/%s',
+             },
+             {'title': 'Test feature link',
+              'category': 'example',
+              'target': 'http://localhost:8080/featured_module',
+              'source': 'http://nohost/plone/workspace/%s',
+             },
+             {'title': 'Featured link 02',
+              'category': 'example',
+              'target': 'http://localhost:8080/featured_module_02',
+              'source': 'http://nohost/plone/workspace/%s',
+             },
+             {'title': 'Featured link 03',
+              'category': 'example',
+              'target': 'http://localhost:8080/featured_module_03',
+              'source': 'http://nohost/plone/workspace/%s',
+             },
+             {'title': 'Prerequisite featured link 01',
+              'category': 'prerequisite',
+              'target': 'http://localhost:8080/featured_module_prereq_01',
+              'source': 'http://nohost/plone/workspace/%s',
+             },
+             {'title': 'Prerequisite featured link 02',
+              'category': 'prerequisite',
+              'target': 'http://localhost:8080/featured_module_prereq_02',
+              'source': 'http://nohost/plone/workspace/%s',
+             },
+             {'title': 'Prerequisite featured link 03',
+              'category': 'prerequisite',
+              'target': 'http://localhost:8080/featured_module_prereq_03',
+              'source': 'http://nohost/plone/workspace/%s',
+             },
+            ]
+        
+        for idx in range(0,9):
+            link = links[idx]
+            ref_data = link_reference_data[idx]
+            self.assertEqual(
+                link.title,
+                ref_data['title'],
+                'Link "%s" title incorrect' %idx)
+            self.assertEqual(
+                link.category,
+                ref_data['category'],
+                'Link "%s" category incorrect' %idx)
+            self.assertEqual(
+                link.target,
+                ref_data['target'],
+                'Link "%s" target incorrect' %idx)
+            self.assertEqual(
+                link.source,
+                ref_data['source'] %module.id,
+                'Link "%s" source incorrect' %idx)
+
+
     def _createModule(self, context, filename):
         """ Utility method to setup the environment and create a module.
         """
