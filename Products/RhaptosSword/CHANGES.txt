@@ -1,6 +1,3 @@
-RhaptosSword-2.1
-  - Import featured links if they are in our metadata.
-
 RhaptosSword-2.0
   - Use rhaptos.swordservice.plone to provide the sword functionality
   - Support sword version 2.0
