@@ -2,6 +2,7 @@
 <atom:feed xmlns:sword="http://purl.org/net/sword/terms/" 
       xmlns:atom="http://www.w3.org/2005/Atom"
       xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
       tal:define="context nocall:view/context;
                   treatment view/treatment">
 
@@ -19,17 +20,23 @@
             tal:attributes="href entry/absolute_url"
         />
     </atom:entry>
-
+    
+    <metal:treatment define-macro="treatment">
     <sword:treatment>
         <tal:actions replace="treatment/actions" />
-        <tal:preview_link replace="treatment/preview_link" />
-        <tal:description_of_changes replace="treatment/description_of_changes" />
+        <tal:preview_link replace="structure treatment/preview_link" />
+        <tal:description_of_changes tal:condition="treatment/description_of_changes|nothing">
+        The current description of the changes you have made for this version of the module: <tal:block tal:replace="structure treatment/description_of_changes"/>
+        </tal:description_of_changes>
+
         <tal:publication_requirements condition="treatment/publication_requirements">
-            Publication requirements:\n
-            <tal:requirements repeat="requirement treatment/publication_requirements">
-                <tal:requirement replace="string:${repeat/requirement/number}. ${requirement}" />
-            </tal:requirements>
+        Before publishing:
+
+        <tal:requirements repeat="requirement treatment/publication_requirements">
+            <tal:requirement replace="structure string:${repeat/requirement/number}. ${requirement}" />
+        </tal:requirements>
         </tal:publication_requirements>
     </sword:treatment>
+    </metal:treatment>
 
 </atom:feed>

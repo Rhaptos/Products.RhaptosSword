@@ -35,7 +35,7 @@ PREVIEW_MSG = \
 """You can <a href="%s/module_view">preview your module here</a> to see what it will look like once it is published."""
 
 ACTIONS_MSG = \
-"""Module '%s' was imported via the SWORD API."""
+"""Module '%s' was imported."""
 
 DESCRIPTION_OF_CHANGES = \
 """The current description of the changes you have made for this version of the module: "%s" """
@@ -44,8 +44,7 @@ AUTHOR_AGREEMENT = \
 """Author (%s, account:%s), will need to <a href="%s/module_publish">sign the license here.</a>"""
 
 COLABORATION_WARNING = \
-"""You cannot publish with pending role requests. Contributor, %s (account:%s),
-must <a href="%s/collaborations?user=%s">agree to thw pending requests</a>."""
+"""Contributor, %s (account:%s, email:%s), must <a href="%s/collaborations?user=%s">agree to be associated with this module</a>."""
          
 DESCRIPTION_CHANGES_WARNING = \
 """You must <a href="%s">describe the changes that you have made to this version</a> before publishing."""
@@ -176,8 +175,9 @@ class SWORDTreatmentMixin(object):
             user = self.pmt.getMemberById(user_id)
             if user:
                 fullname = user.getProperty('fullname')
+                email = user.getProperty('email')
                 return COLABORATION_WARNING % \
-                    (fullname, user_id, context.absolute_url(), user_id)
+                    (fullname, user_id, email, context.absolute_url(), user_id)
             return ''
 
         encoding = self.getEncoding() 

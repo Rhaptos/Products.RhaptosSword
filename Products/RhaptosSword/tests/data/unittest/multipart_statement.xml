@@ -40,13 +40,14 @@
     </atom:entry>
 
     <sword:treatment>
-        Module 'My Title' was imported via the SWORD API.
-        You can &lt;a href=&quot;http://nohost/plone/workspace/__MODULE_ID__/module_view&quot;&gt;preview your module here&lt;/a&gt; to see what it will look like once it is published.
-        Frobnicate the Bar
+        Module 'My Title' was imported.
+        You can <a href="http://nohost/plone/workspace/__MODULE_ID__/module_view">preview your module here</a> to see what it will look like once it is published.
         
-            Publication requirements:\n
-            
-                1. Author (, account:test_user_1_), will need to &lt;a href=&quot;http://nohost/plone/workspace/__MODULE_ID__/module_publish&quot;&gt;sign the license here.&lt;/a&gt;
+        The current description of the changes you have made for this version of the module: Frobnicate the Bar
+        
+        Before publishing:
+        
+            1. Author (, account:test_user_1_), will need to <a href="http://nohost/plone/workspace/__MODULE_ID__/module_publish">sign the license here.</a>
             
         
     </sword:treatment>
