@@ -32,7 +32,8 @@
     <dcterms:language xsi:type="ISO639-1">en</dcterms:language> 
 
     <dcterms:license xsi:type="dcterms:URI"/>
-
+    
+    
     <sword:treatment>
         Module 'My Title' was imported.
         You can <a href="http://nohost/plone/workspace/__MODULE_ID__/module_view">preview your module here</a> to see what it will look like once it is published.
@@ -42,6 +43,7 @@
 
         
         Before publishing:
+
         
             1. Author (, account:test_user_1_), will need to <a href="http://nohost/plone/workspace/__MODULE_ID__/module_publish">sign the license here.</a>
         
@@ -58,6 +60,7 @@ NOTE: Due to an increase of spam on our site:
         
         
     </sword:treatment>
+    
 
     
     <!-- For all UNPUBLISHED modules -->

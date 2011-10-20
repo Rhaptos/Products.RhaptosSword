@@ -56,7 +56,8 @@
 
         
         Before publishing:
-             
+
+        
             1. Author (, account:test_user_1_), will need to <a href="http://nohost/plone/workspace/__MODULE_ID__/module_publish">sign the license here.</a>
         
         
@@ -68,12 +69,13 @@ NOTE: Due to an increase of spam on our site:
 <li>Once your content is accepted and published, subsequent publishes will not have to be held.</li>
 <li>We appreciate your patience with this policy.</li>
 </ul>
-    
-    
+
+        
+        
     </sword:treatment>
     
 
-
+    
     <!-- For all UNPUBLISHED modules -->
 
     <link href="http://nohost/plone/workspace/__MODULE_ID__/module_view?format=html" rel="alternate"/>

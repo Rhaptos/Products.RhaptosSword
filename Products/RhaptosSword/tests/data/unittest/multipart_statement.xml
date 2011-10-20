@@ -38,18 +38,23 @@
     <atom:entry>
         <link href="http://nohost/plone/workspace/__MODULE_ID__/h_notch.png" rel="edit-media"/>
     </atom:entry>
-
+    
+    
     <sword:treatment>
         Module 'My Title' was imported.
         You can <a href="http://nohost/plone/workspace/__MODULE_ID__/module_view">preview your module here</a> to see what it will look like once it is published.
         
         The current description of the changes you have made for this version of the module: Frobnicate the Bar
         
+
+        
         Before publishing:
+
         
             1. Author (, account:test_user_1_), will need to <a href="http://nohost/plone/workspace/__MODULE_ID__/module_publish">sign the license here.</a>
-            
+        
         
     </sword:treatment>
+    
 
 </atom:feed>
