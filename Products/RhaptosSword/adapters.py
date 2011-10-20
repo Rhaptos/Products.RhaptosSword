@@ -330,7 +330,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             SWORD V2 Spec for Publishing Modules in Connexions
             Section: Metadata
         """
-        self.update_semantics = 'update'
+        self.update_semantics = 'merge'
         metadata = {}
         metadata.update(self.getMetadata(dom, METADATA_MAPPING))
         for oerdc_name, cnx_name in METADATA_MAPPING.items():
@@ -625,14 +625,14 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             else:
                 updateRoles.update(domRoles)
 
-        if self.update_semantics == 'merge':
+        elif self.update_semantics == 'merge':
             updateRoles.update(moduleRoles)
             for role, userids in domRoles.items():
                 userids = set(userids)
                 userids.union(updateRoles.get(role, []))
                 updateRoles[role] = list(userids)
 
-        if self.update_semantics == 'replace':
+        elif self.update_semantics == 'replace':
             currentUsers = set()
             for userids in moduleRoles.values():
                 currentUsers.update(userids)
