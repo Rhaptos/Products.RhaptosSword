@@ -103,6 +103,28 @@ class StubDataObject(object):
         except AttributeError:
             raise KeyError, k
 
+def makeStubFromVersionData(id, data):
+    return StubDataObject(ident=1,
+        name='Published Module %s' % id,
+        abstract = 'The Abstract',
+        roles = {},
+        authors = data[5],
+        language = 'en',
+        version = data[0],
+        created = data[1],
+        revised = data[2],
+        maintainers = data[5],
+        licensors = data[5],
+        submitter = data[3],
+        portal_type = 'Module',
+        license = 'http://creativecommons.org/licenses/by/3.0/',
+        keywords = ('Test', 'Module'),
+        subject = ('Arts',),
+        parent_id = None,
+        parent_version = None,
+        parentAuthors = [],
+    )
+
 
 class StubModuleDB(SimpleItem):
 
@@ -142,25 +164,12 @@ class StubModuleDB(SimpleItem):
 
     def sqlGetLatestModule(self, id):
         data = self.versions[id]
-        ob = StubDataObject(ident=1,
-            name='Published Module %s' % id,
-            abstract = 'The Abstract',
-            roles = {},
-            authors = data[5],
-            language = 'en',
-            version = data[0],
-            created = data[1],
-            revised = data[2],
-            maintainers = data[5],
-            licensors = data[5],
-            submitter = data[3],
-            portal_type = 'Module',
-            license = 'http://creativecommons.org/licenses/by/3.0/',
-            subject = ('Test', 'Module'),
-            parent_id = None,
-            parent_version = None,
-            parentAuthors = None,
-        )
+        ob = makeStubFromVersionData(id, data)
+        return (ob,)
+
+    def sqlGetModule(self, id, version):
+        data = self.versions[id]
+        ob = makeStubFromVersionData(id, data)
         return (ob,)
 
     def sqlGetModuleFilenames(self, id, version):
@@ -184,7 +193,11 @@ class StubModuleStorage(ModuleVersionStorage):
     __implements__ = (IVersionStorage)
 
     def getHistory(self, id):
-        return self.portal_moduledb.versions.get(id, ())
+        result = []
+        for moduleid, data in self.portal_moduledb.versions.items():
+            result.append(makeStubFromVersionData(moduleid, data))
+            
+        return result
 
     def generateId(self):
         repo = self.aq_parent
@@ -884,6 +897,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
 
 
     def testDeriveModule(self):
+        self.setPermissions(['Manage WebDAV Locks'], role='Member')
         self.testUploadAndPublish()
         filename = 'derive_module.xml'
         file = open(os.path.join(DIRNAME, 'data', 'unittest', filename), 'r')
@@ -893,7 +907,9 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         source = dom.getElementsByTagName('dcterms:source')[0]
         source.firstChild.nodeValue = module.id
         uploadrequest = self.createUploadRequest(
-            None, self.folder.workspace, content = dom.toxml())
+            None, self.folder.workspace, content = dom.toxml(),
+            IN_PROGRESS='true'
+            )
         adapter = getMultiAdapter(
                 (self.folder.workspace, uploadrequest), Interface, 'sword')
         xml = adapter()
@@ -977,6 +993,58 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.assertEqual(description_of_changes, '\n        Frobnicate the Bar - second time.\n    ',
             'descriptionOfChanges was not updated')
         self.assertEqual(analyticsCode, '', 'analyticsCode was not updated')
+
+
+    def test_handlePost(self):
+        self._setupRhaptos()
+        self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        filename = 'entry.xml'
+        module = self._createModule(self.portal.workspace, filename)
+
+        # POST the same entry to make sure nothing is lost
+        uploadrequest = self.createUploadRequest(
+            'entry.xml',
+            module,
+            REQUEST_METHOD = 'POST',
+            )
+        adapter = getMultiAdapter(
+                (module, uploadrequest), Interface, 'sword')
+        xml = adapter()
+        dom = parseString(xml)
+
+        returned_depositreceipt = dom.toxml()
+
+        file = open(os.path.join(
+            DIRNAME, 'data', 'unittest', 'entry_depositreceipt.xml'), 'r')
+        dom = parse(file)
+        file.close()
+
+        module = self.portal.workspace.objectValues()[0]
+        self.assertEqual(module.message, 'Created module')
+        mid = dom.getElementsByTagName('id')
+        for element in mid:
+            element.firstChild.nodeValue = module.id
+        dates = dom.getElementsByTagName('updated')
+        dates[0].firstChild.nodeValue = module.revised
+        created = dom.getElementsByTagName('dcterms:created')
+        for element in created:
+            element.firstChild.nodeValue = module.created
+        modified = dom.getElementsByTagName('dcterms:modified')
+        for element in modified:
+            element.firstChild.nodeValue = module.revised
+        identifiers = dom.getElementsByTagName('dcterms:identifier')
+        for identifier in identifiers:
+            if identifier.getAttribute('xsi:type') == "dcterms:URI":
+                identifier.firstChild.nodeValue = module.absolute_url()
+
+        reference_depositreceipt = dom.toxml()
+        reference_depositreceipt = reference_depositreceipt.replace('__MODULE_ID__', module.id)
+
+        assert bool(xml), "Upload view does not return a result"
+        assert "<sword:error" not in xml, xml
+        self.assertEqual(returned_depositreceipt, reference_depositreceipt,
+            'Result does not match reference doc: \n\n%s' % diff(
+                returned_depositreceipt, reference_depositreceipt))
 
     
     def test_addRoles(self):
