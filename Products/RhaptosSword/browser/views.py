@@ -327,6 +327,57 @@ class EditIRI(BaseEditIRI, SWORDTreatmentMixin, Explicit):
                 "<br />\n".join(requirements))
 
 
+    def _handlePost(self):
+        """ A POST fo the Edit-IRI can do one of two things. You can either add
+            more metadata by posting an atom entry, you can add more data and
+            metadata with a multipart post, or you can publish the module with
+            an empty request and In-Progress set to false.
+        """
+        context = aq_inner(self.context)
+        content_type = self.request.get_header('Content-Type', '')
+        content_type = getContentType(content_type)
+
+        if content_type in ATOMPUB_CONTENT_TYPES:
+            # Apply more metadata to the item
+            adapter = getMultiAdapter(
+                (context.aq_parent, self.request), IRhaptosWorkspaceSwordAdapter)
+
+            body = self.request.get('BODYFILE')
+            body.seek(0)
+            if context.state == 'published':
+                context.checkout(self.context.objectId)
+            adapter.updateMetadata(context, parse(body))
+        elif content_type.startswith('multipart/'):
+            checkUploadSize(context, self.request.stdin)
+            atom_dom, payload, payload_type = splitMultipartRequest(self.request)
+
+            cksum = self.request.get_header('Content-MD5')
+            merge = self.request.get_header('Update-Semantics')
+            if context.state == 'published':
+                context.checkout(self.context.objectId)
+            adapter.updateMetadata(context, atom_dom)
+            adapter.updateContent(context, StringIO(payload), payload_type,
+                cksum, merge == 'http://purl.org/oerpub/semantics/Merge')
+            context.logAction(adapter.action)
+        elif content_type:
+            # A content type is provided, and its not atom+xml or multipart
+            raise BadRequest(
+                "You cannot POST content of type %s to the SE-IRI" % content_type)
+
+        # If In-Progress is set to false or omitted, try to publish
+        in_progress = self.request.get_header('In-Progress', 'false')
+        if in_progress == 'false':
+            self._handlePublish()
+            # We SHOULD return a deposit receipt, status code 200, and the
+            # Edit-IRI in the Location header.
+            self.request.response.setHeader('Location',
+                '%s/sword' % context.absolute_url())
+            self.request.response.setStatus(200)
+
+        view = context.unrestrictedTraverse('@@sword')
+        return view._handleGet()
+
+
     def _handlePut(self):
         """ PUT against an existing item should update it.
         """

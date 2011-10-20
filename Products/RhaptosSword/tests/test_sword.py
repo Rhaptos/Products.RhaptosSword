@@ -590,7 +590,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         emptyrequest = self.createUploadRequest(
             None,
             context=self.portal.workspace,
-            CONTENT_TYPE='text/plain',
+            CONTENT_TYPE='',
             IN_PROGRESS='false',
         )
         self.setRoles(('Member','Manager'))
