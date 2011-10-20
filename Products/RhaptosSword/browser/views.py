@@ -370,6 +370,8 @@ class EditIRI(BaseEditIRI, SWORDTreatmentMixin, Explicit):
 
         view = context.unrestrictedTraverse('@@sword')
         return view._handleGet()
+
+
     def _handlePut(self):
         """ PUT against an existing item should update it.
         """
