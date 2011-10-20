@@ -38,19 +38,19 @@
         Module '(Untitled)' was imported.
         You can <a href="http://nohost/plone/workspace/__MODULE_ID__/module_view">preview your module here</a> to see what it will look like once it is published.
         
-        The current description of the changes you have made for this version of the module: Created module
+        
+        The current description of the changes you have made for this version of the module: Created module<br/>
         
 
-        
-        Before publishing:
+        Before publishing:<br/>
 
         
-            1. Author (, account:test_user_1_), will need to <a href="http://nohost/plone/workspace/__MODULE_ID__/module_publish">sign the license here.</a>
+            * Author (, account:test_user_1_), will need to <a href="http://nohost/plone/workspace/__MODULE_ID__/module_publish">sign the license here.</a><br/>
         
         
-            2. PUBLISH BLOCKED: This object has an invalid title. You will not be able to
+            * PUBLISH BLOCKED: This object has an invalid title. You will not be able to
 publish until you enter a title on the <a href="http://nohost/plone/workspace/__MODULE_ID__/module_metadata">metadata
-page</a>.
+page</a>.<br/>
         
         
     </sword:treatment>

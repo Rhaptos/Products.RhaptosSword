@@ -38,17 +38,17 @@
         Module 'My Title' was imported.
         You can <a href="http://nohost/plone/workspace/__MODULE_ID__/module_view">preview your module here</a> to see what it will look like once it is published.
         
-        The current description of the changes you have made for this version of the module: Frobnicate the Bar
+        
+        The current description of the changes you have made for this version of the module: Frobnicate the Bar<br/>
         
 
-        
-        Before publishing:
+        Before publishing:<br/>
 
         
-            1. Author (, account:test_user_1_), will need to <a href="http://nohost/plone/workspace/__MODULE_ID__/module_publish">sign the license here.</a>
+            * Author (, account:test_user_1_), will need to <a href="http://nohost/plone/workspace/__MODULE_ID__/module_publish">sign the license here.</a><br/>
         
         
-            2. 
+            * 
 This item will be submitted for publication.<br/>
 NOTE: Due to an increase of spam on our site:
 <ul>
@@ -56,7 +56,7 @@ NOTE: Due to an increase of spam on our site:
 <li>Once your content is accepted and published, subsequent publishes will not have to be held.</li>
 <li>We appreciate your patience with this policy.</li>
 </ul>
-
+<br/>
         
         
     </sword:treatment>
