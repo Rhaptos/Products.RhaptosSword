@@ -1047,6 +1047,29 @@ class TestSwordService(PloneTestCase.PloneTestCase):
                 returned_depositreceipt, reference_depositreceipt))
 
     
+    def test_POSTMultipartOnSEIRI(self):
+        self._setupRhaptos()
+        self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        module = self._createModule(self.portal.workspace, 'entry.xml')
+
+        # try publish on Post with In-Progress set to false
+        uploadrequest = self.createUploadRequest(
+            'multipart.txt',
+            module,
+            REQUEST_METHOD = 'POST',
+            IN_PROGRESS = 'true',
+            CONTENT_TYPE='multipart/related; boundary="===============1338623209=="'
+            )
+        adapter = getMultiAdapter(
+                (module, uploadrequest), Interface, 'sword')
+        xml = adapter()
+
+        # Rudimentary tests. This will return the usual Deposit Receipt that
+        # is already tested elsewhere.
+        self.assertTrue("<sword:error" not in xml, xml)
+        self.assertTrue("<entry" in xml, "Not a valid deposit receipt")
+
+
     def test_addRoles(self):
         self._setupRhaptos()
         self.setRoles(('Manager',))
