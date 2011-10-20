@@ -335,13 +335,17 @@ class EditIRI(BaseEditIRI, SWORDTreatmentMixin, Explicit):
         """
         context = aq_inner(self.context)
         content_type = self.request.get_header('Content-Type', '')
-        if content_type.startswith('application/atom+xml'):
+        content_type = getContentType(content_type)
+
+        if content_type in ATOMPUB_CONTENT_TYPES:
             # Apply more metadata to the item
             adapter = getMultiAdapter(
                 (context.aq_parent, self.request), IRhaptosWorkspaceSwordAdapter)
 
             body = self.request.get('BODYFILE')
             body.seek(0)
+            if context.state == 'published':
+                context.checkout(self.context.objectId)
             adapter.updateMetadata(context, parse(body))
         elif content_type.startswith('multipart/'):
             checkUploadSize(context, self.request.stdin)
@@ -349,6 +353,8 @@ class EditIRI(BaseEditIRI, SWORDTreatmentMixin, Explicit):
 
             cksum = self.request.get_header('Content-MD5')
             merge = self.request.get_header('Update-Semantics')
+            if context.state == 'published':
+                context.checkout(self.context.objectId)
             adapter.updateMetadata(context, atom_dom)
             adapter.updateContent(context, StringIO(payload), payload_type,
                 cksum, merge == 'http://purl.org/oerpub/semantics/Merge')
