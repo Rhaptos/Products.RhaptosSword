@@ -353,8 +353,12 @@ class EditIRI(BaseEditIRI, SWORDTreatmentMixin, Explicit):
 
             cksum = self.request.get_header('Content-MD5')
             merge = self.request.get_header('Update-Semantics')
+            adapter = getMultiAdapter(
+                (context.aq_parent, self.request), IRhaptosWorkspaceSwordAdapter)
+
             if context.state == 'published':
                 context.checkout(self.context.objectId)
+
             adapter.updateMetadata(context, atom_dom)
             adapter.updateContent(context, StringIO(payload), payload_type,
                 cksum, merge == 'http://purl.org/oerpub/semantics/Merge')
