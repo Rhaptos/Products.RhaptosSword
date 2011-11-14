@@ -682,32 +682,38 @@ class ContentSelectionLensEditIRI(EditIRI):
             dom = parse(self.request.get('BODYFILE'))
             path = lens.getPhysicalPath()
             contentId = version = contentURI = ''
+            module = None
             for element in dom.getElementsByTagNameNS(DCTERMS_NAMESPACE, 'identifier'):
                 value = element.firstChild.toxml().strip().encode(encoding) 
                 attribute = element.getAttribute('xsi:type').encode(encoding)
                 if attribute == 'dcterms:URI':
                     contentURI = value
-                elif attribute == 'oerdc:Version':
-                    # if we're not told what version, we pick the latest
-                    if value == 'latest' or value == '' or value is None:
-                        module = content_tool.getRhaptosObject(contentId)
-                        version = module.latest.version
-                    else:
-                        version = value
                 elif attribute == 'oerdc:ContentId':
                     contentId = value
-            namespaceTags = []
-            tags = ''
-            comment = 'Added SWORD API'
-            lens.lensAdd(
-                lensPath=path, 
-                contentId=contentId, 
-                version=version, 
-                namespaceTags=namespaceTags, 
-                tags=tags,
-                comment=comment,
-            )            
-        return lens
+                elif attribute == 'oerdc:Version':
+                    version = value
+
+            if contentId:
+                module = content_tool.getRhaptosObject(contentId)
+                if module:
+                    # if we're not told what version, we pick the latest
+                    if version == 'latest' or version == '' or version is None:
+                        version = module.latest.version
+                    namespaceTags = []
+                    tags = ''
+                    comment = 'Added via SWORD API'
+                    lens.lensAdd(
+                        lensPath=path, 
+                        contentId=contentId, 
+                        version=version, 
+                        namespaceTags=namespaceTags, 
+                        tags=tags,
+                        comment=comment,
+                    )            
+                    return lens
+            else:
+                # actually we should raise and error and use the decorators
+                return None
 
     def _handlePut(self):
         raise NotImplementedError(

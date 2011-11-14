@@ -42,7 +42,7 @@
     <adapter
         for="Products.RhaptosSword.interfaces.IRhaptosSwordContentSelectionLens
              zope.publisher.interfaces.http.IHTTPRequest"
-        provides="rhaptos.swordservice.plone.interfaces.ISWORDContentUploadAdapter"
+        provides="rhaptos.swordservice.plone.interfaces.ISWORDEditIRI"
         factory=".views.ContentSelectionLensEditIRI" />
 
     <adapter
