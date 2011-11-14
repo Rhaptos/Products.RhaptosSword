@@ -48,12 +48,15 @@ ZopeTestCase.installProduct('RhaptosRepository')
 ZopeTestCase.installProduct('CNXMLDocument')
 ZopeTestCase.installProduct('UniFile')
 ZopeTestCase.installProduct('RhaptosCollaborationTool')
+ZopeTestCase.installProduct('ZAnnot')
+ZopeTestCase.installProduct('RhaptosCollection')
 
 #PloneTestCase.setupPloneSite()
 PloneTestCase.setupPloneSite(products=['RhaptosSword'],
     extension_profiles=[
         'Products.RhaptosContent:default',
         'Products.RhaptosModuleEditor:default',
+        'Products.RhaptosCollection:default',
         'Products.CNXMLDocument:default',
         'Products.CNXMLTransforms:default',
         'Products.UniFile:default',
@@ -1676,6 +1679,33 @@ class TestSwordService(PloneTestCase.PloneTestCase):
                 link.source,
                 ref_data['source'] %module.id,
                 'Link "%s" source incorrect' %idx)
+   
+
+    def testDeriveCollection(self):
+        self._setupRhaptos()
+        self.setPermissions(['Manage WebDAV Locks'], role='Member')
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        col_id = 'collection001'
+        self.folder.workspace.invokeFactory('Collection', col_id)
+        col = self.folder.workspace._getOb(col_id)
+        col.setState('published')
+        col.checkout(col_id)
+        #self.testUploadAndPublish()
+        #filename = 'derive_collection.xml'
+        #file = open(os.path.join(DIRNAME, 'data', 'unittest', filename), 'r')
+        #dom = parse(file)
+        #file.close()
+        #module = self.folder.workspace.objectValues()[0]
+        #source = dom.getElementsByTagName('dcterms:source')[0]
+        #source.firstChild.nodeValue = module.id
+        #uploadrequest = self.createUploadRequest(
+        #    None, self.folder.workspace, content = dom.toxml(),
+        #    IN_PROGRESS='true'
+        #    )
+        #adapter = getMultiAdapter(
+        #        (self.folder.workspace, uploadrequest), Interface, 'sword')
+        #xml = adapter()
+        #assert "<sword:error" not in xml, xml
 
 
     def _createModule(self, context, filename):
@@ -1697,7 +1727,11 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         module_id = editIri.split('/')[-2]
         module = context._getOb(module_id)
         return module
-
+    
+    def wf(self, data):
+        file = open(os.path.join(DIRNAME, 'data', 'unittest', 'returned.xml'), 'wb')
+        file.write(data)
+        file.close()
 
 
 def test_suite():
