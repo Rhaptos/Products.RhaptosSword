@@ -21,4 +21,9 @@ class IRhaptosSwordCollection(Interface):
 class ICollabRequest(Interface):
     """ Collaboration requests should ideally be marked with an interface by
         its containing product, but to make our own code nicer, we shall mark
-        it here. """
+        it here.
+    """
+
+class IRhaptosSwordContentSelectionLens(Interface):
+    """ Mark a lense as an object that can accept an atom entry POST.
+    """
