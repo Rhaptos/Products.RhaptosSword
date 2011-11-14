@@ -25,6 +25,7 @@ from rhaptos.swordservice.plone.exceptions import BadRequest
 from Products.RhaptosSword.adapters import IRhaptosWorkspaceSwordAdapter
 from Products.RhaptosSword.adapters import getSiteEncoding
 from Products.RhaptosSword.adapters import METADATA_MAPPING
+from Products.RhaptosSword.adapters import DCTERMS_NAMESPACE
 
 from Products.RhaptosSword.exceptions import PublishUnauthorized
 from Products.RhaptosSword.utils import splitMultipartRequest, checkUploadSize
@@ -661,3 +662,114 @@ class ServiceDocument(BrowserView):
     def portal_title(self):
         """ Return the portal title. """
         return getToolByName(self.context, 'portal_url').getPortalObject().Title()
+
+
+class ContentSelectionLensEditIRI(EditIRI):
+    def _handleGet(self, **kw):
+        raise NotImplementedError(
+            'GET not implemented for %s.' %self.context.__module__)
+
+    def _handlePublish(self):
+        raise NotImplementedError(
+            'PUBLISH not implemented for %s.' %self.context.__module__)
+
+    def _handlePost(self):
+        lens = self.context
+        if not lens.isOpen():
+            # get attrs
+            encoding = self.getEncoding() 
+            content_tool = getToolByName(self.context, 'content')
+            dom = parse(self.request.get('BODYFILE'))
+            path = lens.getPhysicalPath()
+            contentId = version = contentURI = ''
+            for element in dom.getElementsByTagNameNS(DCTERMS_NAMESPACE, 'identifier'):
+                value = element.firstChild.toxml().strip().encode(encoding) 
+                attribute = element.getAttribute('xsi:type').encode(encoding)
+                if attribute == 'dcterms:URI':
+                    contentURI = value
+                elif attribute == 'oerdc:Version':
+                    # if we're not told what version, we pick the latest
+                    if value == 'latest' or value == '' or value is None:
+                        module = content_tool.getRhaptosObject(contentId)
+                        version = module.latest.version
+                    else:
+                        version = value
+                elif attribute == 'oerdc:ContentId':
+                    contentId = value
+            namespaceTags = []
+            tags = ''
+            comment = 'Added SWORD API'
+            lens.lensAdd(
+                lensPath=path, 
+                contentId=contentId, 
+                version=version, 
+                namespaceTags=namespaceTags, 
+                tags=tags,
+                comment=comment,
+            )            
+        return lens
+
+    def _handlePut(self):
+        raise NotImplementedError(
+            'PUT not implemented for %s.' %self.context.__module__)
+
+
+class CollectionEditIRI(EditIRI):
+    def _handleGet(self, **kw):
+        raise NotImplementedError(
+            'GET not implemented for %s.' %self.context.__module__)
+
+    def _handlePublish(self):
+        raise NotImplementedError(
+            'PUBLISH not implemented for %s.' %self.context.__module__)
+
+    def _handlePost(self):
+        body = self.context.request.get('BODYFILE')
+        body.seek(0)
+        dom = parse(body)
+        body.seek(0)
+        elements = dom.getElementsByTagNameNS(
+            "http://purl.org/dc/terms/", 'source')
+        collection_url = \
+            elements[0].firstChild.toxml().encode(self.getEncoding())
+        collection_id = collection_url.split('/')[-1]
+        # Fetch collection
+        content_tool = getToolByName(self.context, 'content')
+        collection = content_tool.getRhaptosObject(collection_id, 'latest')
+
+        # Fetch content and area
+        #content = self.content(collection_id, version)
+        #area = portal.restrictedTraverse(form['area_path'])
+        area = self.context.aq_inner.aq_parent
+
+        # There are going to be stale items later
+        to_delete_id = ''
+
+        # Content is not in area - create
+        to_delete_id = area.generateUniqueId()
+        area.invokeFactory(id=to_delete_id, type_name=collection.portal_type)
+        obj = area._getOb(to_delete_id)
+
+        # Content must be checked out to area before a fork is possible
+        obj.setState('published')
+        obj.checkout(collection.objectId)
+
+        # Do the fork
+        forked_collection = obj.forkContent(license=collection.getDefaultLicense(), 
+            return_context=True,
+        )
+        forked_collection.setState('created')
+
+        # For some reason setGoogleAnalyticsTrackingCode causes an
+        # Unauthorized error in forkContent. It is supressed by the 
+        # return_context parameter allowing us to set it here.
+        forked_collection.setGoogleAnalyticsTrackingCode(None)
+
+        # Delete stale item
+        if to_delete_id:
+            area.manage_delObjects(ids=[to_delete_id])
+        return forked_collection
+
+    def _handlePut(self):
+        raise NotImplementedError(
+            'PUT not implemented for %s.' %self.context.__module__)
