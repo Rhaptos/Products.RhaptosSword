@@ -39,6 +39,7 @@ from Products.RhaptosModuleStorage.ModuleVersionFolder import ModuleVersionStora
 from Products.RhaptosModuleStorage.ModuleDBTool import CommitError
 from Products.RhaptosModuleStorage.ModuleView import ModuleView
 from Products.RhaptosCollaborationTool.interfaces.portal_collaboration import portal_collaboration as ICollaborationTool
+from Products.RhaptosRepository.interfaces.IRepository import IRepository
 
 from Testing import ZopeTestCase
 ZopeTestCase.installProduct('RhaptosSword')
@@ -75,6 +76,7 @@ BAD_FILE = 'bad_entry.xml'
 GOOD_FILE = 'entry.xml'
 
 from OFS.SimpleItem import SimpleItem
+from OFS.ObjectManager import ObjectManager
 
 # Patch in a non-db version of ModuleView.getFile
 def _ModuleView_getFile(self, name):
@@ -256,6 +258,31 @@ class StubWorkspaces(SimpleItem):
     
     def __call__(self):
         return self.wgs
+
+class StubRhaptosRepository(ObjectManager):
+    __implements__ = IRepository
+
+    def __init__(self, context):
+        self.id = 'content'
+        self._all_storages = []
+        self._default_storage = None
+        self._context = context
+
+    def getRhaptosObject(self, id, version=None, **kwargs):
+        obj = self._context._getOb(id)
+        setattr(obj, 'latest', obj)
+        return obj
+    
+    def registerStorage(self, storage):
+        id = storage.getId()
+        self._setObject(id, storage)
+        self._all_storages.append(id)
+
+    def setDefaultStorage(self, id):
+        self._default_storage = id
+
+    def hasRhaptosObject(self, id):
+        return bool(self.hasObject(id))
 
 
 def clone_request(req, response=None, env=None):
@@ -658,6 +685,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         pubmod = self.portal.workspace._getOb(editorid)
         self.assertTrue(pubmod.version == "1.2",
             "Version did not increment")
+        return pubmod
 
     def testPublishOnCreate(self):
         self._setupRhaptos()
@@ -1683,29 +1711,45 @@ class TestSwordService(PloneTestCase.PloneTestCase):
 
     def testDeriveCollection(self):
         self._setupRhaptos()
-        self.setPermissions(['Manage WebDAV Locks'], role='Member')
+        self.setRoles(('Member','Manager'))
         self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+
+        # we want to use our stub instead of the normal one
+        self.portal.content = StubRhaptosRepository(self.folder.workspace)
         col_id = 'collection001'
         self.folder.workspace.invokeFactory('Collection', col_id)
         col = self.folder.workspace._getOb(col_id)
         col.setState('published')
         col.checkout(col_id)
-        #self.testUploadAndPublish()
-        #filename = 'derive_collection.xml'
-        #file = open(os.path.join(DIRNAME, 'data', 'unittest', filename), 'r')
-        #dom = parse(file)
-        #file.close()
-        #module = self.folder.workspace.objectValues()[0]
-        #source = dom.getElementsByTagName('dcterms:source')[0]
-        #source.firstChild.nodeValue = module.id
-        #uploadrequest = self.createUploadRequest(
-        #    None, self.folder.workspace, content = dom.toxml(),
-        #    IN_PROGRESS='true'
-        #    )
-        #adapter = getMultiAdapter(
-        #        (self.folder.workspace, uploadrequest), Interface, 'sword')
-        #xml = adapter()
-        #assert "<sword:error" not in xml, xml
+        filename = 'derive_collection.xml'
+        file = open(os.path.join(DIRNAME, 'data', 'unittest', filename), 'r')
+        dom = parse(file)
+        file.close()
+        source = dom.getElementsByTagName('dcterms:source')[0]
+        source.firstChild.nodeValue = \
+            '%s/%s' %(self.folder.workspace.absolute_url(), col_id)
+        uploadrequest = self.createUploadRequest(
+            None, self.folder.workspace, content = dom.toxml(),
+            IN_PROGRESS='true'
+            )
+        adapter = getMultiAdapter(
+                (col, uploadrequest), Interface, 'sword')
+        derived_collection = adapter()
+        self.assertEqual(derived_collection.Title(),
+                         'Derived copy of (Untitled)',
+                         'Derived title incorrect')
+    
+
+    def testAddToLens(self):
+        self._setupRhaptos()
+        self.setPermissions(['Manage WebDAV Locks'], role='Member')
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        lens_id = 'lens001'
+        # create the lens
+        # get a new module
+        # publish the module
+        # craft the xml to add the module to the lens
+        # add the module to the lens
 
 
     def _createModule(self, context, filename):
