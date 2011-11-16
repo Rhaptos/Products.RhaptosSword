@@ -1747,12 +1747,11 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self._testDeriveCollection(filename='derive_collection.xml')
 
     
-    def _testAddToLens(self, filename):
+    def testAddSingleModuleToLens(self):
         self._setupRhaptos()
         self.setRoles(('Member','Manager'))
         self.setPermissions(['Manage WebDAV Locks'], role='Member')
         self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
-        #self.portal.content = StubRhaptosRepository(self.folder.workspace)
 
         # get a new module
         module = self.testUploadAndPublish()
@@ -1763,16 +1762,13 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         lens = self.folder.workspace._getOb(lens_id)
 
         # craft the xml to add the module to the lens
+        filename = 'entry_add_to_lens.xml'
         file = open(os.path.join(DIRNAME, 'data', 'unittest', filename), 'r')
         dom = parse(file)
         file.close()
-        identifiers = dom.getElementsByTagName('dcterms:identifier')
-        for element in identifiers:
-            if element.getAttribute('xsi:type') == 'dcterms:URI':
-                element.firstChild.nodeValue = \
-                    '%s/%s/latest' %(self.folder.workspace.absolute_url(), module.id)
-            elif element.getAttribute('xsi:type') == 'oerdc:ContentId':
-                element.firstChild.nodeValue = module.id
+        href = '%s/%s' %(self.folder.workspace.absolute_url(), module.getId())
+        link = dom.getElementsByTagName('link')[0]
+        link.setAttribute('href', href)
         
         uploadrequest = self.createUploadRequest(
             None, self.folder.workspace, content = dom.toxml(),
@@ -1783,11 +1779,11 @@ class TestSwordService(PloneTestCase.PloneTestCase):
                 (lens, uploadrequest), Interface, 'sword')
         xml = adapter()
 
+        # assert that the module was added to the lens
+        modules = lens.listFolderContents(spec='SelectedContent')
+        self.assertEqual(len(modules), 1, 'More than one module linked.')
+
     
-    def testAddToLens_NoVersion(self):
-        self._testAddToLens('entry_add_to_lens.xml')
-
-
     def _createModule(self, context, filename):
         """ Utility method to setup the environment and create a module.
         """
