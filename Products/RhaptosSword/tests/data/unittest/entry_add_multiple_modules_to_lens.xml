@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<feed xmlns="http://www.w3.org/2005/Atom" 
+         xmlns:sword="http://purl.org/net/sword/terms/">
+    <entry>
+        <link rel="content"
+            href="http://localhost:8080/site/Members/rijk/m10000" />
+    </entry>
+
+    <entry>
+        <link rel="content"
+            href="http://localhost:8080/site/Members/rijk/m10001" />
+    </entry>
+
+</feed>

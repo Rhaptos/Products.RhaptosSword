@@ -599,7 +599,8 @@ class TestSwordService(PloneTestCase.PloneTestCase):
             See if we can publish it.
         """
         self._setupRhaptos()
-        self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        if not 'workspace' in self.portal.objectIds():
+            self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
         uploadrequest = self.createUploadRequest(
             'multipart.txt',
             context=self.portal.workspace,
@@ -1783,6 +1784,48 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         modules = lens.listFolderContents(spec='SelectedContent')
         self.assertEqual(len(modules), 1, 'More than one module linked.')
 
+
+    def testAddMultipleModulesToLens(self):
+        self._setupRhaptos()
+        self.setRoles(('Member','Manager'))
+        self.setPermissions(['Manage WebDAV Locks'], role='Member')
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        transaction.commit()
+
+        # create the lens
+        lens_id = 'lens001'
+        self.folder.workspace.invokeFactory('ContentSelectionLens', lens_id)
+        lens = self.folder.workspace._getOb(lens_id)
+
+        # craft the xml to add the module to the lens
+        filename = 'entry_add_multiple_modules_to_lens.xml'
+        file = open(os.path.join(DIRNAME, 'data', 'unittest', filename), 'r')
+        dom = parse(file)
+        file.close()
+        
+        modules = []
+        links = dom.getElementsByTagName('link')
+        context = self.folder.workspace
+        for link in links:
+            module = self._createModule(context, 'entry.xml')
+            self._publishModule(context, module)
+            modules.append(module)
+            href = '%s/%s' %(context.absolute_url(), module.getId())
+            link.setAttribute('href', href)
+
+        uploadrequest = self.createUploadRequest(
+            None, self.folder.workspace, content = dom.toxml(),
+            IN_PROGRESS= 'true',
+            )
+        # add the module to the lens
+        adapter = getMultiAdapter(
+                (lens, uploadrequest), Interface, 'sword')
+        xml = adapter()
+
+        # assert that the module was added to the lens
+        lens_modules = lens.listFolderContents(spec='SelectedContent')
+        self.assertEqual(len(modules), len(lens_modules),
+                         'The lens modules are incorrect.')
     
     def _createModule(self, context, filename):
         """ Utility method to setup the environment and create a module.
@@ -1804,6 +1847,28 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         module_id = editIri.split('/')[-2]
         module = context._getOb(module_id)
         return module
+
+    
+    def _publishModule(self, context, module):
+        # Sign the license, set the title, set maintainer, author, copyright
+        # holder, description of changes.
+        module.license = 'http://creativecommons.org/licenses/by/3.0/'
+        module.title = 'The Tigger Movie'
+        module.maintainers = ['test_user_1_']
+        module.authors = ['test_user_1_']
+        module.licensors = ['test_user_1_']
+        module.message = "I will not buy this tobacconist's, it is scratched"
+
+        # Publish it for the first time
+        emptyrequest = self.createUploadRequest(
+            None,
+            context=context,
+            CONTENT_TYPE='',
+            IN_PROGRESS='false',
+        )
+        xml = getMultiAdapter((module, emptyrequest), ISWORDEditIRI)()
+        return module
+
     
     def wf(self, data):
         file = open(os.path.join(DIRNAME, 'data', 'unittest', 'returned.xml'), 'wb')

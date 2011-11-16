@@ -27,7 +27,7 @@ from Products.RhaptosSword.adapters import getSiteEncoding
 from Products.RhaptosSword.adapters import METADATA_MAPPING
 from Products.RhaptosSword.adapters import DCTERMS_NAMESPACE
 
-from Products.RhaptosSword.exceptions import PublishUnauthorized
+from Products.RhaptosSword.exceptions import PublishUnauthorized, Unpublishable
 from Products.RhaptosSword.utils import splitMultipartRequest, checkUploadSize
 
 
