@@ -144,7 +144,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         # see if the request has a atompub payload that specifies,
         # module id in "source" or "mdml:derived_from" in ATOM entry.
         def _deriveOrCheckout(dom):
-            # Check if this is a request to derive or checkout a item
+            # Check if this is a request to derive or checkout an item
             # 'item' could be a module or a collection at this point.
             elements = dom.getElementsByTagNameNS(
                 "http://purl.org/dc/terms/", 'isVersionOf')
