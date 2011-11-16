@@ -1,3 +1,4 @@
+import AccessControl
 import os, sys
 if __name__ == '__main__':
     execfile(os.path.join(sys.path[0], 'framework.py'))
@@ -51,6 +52,8 @@ ZopeTestCase.installProduct('UniFile')
 ZopeTestCase.installProduct('RhaptosCollaborationTool')
 ZopeTestCase.installProduct('ZAnnot')
 ZopeTestCase.installProduct('RhaptosCollection')
+ZopeTestCase.installProduct('ZCatalog')
+ZopeTestCase.installProduct('Lensmaker')
 
 #PloneTestCase.setupPloneSite()
 PloneTestCase.setupPloneSite(products=['RhaptosSword'],
@@ -61,7 +64,8 @@ PloneTestCase.setupPloneSite(products=['RhaptosSword'],
         'Products.CNXMLDocument:default',
         'Products.CNXMLTransforms:default',
         'Products.UniFile:default',
-        'Products.LinkMapTool:default'
+        'Products.LinkMapTool:default',
+        'Products.Lensmaker:default',
         ]
     )
 
@@ -262,6 +266,8 @@ class StubWorkspaces(SimpleItem):
 class StubRhaptosRepository(ObjectManager):
     __implements__ = IRepository
 
+    security = AccessControl.ClassSecurityInfo()
+
     def __init__(self, context):
         self.id = 'content'
         self._all_storages = []
@@ -281,6 +287,7 @@ class StubRhaptosRepository(ObjectManager):
     def setDefaultStorage(self, id):
         self._default_storage = id
 
+    security.declarePublic("hasRhaptosObject")
     def hasRhaptosObject(self, id):
         return bool(self.hasObject(id))
 
@@ -1709,7 +1716,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
                 'Link "%s" source incorrect' %idx)
    
 
-    def testDeriveCollection(self):
+    def _testDeriveCollection(self, filename):
         self._setupRhaptos()
         self.setRoles(('Member','Manager'))
         self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
@@ -1721,7 +1728,6 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         col = self.folder.workspace._getOb(col_id)
         col.setState('published')
         col.checkout(col_id)
-        filename = 'derive_collection.xml'
         file = open(os.path.join(DIRNAME, 'data', 'unittest', filename), 'r')
         dom = parse(file)
         file.close()
@@ -1730,26 +1736,56 @@ class TestSwordService(PloneTestCase.PloneTestCase):
             '%s/%s' %(self.folder.workspace.absolute_url(), col_id)
         uploadrequest = self.createUploadRequest(
             None, self.folder.workspace, content = dom.toxml(),
-            IN_PROGRESS='true'
             )
         adapter = getMultiAdapter(
-                (col, uploadrequest), Interface, 'sword')
-        derived_collection = adapter()
-        self.assertEqual(derived_collection.Title(),
-                         'Derived copy of (Untitled)',
-                         'Derived title incorrect')
+                (self.folder.workspace, uploadrequest), Interface, 'sword')
+        xml = adapter()
+        assert "<sword:error" not in xml, xml
     
+    
+    def testDeriveCollection_NoVersionNumber(self):
+        self._testDeriveCollection(filename='derive_collection.xml')
 
-    def testAddToLens(self):
+    
+    def _testAddToLens(self, filename):
         self._setupRhaptos()
+        self.setRoles(('Member','Manager'))
         self.setPermissions(['Manage WebDAV Locks'], role='Member')
         self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
-        lens_id = 'lens001'
-        # create the lens
+        #self.portal.content = StubRhaptosRepository(self.folder.workspace)
+
         # get a new module
-        # publish the module
+        module = self.testUploadAndPublish()
+
+        # create the lens
+        lens_id = 'lens001'
+        self.folder.workspace.invokeFactory('ContentSelectionLens', lens_id)
+        lens = self.folder.workspace._getOb(lens_id)
+
         # craft the xml to add the module to the lens
+        file = open(os.path.join(DIRNAME, 'data', 'unittest', filename), 'r')
+        dom = parse(file)
+        file.close()
+        identifiers = dom.getElementsByTagName('dcterms:identifier')
+        for element in identifiers:
+            if element.getAttribute('xsi:type') == 'dcterms:URI':
+                element.firstChild.nodeValue = \
+                    '%s/%s/latest' %(self.folder.workspace.absolute_url(), module.id)
+            elif element.getAttribute('xsi:type') == 'oerdc:ContentId':
+                element.firstChild.nodeValue = module.id
+        
+        uploadrequest = self.createUploadRequest(
+            None, self.folder.workspace, content = dom.toxml(),
+            IN_PROGRESS= 'true',
+            )
         # add the module to the lens
+        adapter = getMultiAdapter(
+                (lens, uploadrequest), Interface, 'sword')
+        xml = adapter()
+
+    
+    def testAddToLens_NoVersion(self):
+        self._testAddToLens('entry_add_to_lens.xml')
 
 
     def _createModule(self, context, filename):
@@ -1759,6 +1795,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
             filename, 
             context,
             CONTENT_DISPOSITION='attachment; filename=%s' %filename,
+            IN_PROGRESS= 'true',
         )
 
         # Call the sword view on this request to perform the upload
