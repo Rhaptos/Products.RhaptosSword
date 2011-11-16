@@ -144,22 +144,23 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         # see if the request has a atompub payload that specifies,
         # module id in "source" or "mdml:derived_from" in ATOM entry.
         def _deriveOrCheckout(dom):
-            # Check if this is a request to derive or checkout a module
+            # Check if this is a request to derive or checkout a item
+            # 'item' could be a module or a collection at this point.
             elements = dom.getElementsByTagNameNS(
                 "http://purl.org/dc/terms/", 'isVersionOf')
             if len(elements) > 0:
-                module_id = \
+                item_id = \
                     elements[0].firstChild.toxml().encode(self.encoding)
-                obj = self.checkoutModule(module_id)
+                obj = self.checkoutItem(item_id)
                 self.action = 'checkout'
                 return obj
             elements = dom.getElementsByTagNameNS(
                 "http://purl.org/dc/terms/", 'source')
             if len(elements) > 0:
                 # now we can fork / derive the module
-                module_id = \
+                item_id = \
                     elements[0].firstChild.toxml().encode(self.encoding)
-                obj = self.deriveModule(module_id)
+                obj = self.deriveItem(item_id)
                 self.action = 'derive'
                 return obj
 
@@ -196,24 +197,24 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         return obj
 
 
-    def deriveModule(self, url):
+    def deriveItem(self, url):
         """ We checkout the object, fork it, remove the temp one and 
             return the forked copy.
         """
-        module_id = url.split('/')[-1]
-        # Fetch module and area
-        version = 'latest'
+        item_id = url.split('/')[-1]
+        # Fetch item and area
+        version = 'latest' #TODO: honour the version in the xml payload
         content_tool = getToolByName(self.context, 'content')
-        module = content_tool.getRhaptosObject(module_id, version)
+        item = content_tool.getRhaptosObject(item_id, version)
         area = self.context
         # We create a copy that we want to clean up later, let's track the id
         to_delete_id = area.generateUniqueId()
-        area.invokeFactory(id=to_delete_id, type_name=module.portal_type)
+        area.invokeFactory(id=to_delete_id, type_name=item.portal_type)
         obj = area._getOb(to_delete_id)
 
-        # module must be checked out to area before a fork is possible
+        # item must be checked out to area before a fork is possible
         obj.setState('published')
-        obj.checkout(module.objectId)
+        obj.checkout(item.objectId)
 
         # Do the fork
         forked_obj = obj.forkContent(license='', return_context=True)
@@ -235,46 +236,46 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         return forked_obj
 
 
-    def canCheckout(self, module):
+    def canCheckout(self, item):
         #return False
         pms = getToolByName(self.context, 'portal_membership')
         member = pms.getAuthenticatedMember()
 
-        li = list(module.authors) \
-            + list(module.maintainers) \
-            + list(module.licensors) \
-            + list(module.roles.get('translators', []))
+        li = list(item.authors) \
+            + list(item.maintainers) \
+            + list(item.licensors) \
+            + list(item.roles.get('translators', []))
 
         return member.getId() in li
 
 
-    def checkoutModule(self, url):
+    def checkoutItem(self, url):
         context = aq_inner(self.context)
-        module_id = url.split('/')[-1]
+        item_id = url.split('/')[-1]
 
-        # Fetch module
+        # Fetch item
         content_tool = getToolByName(self.context, 'content')
-        module = content_tool.getRhaptosObject(module_id, 'latest')
+        item = content_tool.getRhaptosObject(item_id, 'latest')
 
-        if not self.canCheckout(module):
+        if not self.canCheckout(item):
             raise CheckoutUnauthorized(
-                "You do not have permission to checkout %s" % module_id,
-                "You are not a maintainer of the requested module or "
+                "You do not have permission to checkout %s" % item_id,
+                "You are not a maintainer of the requested item or "
                 "you do not have sufficient permissions for this workspace")
 
-        if module_id not in context.objectIds():
-            context.invokeFactory(id=module_id, type_name=module.portal_type)
-            obj = context._getOb(module_id)
+        if item_id not in context.objectIds():
+            context.invokeFactory(id=item_id, type_name=item.portal_type)
+            obj = context._getOb(item_id)
             obj.setState('published')
-            obj.checkout(module.objectId)
+            obj.checkout(item.objectId)
             return obj
         else:
-            obj = context._getOb(module_id)
+            obj = context._getOb(item_id)
             if obj.state == 'published':
                 # Check out on top of published copy
-                obj.checkout(module.objectId)
+                obj.checkout(item.objectId)
                 return obj
-            elif obj.state == "checkedout" and obj.version == module.version:
+            elif obj.state == "checkedout" and obj.version == item.version:
                 # Already checked out, use as is
                 return obj
             else:
