@@ -669,10 +669,6 @@ class ContentSelectionLensEditIRI(EditIRI):
         raise NotImplementedError(
             'GET not implemented for %s.' %self.context.__module__)
 
-    def _handlePublish(self):
-        raise NotImplementedError(
-            'PUBLISH not implemented for %s.' %self.context.__module__)
-
     def _handlePost(self):
         lens = self.context
         if not lens.isOpen():
@@ -721,61 +717,10 @@ class ContentSelectionLensEditIRI(EditIRI):
 
 
 class CollectionEditIRI(EditIRI):
+
+    depositreceipt = ViewPageTemplateFile('collection_depositreceipt.pt')
+
     def _handleGet(self, **kw):
-        raise NotImplementedError(
-            'GET not implemented for %s.' %self.context.__module__)
-
-    def _handlePublish(self):
-        raise NotImplementedError(
-            'PUBLISH not implemented for %s.' %self.context.__module__)
-
-    def _handlePost(self):
-        body = self.context.request.get('BODYFILE')
-        body.seek(0)
-        dom = parse(body)
-        body.seek(0)
-        elements = dom.getElementsByTagNameNS(
-            "http://purl.org/dc/terms/", 'source')
-        collection_url = \
-            elements[0].firstChild.toxml().encode(self.getEncoding())
-        collection_id = collection_url.split('/')[-1]
-        # Fetch collection
-        content_tool = getToolByName(self.context, 'content')
-        collection = content_tool.getRhaptosObject(collection_id, 'latest')
-
-        # Fetch content and area
-        #content = self.content(collection_id, version)
-        #area = portal.restrictedTraverse(form['area_path'])
-        area = self.context.aq_inner.aq_parent
-
-        # There are going to be stale items later
-        to_delete_id = ''
-
-        # Content is not in area - create
-        to_delete_id = area.generateUniqueId()
-        area.invokeFactory(id=to_delete_id, type_name=collection.portal_type)
-        obj = area._getOb(to_delete_id)
-
-        # Content must be checked out to area before a fork is possible
-        obj.setState('published')
-        obj.checkout(collection.objectId)
-
-        # Do the fork
-        forked_collection = obj.forkContent(license=collection.getDefaultLicense(), 
-            return_context=True,
-        )
-        forked_collection.setState('created')
-
-        # For some reason setGoogleAnalyticsTrackingCode causes an
-        # Unauthorized error in forkContent. It is supressed by the 
-        # return_context parameter allowing us to set it here.
-        forked_collection.setGoogleAnalyticsTrackingCode(None)
-
-        # Delete stale item
-        if to_delete_id:
-            area.manage_delObjects(ids=[to_delete_id])
-        return forked_collection
-
-    def _handlePut(self):
-        raise NotImplementedError(
-            'PUT not implemented for %s.' %self.context.__module__)
+        view = self.__of__(self.context)
+        pt = self.depositreceipt.__of__(view)
+        return pt(**kw)
