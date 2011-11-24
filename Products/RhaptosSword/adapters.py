@@ -575,6 +575,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         for cnx_role in ROLE_MAPPING.values():
             role_name = cnx_role.lower() + 's'
             ids = getattr(module, role_name, [])
+            ids = [temp_id.encode(self.encoding) for temp_id in ids]
             roles = moduleRoles.get(cnx_role, [])
             roles.extend(ids)
             moduleRoles[cnx_role] = roles
