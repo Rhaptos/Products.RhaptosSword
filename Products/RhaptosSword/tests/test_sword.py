@@ -1758,7 +1758,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         module = self.testUploadAndPublish()
 
         # create the lens
-        lens_id = 'lens001'
+        lens_id = u'lens001'
         self.folder.workspace.invokeFactory('ContentSelectionLens', lens_id)
         lens = self.folder.workspace._getOb(lens_id)
 
@@ -1767,9 +1767,8 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         file = open(os.path.join(DIRNAME, 'data', 'unittest', filename), 'r')
         dom = parse(file)
         file.close()
-        href = '%s/%s' %(self.folder.workspace.absolute_url(), module.getId())
-        link = dom.getElementsByTagName('link')[0]
-        link.setAttribute('href', href)
+        contentId = dom.getElementsByTagName('id')[0]
+        contentId.firstChild.nodeValue = module.getId()
         
         uploadrequest = self.createUploadRequest(
             None, self.folder.workspace, content = dom.toxml(),
@@ -1790,7 +1789,6 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.setRoles(('Member','Manager'))
         self.setPermissions(['Manage WebDAV Locks'], role='Member')
         self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
-        transaction.commit()
 
         # create the lens
         lens_id = 'lens001'
