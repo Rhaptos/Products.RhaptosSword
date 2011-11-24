@@ -15,6 +15,8 @@ from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 
 from rhaptos.atompub.plone.browser.atompub import ATOMPUB_CONTENT_TYPES
 from rhaptos.atompub.plone.browser.atompub import getContentType
+from rhaptos.atompub.plone.exceptions import PreconditionFailed
+
 from rhaptos.swordservice.plone.interfaces import ISWORDEditIRI
 from rhaptos.swordservice.plone.interfaces import ISWORDServiceDocument
 from rhaptos.swordservice.plone.browser.sword import SWORDStatementAdapter
@@ -681,25 +683,38 @@ class ContentSelectionLensEditIRI(EditIRI):
             # get all the modules
             entries = dom.getElementsByTagName('entry')
             for entry in entries:
-                links = entry.getElementsByTagName('link')
-                module_link = links and links[0]
-                contentLink = module_link and \
-                    module_link.getAttribute('href').strip().encode(encoding)
-                contentId = contentLink.split('/')[-1]
+                contentId = entry.getElementsByTagName('id')
+                if not contentId:
+                    raise PreconditionFailed('You must supply a module id.')
+
+                contentId = contentId[0].firstChild.toxml().encode(encoding)
                 if contentId:
                     module = content_tool.getRhaptosObject(contentId)
                     if module:
-                        version = module.latest.version or 'latest'
+                        elements = \
+                            entry.getElementsByTagName('rhaptos:versionStart')
+                        versionStart = elements and elements[0].firstChild.toxml()
+                        version = versionStart.encode(encoding) or 'latest'
+
                         namespaceTags = []
-                        tags = ''
-                        comment = 'Added via SWORD API'
+
+                        tags = entry.getElementsByTagName('rhaptos:tag')
+                        tags = [tag.firstChild.toxml().encode(encoding) for tag in tags]
+                        tags = ' '.join(tags)
+
+                        comments = entry.getElementsByTagName('rhaptos:comment')
+                        comments = \
+                            [comment.firstChild.toxml().encode(encoding) \
+                             for comment in comments]
+                        comments = '\n\r'.join(comments)
+
                         lens.lensAdd(
                             lensPath=path, 
                             contentId=contentId, 
                             version=version, 
                             namespaceTags=namespaceTags, 
                             tags=tags,
-                            comment=comment,
+                            comment=comments,
                         )            
             return lens
         else:
