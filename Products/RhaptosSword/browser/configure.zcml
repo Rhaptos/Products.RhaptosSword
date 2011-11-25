@@ -42,8 +42,8 @@
     <adapter
         for="Products.RhaptosSword.interfaces.IRhaptosSwordContentSelectionLens
              zope.publisher.interfaces.http.IHTTPRequest"
-        provides="rhaptos.swordservice.plone.interfaces.ISWORDEditIRI"
-        factory=".views.ContentSelectionLensEditIRI" />
+        provides="Products.RhaptosSword.interfaces.ILensAtomPubServiceAdapter"
+        factory=".atompub.LensAtomPubAdapter" />
 
     <adapter
         for="Products.RhaptosCollection.interfaces.ICollection

@@ -57,12 +57,6 @@
         interface="Products.RhaptosSword.interfaces.ICollabRequest"
         />
 
-    <!-- Mark lenses so we can accept atom posts on them -->
-    <five:implements                                                              
-        class="Products.Lensmaker.ContentSelectionLens.ContentSelectionLens"
-        interface="Products.RhaptosSword.interfaces.IRhaptosSwordContentSelectionLens"
-        /> 
-
     <adapter
         for="Products.RhaptosSword.interfaces.IRhaptosSwordWorkspace
              zope.publisher.interfaces.http.IHTTPRequest"
@@ -82,5 +76,11 @@
              zope.publisher.interfaces.http.IHTTPRequest"
         provides="rhaptos.swordservice.plone.interfaces.ISWORDListCollection"
         factory="rhaptos.swordservice.plone.browser.sword.ListCollection" />
+
+    <!-- Mark lenses so we can accept atom posts on them -->
+    <five:implements                                                              
+        class="Products.Lensmaker.ContentSelectionLens.ContentSelectionLens"
+        interface="Products.RhaptosSword.interfaces.IRhaptosSwordContentSelectionLens"
+        /> 
 
 </configure>

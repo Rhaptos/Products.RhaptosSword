@@ -665,67 +665,6 @@ class ServiceDocument(BrowserView):
         """ Return the portal title. """
         return getToolByName(self.context, 'portal_url').getPortalObject().Title()
 
-
-class ContentSelectionLensEditIRI(EditIRI):
-    def _handleGet(self, **kw):
-        raise NotImplementedError(
-            'GET not implemented for %s.' %self.context.__module__)
-
-    def _handlePost(self):
-        lens = self.context
-        if not lens.isOpen():
-            # get attrs
-            encoding = self.getEncoding() 
-            content_tool = getToolByName(self.context, 'content')
-            dom = parse(self.request.get('BODYFILE'))
-            path = lens.getPhysicalPath()
-            
-            # get all the modules
-            entries = dom.getElementsByTagName('entry')
-            for entry in entries:
-                contentId = entry.getElementsByTagName('id')
-                if not contentId:
-                    raise PreconditionFailed('You must supply a module id.')
-
-                contentId = contentId[0].firstChild.toxml().encode(encoding)
-                if contentId:
-                    module = content_tool.getRhaptosObject(contentId)
-                    if module:
-                        elements = \
-                            entry.getElementsByTagName('rhaptos:versionStart')
-                        versionStart = elements and elements[0].firstChild.toxml()
-                        version = versionStart.encode(encoding) or 'latest'
-
-                        namespaceTags = []
-
-                        tags = entry.getElementsByTagName('rhaptos:tag')
-                        tags = [tag.firstChild.toxml().encode(encoding) for tag in tags]
-                        tags = ' '.join(tags)
-
-                        comments = entry.getElementsByTagName('rhaptos:comment')
-                        comments = \
-                            [comment.firstChild.toxml().encode(encoding) \
-                             for comment in comments]
-                        comments = '\n\r'.join(comments)
-
-                        lens.lensAdd(
-                            lensPath=path, 
-                            contentId=contentId, 
-                            version=version, 
-                            namespaceTags=namespaceTags, 
-                            tags=tags,
-                            comment=comments,
-                        )            
-            return lens
-        else:
-            # actually we should raise and error and use the decorators
-            return None
-
-    def _handlePut(self):
-        raise NotImplementedError(
-            'PUT not implemented for %s.' %self.context.__module__)
-
-
 class CollectionEditIRI(EditIRI):
 
     depositreceipt = ViewPageTemplateFile('collection_depositreceipt.pt')
