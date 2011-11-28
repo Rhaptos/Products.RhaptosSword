@@ -1825,6 +1825,40 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.assertEqual(len(modules), len(lens_modules),
                          'The lens modules are incorrect.')
     
+    def testForbiddenExceptionOnAddToLens(self):
+        self._setupRhaptos()
+        self.setRoles(('Member','Manager'))
+        self.setPermissions(['Manage WebDAV Locks'], role='Member')
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+
+        # get a new module
+        module = self.testUploadAndPublish()
+
+        # create the lens
+        lens_id = u'lens001'
+        self.folder.workspace.invokeFactory('ContentSelectionLens', lens_id)
+        lens = self.folder.workspace._getOb(lens_id)
+
+        # craft the xml to add the module to the lens
+        filename = 'entry_add_to_lens.xml'
+        file = open(os.path.join(DIRNAME, 'data', 'unittest', filename), 'r')
+        dom = parse(file)
+        file.close()
+        contentId = dom.getElementsByTagName('id')[0]
+        contentId.firstChild.nodeValue = module.getId()
+        
+        uploadrequest = self.createUploadRequest(
+            None, self.folder.workspace, content = dom.toxml(),
+            IN_PROGRESS= 'true',
+            )
+        # add the module to the lens
+        adapter = getMultiAdapter(
+                (lens, uploadrequest), Interface, 'sword')
+        xml = adapter()
+        assert "<sword:error" not in xml, xml
+        xml = adapter()
+
+
     def _createModule(self, context, filename):
         """ Utility method to setup the environment and create a module.
         """

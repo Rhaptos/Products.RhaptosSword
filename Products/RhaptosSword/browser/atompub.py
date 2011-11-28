@@ -1,6 +1,7 @@
 from xml.dom.minidom import parse
 
 from zope.interface import implements
+from zope.security.interfaces import Forbidden
 
 from Products.CMFCore.utils import getToolByName
 
@@ -8,7 +9,9 @@ from rhaptos.atompub.plone.exceptions import PreconditionFailed
 from rhaptos.atompub.plone.browser.atompub import PloneFolderAtomPubAdapter
 from rhaptos.atompub.plone.browser.atompub import getSiteEncoding 
 
+
 from Products.RhaptosSword.interfaces import ILensAtomPubServiceAdapter
+
 
 class LensAtomPubAdapter(PloneFolderAtomPubAdapter):
     implements(ILensAtomPubServiceAdapter)
@@ -33,6 +36,11 @@ class LensAtomPubAdapter(PloneFolderAtomPubAdapter):
 
                 contentId = contentId[0].firstChild.toxml().encode(encoding)
                 if contentId:
+                    if contentId in lens.objectIds():
+                        raise Forbidden(
+                            'Module %s is already part of the lens %s' 
+                            %(contentId, lens.getId())) 
+
                     module = content_tool.getRhaptosObject(contentId)
                     if module:
                         elements = \
