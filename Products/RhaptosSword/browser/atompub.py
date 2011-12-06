@@ -2,6 +2,7 @@ from xml.dom.minidom import parse
 
 from zope.interface import implements
 from zope.security.interfaces import Forbidden
+from zExceptions import Unauthorized
 
 from Products.CMFCore.utils import getToolByName
 
@@ -20,6 +21,11 @@ class LensAtomPubAdapter(PloneFolderAtomPubAdapter):
 
     def __call__(self):
         lens = self.context
+        pmt = getToolByName(self.context, 'portal_membership')
+        authenticated_member = pmt.getAuthenticatedMember()
+        if authenticated_member.getId() != lens.Creator():
+            raise Unauthorized('You may not add to a lens you do not own.')
+
         if not lens.isOpen():
             # get attrs
             encoding = self.getEncoding() 
