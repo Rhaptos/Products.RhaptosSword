@@ -16,30 +16,33 @@
     <title tal:content="context/title">My Deposit</title>
     <id tal:content="context/getId">1234</id>
     <updated tal:content="context/revised">2008-08-18T14:27:08Z</updated>
-    <summary type="text" tal:condition="context/abstract|nothing" tal:content="context/abstract">
-        The summary
-    </summary>
-    <generator uri="rhaptos.swordservice.plone" version="1.0"/>
-
-    <!-- The metadata begins -->
+    <generator uri="rhaptos.swordservice.plone" version="1.0" />
+    
+    <!-- the item's metadata -->
     <dcterms:identifier xsi:type="dcterms:URI" tal:content="context/absolute_url">
         http://cnx.org/content/m10000/1.1/
     </dcterms:identifier> 
+
+    <dcterms:source xsi:type="dcterms:URI" tal:content="view/original_url">
+        http://cnx.org/Members/kfried/col9000
+    </dcterms:source>              
+
     <dcterms:identifier xsi:type="oerdc:Version" tal:content="context/version">
         1.1
     </dcterms:identifier> 
+    
     <dcterms:identifier xsi:type="oerdc:ContentId" tal:content="context/getId">
         m10000
     </dcterms:identifier> 
+
     <dcterms:title tal:content="context/title">
         Biology for Math Majors
     </dcterms:title>
+
     <dcterms:created tal:content="context/created">
         2010/08/10 11:41:00.383 GMT-5
     </dcterms:created> 
-    <dcterms:modified tal:content="context/revised">
-        2011-06-22T14:27:08Z
-    </dcterms:modified> 
+
     <dcterms:creator oerdc:id="creator id" oerdc:email="owner email"
             tal:repeat="creator context/authors"
             tal:content="python:view.fullname(creator)"
@@ -48,6 +51,7 @@
                             oerdc:pending python:view.is_pending(creator)">
         Creator full name  
     </dcterms:creator>
+
     <oerdc:maintainer oerdc:id="maintainer id" oerdc:email="owner email"
             tal:repeat="maintainer context/maintainers"
             tal:content="python:view.fullname(maintainer)"
@@ -56,6 +60,7 @@
                             oerdc:pending python:view.is_pending(maintainer)">
         Maintainer full name  
     </oerdc:maintainer>
+
     <dcterms:rightsHolder oerdc:id="rightsholder id" oerdc:email="rightsholder email"
             tal:repeat="rightsholder context/licensors"
             tal:content="python:view.fullname(rightsholder)"
@@ -64,145 +69,20 @@
                             oerdc:pending python:view.is_pending(rightsholder)">
         Rights holder full name  
     </dcterms:rightsHolder>
-    <oerdc:translator oerdc:id="translator id" oerdc:email="translator email"
-            tal:repeat="translator context/translators|python:()"
-            tal:content="python:view.fullname(translator)"
-            tal:attributes="oerdc:id translator;
-                            oerdc:email python:view.email(translator);
-                            oerdc:pending python:view.is_pending(translator)">
-        Translator full name  
-    </oerdc:translator>
-    <oerdc:editor oerdc:id="editor id" oerdc:email="editor email"
-            tal:repeat="editor context/editors|python:()"
-            tal:content="python:view.fullname(editor)"
-            tal:attributes="oerdc:id editor;
-                            oerdc:email python:view.email(editor);
-                            oerdc:pending python:view.is_pending(editor)">
-        Editor full name  
-    </oerdc:editor>
+
+    <dcterms:language xsi:type="ISO639-1" tal:content="context/language">
+        en
+    </dcterms:language> 
+
+    <dcterms:license xsi:type="dcterms:URI" tal:content="context/license">
+        http://creativecommons.org/licenses/by/3.0/
+    </dcterms:license>
     
-    <oerdc:oer-subject tal:repeat="subject context/subject" tal:content="subject" tal:condition="context/subject">
-        Mathematics and Statistics
-    </oerdc:oer-subject>
-
-    <dcterms:subject xsi:type="oerdc:Subject" tal:repeat="subject context/subject" tal:content="subject" tal:condition="context/subject">
-        Mathematics and Statistics
-    </dcterms:subject>
-    
-    <dcterms:subject tal:repeat="keyword context/keywords" tal:content="keyword">
-        box
-    </dcterms:subject>
-
-    <dcterms:source xsi:type="dcterms:URI"
-        tal:repeat="child view/derived_modules"
-        tal:content="child/absolute_url">
-        http://cnx.org/content/m16296/1.8/
-    </dcterms:source>
-
-    <dcterms:abstract tal:content="context/abstract">
-        The abstract
-    </dcterms:abstract>
-
-    <dcterms:language xsi:type="ISO639-1" tal:content="context/language">en</dcterms:language> 
-
-    <dcterms:license xsi:type="dcterms:URI" tal:content="context/license">http://creativecommons.org/licenses/by/3.0/</dcterms:license>
-    
-    <tal:not_published condition="not:is_published">
-    <!-- For all UNPUBLISHED modules -->
-
-    <link rel="alternate" href="http://cnx.org/Members/kef/module.2006-04-07/module_view?format=html"
-        tal:attributes="href string:${unpublished_link_base}/module_view?format=html" />
-    
-    <content type="application/zip" src="http://cnx.org/Members/kef/m10000/sword/editmedia"
-        tal:attributes="src string:${unpublished_link_base}/sword/editmedia" />
-
-    <link rel="edit-media" href="edit-media-iri"
-        tal:attributes="href string:${unpublished_link_base}/sword/editmedia" />
-
-    <link rel="edit" href="edit-iri"
-          tal:attributes="href string:${unpublished_link_base}/sword" />
-          
-    <link rel="http://purl.org/net/sword/terms/add"
-           href="http://cnx.org/Members/kef/m9000/sword"
-           tal:attributes="href string:${unpublished_link_base}/sword" />
-
-    <link rel="http://purl.org/net/sword/terms/statement" 
-           type="application/atom+xml;type=feed" 
-           href="http://cnx.org/Members/kef/m10000/sword/statement"
-           tal:attributes="href string:${unpublished_link_base}/sword/statement.atom" />
-
-    <sword:packaging>http://purl.org/net/sword/package/SimpleZip</sword:packaging>
-
-    <link rel="http://purl.org/net/sword/terms/derivedResource" 
-            href="http://cnx.org/Members/kef/m10000/module_view?format=html"
-            tal:attributes="href string:${unpublished_link_base}/module_view?format=html" />
-            
-    <link rel="http://purl.org/net/sword/terms/derivedResource" 
-           href="http://cnx.org/Members/kef/m10000"
-           tal:attributes="href string:${unpublished_link_base}/" />
-
-    <link rel="http://purl.org/net/sword/terms/derivedResource" 
-            type="application/pdf" href="http://cnx.org/Members/kef/m10000/module_view?format=pdf"
-            tal:attributes="href string:${unpublished_link_base}/module_view?format=pdf" />
-            
-    <link rel="http://purl.org/net/sword/terms/derivedResource" 
-            type="application/zip" href="http://cnx.org/Members/kef/m10000/module_export?format=zip"
-            tal:attributes="href string:${unpublished_link_base}/module_export?format=zip" />
-
-    <link rel="http://purl.org/net/sword/terms/derivedResource" 
-            type="application/xml" href="http://cnx.org/Members/kef/m10000/module_export?format=plain"
-            tal:attributes="href string:${unpublished_link_base}/module_export?format=plain" />
-
-    <!-- END for all UNPUBLISHED modules -->
-    </tal:not_published>
-
-    <tal:if_published condition="is_published">
-    <!-- For all PUBLISHED modules -->
-
-    <content type="application/zip" src="http://cnx.org/content/m1235/1.1/module_view?format=zip"
-        tal:attributes="src string:${published_link_base}/module_export?format=zip" />
-
-    <link rel="edit-media" href="edit-media-iri"
-        tal:attributes="href string:${unpublished_link_base}/sword/editmedia" />
-
-    <link rel="edit" href="edit-iri"
-          tal:attributes="href string:${unpublished_link_base}/sword" />
-          
-    <link rel="http://purl.org/net/sword/terms/add"
-           href="http://cnx.org/Members/kef/m9000/sword"
-           tal:attributes="href string:${unpublished_link_base}/sword" />
-
-    <link rel="http://purl.org/net/sword/terms/statement" 
-           type="application/atom+xml;type=feed" 
-           href="http://cnx.org/Members/kef/m10000/sword/statement"
-           tal:attributes="href string:${unpublished_link_base}/sword/statement" />
-
-    <sword:packaging>http://purl.org/net/sword/package/SimpleZip</sword:packaging>
-
-    <link rel="http://purl.org/net/sword/terms/derivedResource" 
-            href="http://cnx.org/Members/kef/m10000/"
-            tal:attributes="href string:${published_link_base}/" />
-            
-    <link rel="http://purl.org/net/sword/terms/derivedResource" 
-            type="application/pdf" href="http://cnx.org/Members/kef/m10000/module_view?format=pdf"
-            tal:attributes="href string:${published_link_base}/module_view?format=pdf" />
-            
-    <link rel="http://purl.org/net/sword/terms/derivedResource" 
-            type="application/zip" href="http://cnx.org/Members/kef/m10000/module_export?format=epub"
-            tal:attributes="href string:${published_link_base}/module_export?format=epub" />
-
-    <link rel="http://purl.org/net/sword/terms/derivedResource" 
-            type="application/xml" href="http://cnx.org/Members/kef/m10000/module_export?format=zip"
-            tal:attributes="href string:${published_link_base}/module_export?format=zip" />
-
-    <link rel="http://purl.org/net/sword/terms/derivedResource" 
-            type="application/xml" href="http://cnx.org/Members/kef/m10000/module_export?format=offline"
-            tal:attributes="href string:${published_link_base}/module_export?format=offline" />
-
-    <!-- END for all PUBLISHED modules -->
-    </tal:if_published>
-
-    <oerdc:analyticsCode tal:condition="context/getGoogleAnalyticsTrackingCode"
-           tal:content="context/getGoogleAnalyticsTrackingCode">UA-4688042-1</oerdc:analyticsCode>
+    <sword:treatment>
+    <span tal:replace="view/treatment">
+        A derived copy of Collection 9000 was created for editing.  
+        * You can <a href="http://cnx.org/Members/kef/col9000/">edit the collection here</a>. 
+    </span>
+    </sword:treatment>   
 
 </entry>

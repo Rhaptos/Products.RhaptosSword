@@ -673,3 +673,14 @@ class CollectionEditIRI(EditIRI):
         view = self.__of__(self.context)
         pt = self.depositreceipt.__of__(view)
         return pt(**kw)
+
+    def original_url(self):
+        return self.context.getParent().absolute_url()
+
+    def treatment(self):
+        message = \
+        """A derived copy of Collection %s was created for editing.
+           * You can <a href="%s">edit the collection here</a>.""" \
+        % (self.context.getId(), self.context.absolute_url())
+        return message
+
