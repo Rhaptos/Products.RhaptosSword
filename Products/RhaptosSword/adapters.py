@@ -40,20 +40,9 @@ from Products.RhaptosSword.exceptions import OverwriteNotPermitted
 from Products.RhaptosSword.exceptions import TransformFailed
 from Products.RhaptosSword.exceptions import DepositFailed
 
-from utils import splitMultipartRequest, checkUploadSize
+from Products.RhaptosSword.utils import splitMultipartRequest, checkUploadSize
+from Products.RhaptosSword.utils import getSiteEncoding, SWORDTreatmentMixin
 
-def getSiteEncoding(context):
-    """ if we have on return it,
-        if not, figure out what it is, store it and return it.
-    """
-    encoding = 'utf-8'
-    properties = getToolByName(context, 'portal_properties')
-    site_properties = getattr(properties, 'site_properties', None)
-    if site_properties:
-        encoding = site_properties.getProperty('default_charset')
-    return encoding
-
-    
 class ValidationError(Exception):
     """ Basic validation error
     """
@@ -710,13 +699,16 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                 obj.removeCollaborator(c)
 
     
-class RhaptosEditMedia(EditMedia):
+class RhaptosEditMedia(EditMedia, SWORDTreatmentMixin):
+
+    depositreceipt = ViewPageTemplateFile('browser/depositreceipt.pt')
 
     def __init__(self, context, request):
         """ we override init in order to add DELETE as a legitemate
             call in RhaptosSword land.
         """
         EditMedia.__init__(self, context, request)
+        SWORDTreatmentMixin.__init__(self, context, request)
         self.callmap.update({'DELETE': self.DELETE,})
 
     def GET(self):
@@ -731,6 +723,7 @@ class RhaptosEditMedia(EditMedia):
         """ PUT against an existing item should update it.
         """
         # Check upload size
+        import pdb;pdb.set_trace()
         body = self.request.get('BODYFILE')
         checkUploadSize(self.context, body)
 
@@ -753,6 +746,10 @@ class RhaptosEditMedia(EditMedia):
         adapter.updateContent(self.context, body, content_type, cksum,
             merge == 'http://purl.org/oerpub/semantics/Merge')
         self.context.logAction(adapter.action)
+
+        view = self.__of__(self.context)
+        pt = self.depositreceipt.__of__(view)
+        return pt()
 
     def addFile(self, context, filename, f):
         # These files may never be uploaded, because we cannot process
@@ -861,3 +858,6 @@ class RhaptosEditMedia(EditMedia):
         self.context.manage_delObjects(ids)
         self.context.createTemplate()
         return self.request.response.setStatus(200)
+
+    def treatment(self):
+        return self.get_treatment(self.context)
