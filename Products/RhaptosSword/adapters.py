@@ -723,7 +723,6 @@ class RhaptosEditMedia(EditMedia, SWORDTreatmentMixin):
         """ PUT against an existing item should update it.
         """
         # Check upload size
-        import pdb;pdb.set_trace()
         body = self.request.get('BODYFILE')
         checkUploadSize(self.context, body)
 
@@ -860,4 +859,5 @@ class RhaptosEditMedia(EditMedia, SWORDTreatmentMixin):
         return self.request.response.setStatus(200)
 
     def treatment(self):
+        """ Delegate to mixin class"""
         return self.get_treatment(self.context)
