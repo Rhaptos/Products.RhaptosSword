@@ -330,7 +330,8 @@ class CollectionEditIRI(EditIRI):
         return pt(**kw)
 
     def original_url(self):
-        return self.context.getParent().absolute_url()
+        collection = self.context.getParent() or self.context
+        return collection.absolute_url()
 
     def treatment(self):
         message = \
