@@ -42,8 +42,8 @@
     
     <sword:treatment>
         
-    <generator uri="rhaptos.swordservice.plone" version="0.1">
-        uri:rhaptos.swordservice.plone version:0.1
+    <generator uri="rhaptos.swordservice.plone" version="1.1">
+        uri:rhaptos.swordservice.plone version:1.1
     </generator>
 
  
