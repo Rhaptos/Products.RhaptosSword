@@ -48,6 +48,12 @@
     
     
     <sword:treatment>
+        
+    <generator uri="rhaptos.swordservice.plone" version="0.1">
+        uri:rhaptos.swordservice.plone version:0.1
+    </generator>
+
+ 
         Module 'Box Plots Statistics for Majors' was imported.
         You can <a href="http://nohost/plone/workspace/__MODULE_ID__/module_view">preview your module here</a> to see what it will look like once it is published.
         

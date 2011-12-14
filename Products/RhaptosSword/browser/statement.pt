@@ -23,6 +23,7 @@
     
     <metal:treatment define-macro="treatment">
     <sword:treatment>
+        <span tal:replace="structure context/@@generator-tag" /> 
         <tal:actions replace="treatment/actions" />
         <tal:preview_link replace="structure treatment/preview_link" />
         <tal:description_of_changes tal:condition="treatment/description_of_changes|nothing">
