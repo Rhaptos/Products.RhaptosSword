@@ -17,7 +17,7 @@
     <author><name tal:content="memberid">jbloggs</name></author>
     <summary type="text" tal:content="context/abstract | nothing">A summary</summary>
     <sword:userAgent tal:content="memberid"></sword:userAgent>
-    <generator uri="http://cnx.org/sword" version="??" tal:attributes="uri import_url"/>
+    <span tal:replace="structure context/@@generator-tag">cnx.org</span>
     <link rel="edit" href="http://cnx.org/Members/userid/module.2008-11-19.7209280058/view" tal:attributes="href url" />
 </entry>
 

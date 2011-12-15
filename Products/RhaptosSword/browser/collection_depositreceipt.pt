@@ -16,8 +16,7 @@
     <title tal:content="context/title">My Deposit</title>
     <id tal:content="context/getId">1234</id>
     <updated tal:content="context/revised">2008-08-18T14:27:08Z</updated>
-    <generator uri="rhaptos.swordservice.plone" version="1.0" />
-    
+    <span tal:replace="structure context/@@generator-tag">cnx.org</span>
     <!-- the item's metadata -->
     <dcterms:identifier xsi:type="dcterms:URI" tal:content="context/absolute_url">
         http://cnx.org/content/m10000/1.1/

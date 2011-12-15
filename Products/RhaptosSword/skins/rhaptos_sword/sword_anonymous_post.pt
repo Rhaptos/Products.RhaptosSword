@@ -11,7 +11,7 @@
     <name>Rhaptos repository</name>
   </author>
   <title>ERROR: Unauthorized submission: Check credentials and target </title>
-  <generator tal:attributes="uri string:${here/absolute_url}/sword">cnx.org</generator>
+  <span tal:replace="structure context/@@generator-tag">cnx.org</span>
   <summary>Unauthorized posting attempt.</summary>
   <sword:treatment>processing failed</sword:treatment>
   <link rel="alternate" href="http://cnx.org/help/Sword" type="text/html"/>

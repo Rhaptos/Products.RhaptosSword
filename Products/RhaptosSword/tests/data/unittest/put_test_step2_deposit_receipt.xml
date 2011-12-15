@@ -4,7 +4,10 @@
   <title>My Title 2</title>
   <id>module_id</id>
   <updated>2011/09/16 00:09:45.569 GMT+2</updated>
-  <generator uri="rhaptos.swordservice.plone" version="1.0"/>
+
+  <generator uri="rhaptos.swordservice.plone" version="1.1"/>
+
+
   <!-- The metadata begins -->
   <dcterms:identifier xsi:type="dcterms:URI">http://nohost/plone/Members/test_user_1_/workspace/module_id</dcterms:identifier>
   <dcterms:identifier xsi:type="oerdc:Version">**new**</dcterms:identifier>
