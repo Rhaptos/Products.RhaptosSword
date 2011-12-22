@@ -73,7 +73,7 @@
         Translator full name  
     </oerdc:translator>
     <oerdc:editor oerdc:id="editor id" oerdc:email="editor email"
-            tal:repeat="translator python:context.roles.get('editors', [])"
+            tal:repeat="editor python:context.roles.get('editors', [])"
             tal:content="python:view.fullname(editor)"
             tal:attributes="oerdc:id editor;
                             oerdc:email python:view.email(editor);
