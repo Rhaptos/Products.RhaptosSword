@@ -5,6 +5,13 @@ from email import message_from_file
 from Products.CMFCore.utils import getToolByName
 from rhaptos.swordservice.plone.exceptions import MaxUploadSizeExceeded
 
+DESCRIPTION_OF_TREATMENT =\
+        {'derive': "Checkout and derive a new copy.",
+         'checkout': "Checkout to user's workspace.",
+         'create': "Created a module.",
+         'save': "Changes saved."
+        }
+
 ACTIONS_MSG = \
 """Module '%s' was imported."""
 

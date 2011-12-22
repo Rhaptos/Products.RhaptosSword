@@ -22,6 +22,8 @@ from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from Products.CNXMLTransforms.helpers import CNXImportError, doTransform, makeContent
 from Products.CNXMLDocument.XMLService import XMLParserError
 from Products.CNXMLDocument.XMLService import validate
+from Products.RhaptosCollection.interfaces import ICollection
+from Products.RhaptosModuleEditor.interfaces import IModule
 
 from rhaptos.atompub.plone.exceptions import PreconditionFailed
 from rhaptos.atompub.plone.browser.atompub import ATOMPUB_CONTENT_TYPES
@@ -75,13 +77,6 @@ METADATA_DEFAULTS = \
          'keywords': [],
          'subject': [],
          'GoogleAnalyticsTrackingCode': '',
-        }
-
-DESCRIPTION_OF_TREATMENT =\
-        {'derive': "Checkout and derive a new copy.",
-         'checkout': "Checkout to user's workspace.",
-         'create': "Created a module.",
-         'save': "Changes saved."
         }
 
 ROLE_MAPPING = {'creator': 'Author',
@@ -310,7 +305,10 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                     metadata[cnx_name] = current_value
         if metadata:
             self.validate_metadata(metadata)
-            obj.update_metadata(**metadata)
+            if ICollection.providedBy(obj):
+                obj.collection_metadata(**metadata)
+            elif IModule.providedBy(obj):
+                obj.update_metadata(**metadata)
         self.updateRoles(obj, dom)
         obj.reindexObject(idxs=metadata.keys())
 
@@ -338,7 +336,10 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                     metadata[cnx_name] = new_values
         if metadata:
             self.validate_metadata(metadata)
-            obj.update_metadata(**metadata)
+            if ICollection.providedBy(obj):
+                obj.collection_metadata(**metadata)
+            elif IModule.providedBy(obj):
+                obj.update_metadata(**metadata)
         self.updateRoles(obj, dom)
         obj.reindexObject(idxs=metadata.keys())
 
@@ -363,7 +364,10 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         metadata.update(self.getMetadata(dom, METADATA_MAPPING))
         if metadata:
             self.validate_metadata(metadata)
-            obj.update_metadata(**metadata)
+            if ICollection.providedBy(obj):
+                obj.collection_metadata(**metadata)
+            elif IModule.providedBy(obj):
+                obj.update_metadata(**metadata)
         # we set GoogleAnalyticsTrackingCode explicitly, since the script
         # 'update_metadata' ignores empty strings.
         obj.GoogleAnalyticsTrackingCode = metadata.get('GoogleAnalyticsTrackingCode')
