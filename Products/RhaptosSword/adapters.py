@@ -1,3 +1,4 @@
+from HTMLParser import HTMLParser
 from copy import copy
 from xml.dom.minidom import parse
 from zipfile import BadZipfile
@@ -69,6 +70,9 @@ METADATA_MAPPING =\
          'descriptionOfChanges': 'message',
          'analyticsCode': 'GoogleAnalyticsTrackingCode',
         }
+
+# 'abstract' should probably also be added to this list
+ATTRIBUTES_TO_FIX = ['title',]
 
 METADATA_DEFAULTS = \
         {'title': '(Untitled)',
@@ -305,6 +309,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                     metadata[cnx_name] = current_value
         if metadata:
             self.validate_metadata(metadata)
+            metadata = self.fixEntities(metadata, ATTRIBUTES_TO_FIX)
             if ICollection.providedBy(obj):
                 obj.collection_metadata(**metadata)
             elif IModule.providedBy(obj):
@@ -336,6 +341,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                     metadata[cnx_name] = new_values
         if metadata:
             self.validate_metadata(metadata)
+            metadata = self.fixEntities(metadata, ATTRIBUTES_TO_FIX)
             if ICollection.providedBy(obj):
                 obj.collection_metadata(**metadata)
             elif IModule.providedBy(obj):
@@ -364,6 +370,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         metadata.update(self.getMetadata(dom, METADATA_MAPPING))
         if metadata:
             self.validate_metadata(metadata)
+            metadata = self.fixEntities(metadata, ATTRIBUTES_TO_FIX)
             if ICollection.providedBy(obj):
                 obj.collection_metadata(**metadata)
             elif IModule.providedBy(obj):
@@ -546,6 +553,17 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
 
                 if value and not metadata.has_key(cnxname):
                     metadata[cnxname] = value
+        return metadata
+    
+
+    def fixEntities(self, metadata, names):
+        # fix the escaped entities or we end up with things like:
+        # '&amp;' in the title
+        htmlparser = HTMLParser()
+        for name in names:
+            value = metadata.get(name)
+            if value:
+                metadata[name] = htmlparser.unescape(value)
         return metadata
 
 

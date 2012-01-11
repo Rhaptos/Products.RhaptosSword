@@ -17,7 +17,7 @@
     <title tal:content="context/title">My Deposit</title>
     <id tal:content="context/getId">1234</id>
     <updated tal:content="context/revised">2008-08-18T14:27:08Z</updated>
-    <summary type="text" tal:condition="context/abstract" tal:content="context/abstract">
+    <summary type="text" tal:condition="context/abstract" tal:content="structure context/abstract">
         The summary
         </summary>
     <span tal:replace="structure context/@@generator-tag">cnx.org</span>
@@ -83,7 +83,7 @@
     
     <!-- CNX-Supported but not in MDML -->
     <oerdc:descriptionOfChanges tal:condition="treatment/description_of_changes">
-        <tal:description_of_changes replace="treatment/description_of_changes" />
+        <tal:description_of_changes replace="structure treatment/description_of_changes" />
     </oerdc:descriptionOfChanges> 
 
     <oerdc:oer-subject tal:repeat="subject context/subject" tal:content="subject" tal:condition="context/subject">
@@ -104,7 +104,7 @@
         http://cnx.org/content/m16296/1.8/
     </dcterms:source>
 
-    <dcterms:abstract tal:content="context/abstract">
+    <dcterms:abstract tal:content="structure context/abstract">
         The abstract
     </dcterms:abstract>
 
