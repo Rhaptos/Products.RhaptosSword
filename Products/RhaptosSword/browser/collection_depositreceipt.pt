@@ -78,7 +78,7 @@
     </dcterms:license>
     
     <sword:treatment>
-    <span tal:replace="view/treatment">
+    <span tal:replace="structure view/treatment">
         A derived copy of Collection 9000 was created for editing.  
         * You can <a href="http://cnx.org/Members/kef/col9000/">edit the collection here</a>. 
     </span>
