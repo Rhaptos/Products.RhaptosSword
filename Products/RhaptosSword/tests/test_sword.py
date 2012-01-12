@@ -188,6 +188,9 @@ class StubModuleDB(SimpleItem):
     def sqlGetModuleFilenames(self, id, version):
         return self.files[id]
 
+    def sqlGetRating(self, moduleid, version):
+        return None
+
 class StubLanuageTool(SimpleItem):
 
     def __init__(self):
@@ -1865,7 +1868,41 @@ class TestSwordService(PloneTestCase.PloneTestCase):
                 (lens, uploadrequest), Interface, 'atompub')
         xml = adapter()
         assert "<sword:error" not in xml, xml
+
+
+    def testAddToLensWithStopVersion(self):
+        self._setupRhaptos()
+        self.setRoles(('Member','Manager'))
+        self.setPermissions(['Manage WebDAV Locks'], role='Member')
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+
+        # get a new module
+        module = self.testUploadAndPublish()
+
+        # create the lens
+        lens_id = u'lens001'
+        self.folder.workspace.invokeFactory('ContentSelectionLens', lens_id)
+        lens = self.folder.workspace._getOb(lens_id)
+
+        # craft the xml to add the module to the lens
+        filename = 'entry_add_to_lens_stopversion_included.xml'
+        file = open(os.path.join(DIRNAME, 'data', 'unittest', filename), 'r')
+        dom = parse(file)
+        file.close()
+        contentId = dom.getElementsByTagName('id')[0]
+        contentId.firstChild.nodeValue = module.getId()
+        
+        uploadrequest = self.createUploadRequest(
+            None, self.folder.workspace, content = dom.toxml(),
+            IN_PROGRESS= 'true',
+            )
+        # add the module to the lens
+        adapter = getMultiAdapter(
+                (lens, uploadrequest), Interface, 'atompub')
         xml = adapter()
+        assert "<sword:error" not in xml, xml
+
+        self._publishModule(self.folder.workspace, module)
 
 
     def _createModule(self, context, filename):
@@ -1909,8 +1946,8 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         )
         xml = getMultiAdapter((module, emptyrequest), ISWORDEditIRI)()
         return module
+   
 
-    
     def wf(self, data):
         file = open(os.path.join(DIRNAME, 'data', 'unittest', 'returned.xml'), 'wb')
         file.write(data)
