@@ -1,5 +1,7 @@
+import transaction
 from xml.dom.minidom import parse
 
+from ZTUtils import make_query
 from zope.interface import implements
 from zope.security.interfaces import Forbidden
 from zExceptions import Unauthorized
@@ -71,7 +73,7 @@ class LensAtomPubAdapter(PloneFolderAtomPubAdapter):
                              for comment in comments]
                         comments = '\n\r'.join(comments)
 
-                        lens.lensAdd(
+                        self.lensAdd(
                             lensPath=path, 
                             contentId=contentId, 
                             version=version, 
@@ -94,6 +96,87 @@ class LensAtomPubAdapter(PloneFolderAtomPubAdapter):
             self.encoding = getSiteEncoding(self.context)
         return self.encoding
     
+    def lensAdd(self, lensPath, contentId, version, namespaceTags=[], tags='',
+                comment='', approved=False, approved_marker=False, implicit=True,
+                returnTo=None, batched=False):
 
+        """ Add content to a specific lens.
+            Copied and adapted from:
+            Products.Lensmaker/Products/Lensmaker/skins/lensmaker/lensAdd.py
+        """
+        lenstool = self.context.lens_tool
+        history = self.context.content.getHistory(contentId)
+
+        # version defaults
+        versionStart = version  # current
+        versionStop = 'latest'  # latest
+        cmpVersion = [int(x) for x in version.split('.')]
+
+        try:
+            if lensPath == '__new__':
+              # go to creation...
+              querystr = make_query(contentId=contentId,
+                                    namespaceTags=namespaceTags,
+                                    tags=tags, comment=comment,
+                                    versionStart=versionStart,
+                                    versionStop=versionStop,
+                                    implicit=implicit,
+                                    approved=approved,
+                                    returnTo=returnTo)
+              self.context.REQUEST.RESPONSE.redirect('/create_lens?%s' % querystr)
+              return "Need to create"
+            else:
+              lens = self.context.restrictedTraverse(lensPath)
+              if self.context.portal_factory.isTemporary(lens):
+                  # make concrete...
+                  newid = getattr(lens, 'suggestId', lambda: None)() or lens.getId()
+                  lens = self.context.portal_factory.doCreate(lens, newid)
+
+            tags = tags.split()
+            entry = getattr(lens, contentId, None)
+            made = False
+            if entry is None:
+                lens.invokeFactory(id=contentId, type_name="SelectedContent")
+                entry = lens[contentId]
+                made = True
+
+            # unchosen version behavior:
+            #  - if end is latest, do nothing
+            #  - if end <= current, do nothing
+            #  - if end > current, set version to current
+            # we don't pay attention to beginning ranges. versionStart is left alone
+            # (except in creation, of course)
+            if not made:  # we will accept the values above for new content
+                origStart = entry.getRawVersionStart()  # string version, like '1.1'
+                versionStart = origStart
+
+                origStop = entry.getRawVersionStop()
+                if origStop:   # latest is (), so only true for explicit stop versions
+                    cmpOrigStop = entry.getVersionStop()     # list version, like [1,1]
+                    if cmpVersion > cmpOrigStop:
+                        versionStop = version      # current is newer, so set stop to current
+                    else:
+                        versionStop = origStop     # otherwise, leave it alone
+
+            # Only set approved if it is present on the form. This is determined
+            # by checking approved_marker.
+            attrs = dict(contentId=contentId,
+                         versionStart=versionStart,
+                         versionStop=versionStop,
+                         namespaceTags=namespaceTags,
+                         tags=tags,
+                         comment=comment,
+                         implicit=implicit)
+            if approved_marker:
+                attrs['approved'] = approved
+            entry.update(**attrs)
+
+            lens.setModificationDate()
+            lens.reindexObject(idxs=['count', 'modified'])
+
+        except KeyError:
+            return "Error: no such lens"
+
+        return "Sucessful."
 
 
