@@ -561,7 +561,12 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         htmlparser = HTMLParser()
         for name in names:
             value = metadata.get(name)
-            if value:
+            if isinstance(value, list):
+                l = []
+                for v in value:
+                    l.append(htmlparser.unescape(v))
+                metadata[name] = l
+            elif value:
                 metadata[name] = htmlparser.unescape(value)
         return metadata
 
