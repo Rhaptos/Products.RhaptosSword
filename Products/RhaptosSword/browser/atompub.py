@@ -24,7 +24,12 @@ class LensAtomPubAdapter(PloneFolderAtomPubAdapter):
         pmt = getToolByName(self.context, 'portal_membership')
         authenticated_member = pmt.getAuthenticatedMember()
         if authenticated_member.getId() != lens.Creator():
-            raise Unauthorized('You may not add to a lens you do not own.')
+            msg = (
+                'The account, %s, is not allowed to add to the lens '
+                'located at %s since it is not an owner of this lens.' % (
+                authenticated_member.getId(), lens.absolute_url())
+                )
+            raise Unauthorized(msg)
 
         if not lens.isOpen():
             # get attrs
