@@ -71,8 +71,7 @@ METADATA_MAPPING =\
          'analyticsCode': 'GoogleAnalyticsTrackingCode',
         }
 
-# 'abstract' should probably also be added to this list
-ATTRIBUTES_TO_FIX = ['title',]
+ATTRIBUTES_TO_FIX = ['title', 'message', 'keywords']
 
 METADATA_DEFAULTS = \
         {'title': '(Untitled)',
