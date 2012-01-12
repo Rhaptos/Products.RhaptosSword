@@ -83,7 +83,7 @@
     
     <!-- CNX-Supported but not in MDML -->
     <oerdc:descriptionOfChanges tal:condition="treatment/description_of_changes">
-        <tal:description_of_changes replace="structure treatment/description_of_changes" />
+        <tal:description_of_changes replace="treatment/description_of_changes" />
     </oerdc:descriptionOfChanges> 
 
     <oerdc:oer-subject tal:repeat="subject context/subject" tal:content="subject" tal:condition="context/subject">
