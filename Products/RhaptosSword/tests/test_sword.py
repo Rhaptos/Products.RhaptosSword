@@ -91,15 +91,19 @@ def _ModuleView_getFile(self, name):
             return f.file
 ModuleView.getFile = _ModuleView_getFile
 
-class StubZRDBResult(object):
-    def tuples(self):
-        return [(1, 'Arts', 'ISKME subject'),
-                (2, 'Business', 'ISKME subject'),
-                (3, 'Humanities', 'ISKME subject'),
-                (4, 'Mathematics and Statistics', 'ISKME subject'),
-                (5, 'Science and Technology', 'ISKME subject'),
-                (6, 'Social Sciences', 'ISKME subject')
+class StubZRDBResult(list):
+    def __init__(self):
+        data = [StubDataObject(id=1, tag='Arts', scheme='ISKME subject'),
+                StubDataObject(id=2, tag='Business', scheme='ISKME subject'),
+                StubDataObject(id=3, tag='Humanities', scheme='ISKME subject'),
+                StubDataObject(id=4, tag='Mathematics and Statistics', scheme='ISKME subject'),
+                StubDataObject(id=5, tag='Science and Technology', scheme='ISKME subject'),
+                StubDataObject(id=6, tag='Social Sciences', scheme='ISKME subject')
                ]
+        super(StubZRDBResult, self).__init__(data)
+
+    def tuples(self):
+        return [(i.id, i.tag, i.scheme) for i in self]
 
 class StubDataObject(object):
     def __init__(self, **kwargs):
@@ -195,8 +199,14 @@ class StubLanuageTool(SimpleItem):
                 'en-za': 'South African English',
                }
 
+    def listAvailableLanguages(self):
+        return self.getAvailableLanguages()
+
     def getLanguageBindings(self):
         return ('en', 'en', [])
+
+    def getNameForLanguageCode(self, langCode):
+        return self.getAvailableLanguages().get(langCode, langCode)
 
 class StubModuleStorage(ModuleVersionStorage):
     __implements__ = (IVersionStorage)
@@ -1776,7 +1786,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
             )
         # add the module to the lens
         adapter = getMultiAdapter(
-                (lens, uploadrequest), Interface, 'sword')
+                (lens, uploadrequest), Interface, 'atompub')
         xml = adapter()
 
         # assert that the module was added to the lens
@@ -1802,14 +1812,13 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         file.close()
         
         modules = []
-        links = dom.getElementsByTagName('link')
+        entries = dom.getElementsByTagName('entry')
         context = self.folder.workspace
-        for link in links:
+        for entry in entries:
             module = self._createModule(context, 'entry.xml')
             self._publishModule(context, module)
             modules.append(module)
-            href = '%s/%s' %(context.absolute_url(), module.getId())
-            link.setAttribute('href', href)
+            entry.getElementsByTagName('id')[0].firstChild.nodeValue = module.getId()
 
         uploadrequest = self.createUploadRequest(
             None, self.folder.workspace, content = dom.toxml(),
@@ -1817,7 +1826,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
             )
         # add the module to the lens
         adapter = getMultiAdapter(
-                (lens, uploadrequest), Interface, 'sword')
+                (lens, uploadrequest), Interface, 'atompub')
         xml = adapter()
 
         # assert that the module was added to the lens
@@ -1853,7 +1862,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
             )
         # add the module to the lens
         adapter = getMultiAdapter(
-                (lens, uploadrequest), Interface, 'sword')
+                (lens, uploadrequest), Interface, 'atompub')
         xml = adapter()
         assert "<sword:error" not in xml, xml
         xml = adapter()
