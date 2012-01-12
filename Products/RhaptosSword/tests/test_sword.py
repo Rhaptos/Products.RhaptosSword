@@ -191,7 +191,7 @@ class StubModuleDB(SimpleItem):
     def sqlGetRating(self, moduleid, version):
         return None
 
-class StubLanuageTool(SimpleItem):
+class StubLanguageTool(SimpleItem):
 
     def __init__(self):
         self.id = 'language_tool'
@@ -302,7 +302,7 @@ class StubRhaptosRepository(ObjectManager):
 
     security.declarePublic("hasRhaptosObject")
     def hasRhaptosObject(self, id):
-        return bool(self.hasObject(id))
+        return bool(self._context.hasObject(id))
 
 
 def clone_request(req, response=None, env=None):
@@ -350,7 +350,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         if not 'portal_moduledb' in objectIds:
             self.portal._setObject('portal_moduledb', StubModuleDB())
         if not 'portal_languages' in objectIds:
-            self.portal._setObject('portal_languages', StubLanuageTool())
+            self.portal._setObject('portal_languages', StubLanguageTool())
         if not 'lens_tool' in objectIds:
             self.portal._setObject('lens_tool', DummyLensTool())
         if not 'portal_collaboration' in objectIds:
@@ -606,41 +606,39 @@ class TestSwordService(PloneTestCase.PloneTestCase):
             'Result does not match reference doc: \n\n%s' % diff(
                 returned_depositreceipt, reference_depositreceipt))
 
-    def testUploadAndPublish(self):
+    def testUploadAndPublish(self, context):
         """ Upload a module
             Set its metadata
             See if we can publish it.
         """
         self._setupRhaptos()
-        if not 'workspace' in self.portal.objectIds():
-            self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
         uploadrequest = self.createUploadRequest(
             'multipart.txt',
-            context=self.portal.workspace,
+            context=context,
             CONTENT_TYPE='multipart/related; boundary="===============1338623209=="',
             IN_PROGRESS='true',
         )
         # Call the sword view on this request to perform the upload
-        adapter = getMultiAdapter(
-                (self.portal.workspace, uploadrequest), Interface, 'sword')
+        adapter = getMultiAdapter((context, uploadrequest), Interface, 'sword')
         xml = adapter()
         self.assertTrue("<sword:error" not in xml, xml)
         self.assertTrue("<entry" in xml, "Not a valid deposit receipt")
 
         # Sign the license, set the title, set maintainer, author, copyright
         # holder, description of changes.
-        unpubmod = self.portal.workspace.objectValues()[0]
+        unpubmod = context.objectValues()[0]
         unpubmod.license = 'http://creativecommons.org/licenses/by/3.0/'
         unpubmod.title = 'The Tigger Movie'
         unpubmod.maintainers = ['test_user_1_']
         unpubmod.authors = ['test_user_1_']
         unpubmod.licensors = ['test_user_1_']
         unpubmod.message = "I will not buy this tobacconist's, it is scratched"
+        unpubmod.objectId = unpubmod.id
 
         # Publish it for the first time
         emptyrequest = self.createUploadRequest(
             None,
-            context=self.portal.workspace,
+            context=context,
             CONTENT_TYPE='',
             IN_PROGRESS='false',
         )
@@ -650,7 +648,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.assertTrue("<entry" in xml, "Not a valid deposit receipt")
         self.setRoles(('Member',))
 
-        pubmod = self.portal.workspace.objectValues()[0]
+        pubmod = context.objectValues()[0]
         
         file = open(os.path.join(
             DIRNAME, 'data', 'unittest', 'checkout_and_update.txt'), 'r')
@@ -661,13 +659,12 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         uploadrequest = self.createUploadRequest(
             None,
             content=content,
-            context=self.portal.workspace,
+            context=context,
             CONTENT_TYPE='multipart/related; boundary="===============1338623209=="',
             IN_PROGRESS='true'
         )
         # Call the sword view on this request to perform the upload
-        adapter = getMultiAdapter(
-                (self.portal.workspace, uploadrequest), Interface, 'sword')
+        adapter = getMultiAdapter((context, uploadrequest), Interface, 'sword')
         xml = adapter()
 
         # Do the usual checks
@@ -679,7 +676,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         editiri = getEditIRI(dr)
 
         editorid = str(editiri).split('/')[-2]
-        editor = self.portal.workspace.restrictedTraverse(editorid)
+        editor = context.restrictedTraverse(editorid)
 
         # make sure the message was cleared after checkout
         self.assertEqual(editor.message, '')
@@ -703,7 +700,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.assertTrue("<entry" in xml, "Not a valid deposit receipt")
 
         # Check that the version has been incremented
-        pubmod = self.portal.workspace._getOb(editorid)
+        pubmod = context._getOb(editorid)
         self.assertTrue(pubmod.version == "1.2",
             "Version did not increment")
         return pubmod
@@ -780,7 +777,8 @@ class TestSwordService(PloneTestCase.PloneTestCase):
             "http://purl.org/oerpub/error/PublishUnauthorized" in xml, xml)
 
     def testPUTOnStub(self):
-        self.testUploadAndPublish()
+        self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        self.testUploadAndPublish(self.portal.workspace)
         pubmod = self.portal.workspace.objectValues()[0]
         
         file = open(os.path.join(
@@ -950,7 +948,8 @@ class TestSwordService(PloneTestCase.PloneTestCase):
 
     def testDeriveModule(self):
         self.setPermissions(['Manage WebDAV Locks'], role='Member')
-        self.testUploadAndPublish()
+        self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        self.testUploadAndPublish(self.portal.workspace)
         filename = 'derive_module.xml'
         file = open(os.path.join(DIRNAME, 'data', 'unittest', filename), 'r')
         dom = parse(file)
@@ -1768,7 +1767,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
 
         # get a new module
-        module = self.testUploadAndPublish()
+        module = self.testUploadAndPublish(self.folder.workspace)
 
         # create the lens
         lens_id = u'lens001'
@@ -1844,7 +1843,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
 
         # get a new module
-        module = self.testUploadAndPublish()
+        module = self.testUploadAndPublish(self.folder.workspace)
 
         # create the lens
         lens_id = u'lens001'
@@ -1875,9 +1874,10 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.setRoles(('Member','Manager'))
         self.setPermissions(['Manage WebDAV Locks'], role='Member')
         self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        self.portal.content = StubRhaptosRepository(self.folder.workspace)
 
         # get a new module
-        module = self.testUploadAndPublish()
+        module = self.testUploadAndPublish(self.folder.workspace)
 
         # create the lens
         lens_id = u'lens001'
@@ -1899,9 +1899,11 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         # add the module to the lens
         adapter = getMultiAdapter(
                 (lens, uploadrequest), Interface, 'atompub')
+
         xml = adapter()
         assert "<sword:error" not in xml, xml
 
+        module.checkout()
         self._publishModule(self.folder.workspace, module)
 
 
