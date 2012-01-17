@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<entry
+    xmlns="http://www.w3.org/2005/Atom"
+    xmlns:tal="http://xml.zope.org/namespaces/tal"
+    xmlns:metal="http://xml.zope.org/namespaces/metal"
+    xmlns:dcterms="http://purl.org/dc/terms/"
+    xmlns:rhaptos="https://trac.rhaptos.org/trac/rhaptos/wiki/LensAPI"
+    tal:define="entry nocall:options/entry;
+                entry_version_start entry/versionStart;
+                entry_version_stop entry/versionStop;
+                entry_version python:entry_version_stop or 'latest'">
+
+    <author tal:content="entry/getContentAuthors">
+        Lens Creator
+    </author>
+    <title type="text" tal:content="entry/Title">           
+        Entry Title
+    </title>
+    <id tal:content="entry/getId">           
+        Id reference number 
+    </id>
+    <link tal:attributes="rel string:alternate;
+                          href string:/content/${entry/getId}/$entry_version;"/>
+    <rhaptos:inclusive tal:content="entry/implicit">           
+        whether contents are included
+    </rhaptos:inclusive>
+    <rhaptos:versionStart tal:content="entry_version_start">           
+        Start Version
+    </rhaptos:versionStart>
+    <rhaptos:versionStop tal:content="entry_version_stop">           
+        Stop Version
+    </rhaptos:versionStop>
+
+</entry>
+

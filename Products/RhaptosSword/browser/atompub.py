@@ -7,13 +7,25 @@ from zope.security.interfaces import Forbidden
 from zExceptions import Unauthorized
 
 from Products.CMFCore.utils import getToolByName
+from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 
 from rhaptos.atompub.plone.exceptions import PreconditionFailed
+from rhaptos.atompub.plone.browser.atompub import AtomPubService 
 from rhaptos.atompub.plone.browser.atompub import PloneFolderAtomPubAdapter
 from rhaptos.atompub.plone.browser.atompub import getSiteEncoding 
 
 
 from Products.RhaptosSword.interfaces import ILensAtomPubServiceAdapter
+
+
+class RhaptosAtomPubService(AtomPubService):
+    """ override to provide custom atom_entry_document
+    """
+    
+    # As specified by: http://bitworking.org/projects/atom/rfc5023.html#crwp
+    # In answer to a successful POST one must return an:
+    # Atom Entry Document
+    atom_entry_document = ViewPageTemplateFile('atom_entry_document.pt')
 
 
 class LensAtomPubAdapter(PloneFolderAtomPubAdapter):

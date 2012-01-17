@@ -1,10 +1,18 @@
 <configure
-    xmlns="http://namespaces.zope.org/zope">
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser">
 
     <adapter
         for="Products.CMFPlone.interfaces.IPloneSiteRoot
              zope.publisher.interfaces.http.IHTTPRequest"
         provides="rhaptos.swordservice.plone.interfaces.ISWORDServiceDocument"
         factory=".browser.views.ServiceDocument" />
+
+    <browser:page
+        for="*"
+        name="atompub"
+        class=".browser.atompub.RhaptosAtomPubService"
+        permission="zope2.View"
+        />
 
 </configure>
