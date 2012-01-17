@@ -1928,6 +1928,26 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         assert "<sword:error" not in xml, xml
 
 
+    def testCheckoutToWrongWorkspace(self):
+        self._setupRhaptos()
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        context=self.folder.workspace
+
+        self.portal.portal_membership.addMember('user2', 'secret', [], [])
+        self.createMemberarea('user2')
+        self.logout()
+        self.login('user2')
+
+        uploadrequest = self.createUploadRequest(
+            filename='entry.xml',
+            context=context)
+        # Call the sword view on this request to perform the upload
+        adapter = getMultiAdapter(
+                (context, uploadrequest), Interface, 'sword')
+        xml = adapter()
+        assert "Unauthorized" in xml, "This must raise 'Unauthorized'"
+         
+
     def _createModule(self, context, filename):
         """ Utility method to setup the environment and create a module.
         """
