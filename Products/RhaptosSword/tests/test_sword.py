@@ -217,7 +217,8 @@ class StubModuleStorage(ModuleVersionStorage):
     def getHistory(self, id):
         result = []
         for moduleid, data in self.portal_moduledb.versions.items():
-            result.append(makeStubFromVersionData(moduleid, data))
+            if moduleid == id:
+                result.append(makeStubFromVersionData(moduleid, data))
             
         return result
 
@@ -1831,10 +1832,9 @@ class TestSwordService(PloneTestCase.PloneTestCase):
                 (lens, uploadrequest), Interface, 'atompub')
         xml = adapter()
 
-        # assert that the module was added to the lens
-        lens_modules = lens.listFolderContents(spec='SelectedContent')
-        self.assertEqual(len(modules), len(lens_modules),
-                         'The lens modules are incorrect.')
+        self.assertTrue("Multiple entries submitted, "
+                        "only one entry allowed" in xml)
+
     
     def testForbiddenExceptionOnAddToLens(self):
         self._setupRhaptos()
