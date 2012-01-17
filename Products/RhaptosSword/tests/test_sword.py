@@ -503,7 +503,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         returned_depositreceipt = dom.toxml()
 
         file = open(os.path.join(
-            DIRNAME, 'data', 'unittest', 'entry_depositreceipt.xml'), 'r')
+            DIRNAME, 'data', 'unittest', 'entry_depositreceipt_firstpost.xml'), 'r')
         dom = parse(file)
         file.close()
 
