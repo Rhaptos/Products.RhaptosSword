@@ -10,7 +10,7 @@
 
 
     <!-- The metadata begins -->
-    <dcterms:identifier xsi:type="dcterms:URI">http://nohost/plone/workspace/__MODULE_ID__</dcterms:identifier> 
+    <dcterms:identifier xsi:type="dcterms:URI">http://nohost/plone/Members/test_user_1_/workspace/__MODULE_ID__</dcterms:identifier> 
     <dcterms:identifier xsi:type="oerdc:Version">**new**</dcterms:identifier> 
     <dcterms:identifier xsi:type="oerdc:ContentId">__MODULE_ID__</dcterms:identifier> 
     <dcterms:title>Box Plots Statistics for Majors</dcterms:title>
@@ -51,7 +51,7 @@
     
     <sword:treatment>
         Module 'Box Plots Statistics for Majors' was imported.
-        You can <a href="http://nohost/plone/workspace/__MODULE_ID__/module_view">preview your module here</a> to see what it will look like once it is published.
+        You can <a href="http://nohost/plone/Members/test_user_1_/workspace/__MODULE_ID__/module_view">preview your module here</a> to see what it will look like once it is published.
         
         The current description of the changes you have made for this version of the module: Created module
         
@@ -60,18 +60,7 @@
         Before publishing:
 
         
-            1. Author (, account:test_user_1_), will need to <a href="http://nohost/plone/workspace/__MODULE_ID__/module_publish">sign the license here.</a>
-        
-        
-            2. 
-This item will be submitted for publication.<br/>
-NOTE: Due to an increase of spam on our site:
-<ul>
-<li>The first publish of a new author is held to ensure it does not violate the Site User Agreement.</li>
-<li>Once your content is accepted and published, subsequent publishes will not have to be held.</li>
-<li>We appreciate your patience with this policy.</li>
-</ul>
-
+            1. Author (, account:test_user_1_), will need to <a href="http://nohost/plone/Members/test_user_1_/workspace/__MODULE_ID__/module_publish">sign the license here.</a>
         
         
     </sword:treatment>
@@ -80,29 +69,29 @@ NOTE: Due to an increase of spam on our site:
     
     <!-- For all UNPUBLISHED modules -->
 
-    <link href="http://nohost/plone/workspace/__MODULE_ID__/module_view?format=html" rel="alternate"/>
+    <link href="http://nohost/plone/Members/test_user_1_/workspace/__MODULE_ID__/module_view?format=html" rel="alternate"/>
     
-    <content src="http://nohost/plone/workspace/__MODULE_ID__/sword/editmedia" type="application/zip"/>
+    <content src="http://nohost/plone/Members/test_user_1_/workspace/__MODULE_ID__/sword/editmedia" type="application/zip"/>
 
-    <link href="http://nohost/plone/workspace/__MODULE_ID__/sword/editmedia" rel="edit-media"/>
+    <link href="http://nohost/plone/Members/test_user_1_/workspace/__MODULE_ID__/sword/editmedia" rel="edit-media"/>
 
-    <link href="http://nohost/plone/workspace/__MODULE_ID__/sword" rel="edit"/>
+    <link href="http://nohost/plone/Members/test_user_1_/workspace/__MODULE_ID__/sword" rel="edit"/>
           
-    <link href="http://nohost/plone/workspace/__MODULE_ID__/sword" rel="http://purl.org/net/sword/terms/add"/>
+    <link href="http://nohost/plone/Members/test_user_1_/workspace/__MODULE_ID__/sword" rel="http://purl.org/net/sword/terms/add"/>
 
-    <link href="http://nohost/plone/workspace/__MODULE_ID__/sword/statement.atom" rel="http://purl.org/net/sword/terms/statement" type="application/atom+xml;type=feed"/>
+    <link href="http://nohost/plone/Members/test_user_1_/workspace/__MODULE_ID__/sword/statement.atom" rel="http://purl.org/net/sword/terms/statement" type="application/atom+xml;type=feed"/>
 
     <sword:packaging>http://purl.org/net/sword/package/SimpleZip</sword:packaging>
 
-    <link href="http://nohost/plone/workspace/__MODULE_ID__/module_view?format=html" rel="http://purl.org/net/sword/terms/derivedResource"/>
+    <link href="http://nohost/plone/Members/test_user_1_/workspace/__MODULE_ID__/module_view?format=html" rel="http://purl.org/net/sword/terms/derivedResource"/>
             
-    <link href="http://nohost/plone/workspace/__MODULE_ID__/" rel="http://purl.org/net/sword/terms/derivedResource"/>
+    <link href="http://nohost/plone/Members/test_user_1_/workspace/__MODULE_ID__/" rel="http://purl.org/net/sword/terms/derivedResource"/>
 
-    <link href="http://nohost/plone/workspace/__MODULE_ID__/module_view?format=pdf" rel="http://purl.org/net/sword/terms/derivedResource" type="application/pdf"/>
+    <link href="http://nohost/plone/Members/test_user_1_/workspace/__MODULE_ID__/module_view?format=pdf" rel="http://purl.org/net/sword/terms/derivedResource" type="application/pdf"/>
             
-    <link href="http://nohost/plone/workspace/__MODULE_ID__/module_export?format=zip" rel="http://purl.org/net/sword/terms/derivedResource" type="application/zip"/>
+    <link href="http://nohost/plone/Members/test_user_1_/workspace/__MODULE_ID__/module_export?format=zip" rel="http://purl.org/net/sword/terms/derivedResource" type="application/zip"/>
 
-    <link href="http://nohost/plone/workspace/__MODULE_ID__/module_export?format=plain" rel="http://purl.org/net/sword/terms/derivedResource" type="application/xml"/>
+    <link href="http://nohost/plone/Members/test_user_1_/workspace/__MODULE_ID__/module_export?format=plain" rel="http://purl.org/net/sword/terms/derivedResource" type="application/xml"/>
 
     <!-- END for all UNPUBLISHED modules -->
     

@@ -288,6 +288,7 @@ class StubRhaptosRepository(ObjectManager):
         self._default_storage = None
         self._context = context
 
+    security.declarePublic("getRhaptosObject")
     def getRhaptosObject(self, id, version=None, **kwargs):
         obj = self._context._getOb(id)
         setattr(obj, 'latest', obj)
@@ -304,6 +305,10 @@ class StubRhaptosRepository(ObjectManager):
     security.declarePublic("hasRhaptosObject")
     def hasRhaptosObject(self, id):
         return bool(self._context.hasObject(id))
+
+    security.declarePublic("publishRevision")
+    def publishRevision(self, context, message):
+        return True
 
 
 def clone_request(req, response=None, env=None):
@@ -468,6 +473,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
          See what happens when we throw bad xml at the import funtionality.
         """
         self._setupRhaptos()
+        self.setRoles(('Manager',))
         if not 'workspace' in self.portal.objectIds():
             self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
         uploadrequest = self.createUploadRequest('bad_entry.xml', self.portal.workspace)
@@ -482,16 +488,16 @@ class TestSwordService(PloneTestCase.PloneTestCase):
     def testMetadata(self):
         """ See if the metadata is added correctly. """
         self._setupRhaptos()
-        self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
         uploadrequest = self.createUploadRequest(
             'entry.xml',
-            self.portal.workspace,
+            self.folder.workspace,
             CONTENT_DISPOSITION='attachment; filename=entry.xml',
         )
 
         # Call the sword view on this request to perform the upload
         adapter = getMultiAdapter(
-                (self.portal.workspace, uploadrequest), Interface, 'sword')
+                (self.folder.workspace, uploadrequest), Interface, 'sword')
         xml = adapter()
         dom = parseString(xml)
         returned_depositreceipt = dom.toxml()
@@ -501,7 +507,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         dom = parse(file)
         file.close()
 
-        module = self.portal.workspace.objectValues()[0]
+        module = self.folder.workspace.objectValues()[0]
         self.assertEqual(module.message, 'Created module')
         mid = dom.getElementsByTagName('id')
         for element in mid:
@@ -562,25 +568,25 @@ class TestSwordService(PloneTestCase.PloneTestCase):
 
     def testMultipart(self):
         self._setupRhaptos()
-        self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
         uploadrequest = self.createUploadRequest(
             'multipart.txt',
-            context=self.portal.workspace,
+            context=self.folder.workspace,
             CONTENT_TYPE='multipart/related; boundary="===============1338623209=="'
         )
         # Call the sword view on this request to perform the upload
         adapter = getMultiAdapter(
-                (self.portal.workspace, uploadrequest), Interface, 'sword')
+                (self.folder.workspace, uploadrequest), Interface, 'sword')
         xml = adapter()
         drdom = parseString(xml)
         editiri = getEditIRI(drdom)
         # it is no longer /sword/edit... just /sword
         moduleid = editiri.split('/')[-2]
         returned_depositreceipt = drdom.toxml()
-        self.assertTrue(moduleid in self.portal.workspace.objectIds())
+        self.assertTrue(moduleid in self.folder.workspace.objectIds())
         self.assertTrue("<entry" in xml, "Not a valid deposit receipt")
 
-        module = self.portal.workspace.objectValues()[0]
+        module = self.folder.workspace.objectValues()[0]
         self.assertEqual(module.message, 'Frobnicate the Bar')
         file = open(os.path.join(DIRNAME, 'data', 'unittest', 'multipart_depositreceipt.xml'), 'r')
         dom = parse(file)
@@ -607,7 +613,8 @@ class TestSwordService(PloneTestCase.PloneTestCase):
             'Result does not match reference doc: \n\n%s' % diff(
                 returned_depositreceipt, reference_depositreceipt))
 
-    def testUploadAndPublish(self, context):
+
+    def _createAndPublishModule(self, context):
         """ Upload a module
             Set its metadata
             See if we can publish it.
@@ -635,6 +642,8 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         unpubmod.licensors = ['test_user_1_']
         unpubmod.message = "I will not buy this tobacconist's, it is scratched"
         unpubmod.objectId = unpubmod.id
+        if not hasattr(unpubmod, 'name'):
+            setattr(unpubmod, 'name', unpubmod.id)
 
         # Publish it for the first time
         emptyrequest = self.createUploadRequest(
@@ -650,6 +659,14 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.setRoles(('Member',))
 
         pubmod = context.objectValues()[0]
+        return pubmod
+    
+
+    def testUploadAndPublish(self):
+        self.setRoles(('Manager',))
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        context = self.folder.workspace
+        pubmod = self._createAndPublishModule(context) 
         
         file = open(os.path.join(
             DIRNAME, 'data', 'unittest', 'checkout_and_update.txt'), 'r')
@@ -692,6 +709,12 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         editor.licensors = ['test_user_1_']
         editor.message = 'Our hovercraft is no longer invested by eels'
 
+        emptyrequest = self.createUploadRequest(
+            None,
+            context=context,
+            CONTENT_TYPE='',
+            IN_PROGRESS='false',
+        )
         # Now publish it by posting to the edit-iri
         adapter = getMultiAdapter((editor, emptyrequest), ISWORDEditIRI)
         xml = adapter()
@@ -707,19 +730,20 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         return pubmod
 
     def testPublishOnCreate(self):
+        self.setRoles(('Manager',))
         self._setupRhaptos()
-        self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
         # try publish immediately with In-Progress set to false
         uploadrequest = self.createUploadRequest(
             'entry.xml',
-            self.portal.workspace,
+            self.folder.workspace,
             CONTENT_DISPOSITION='attachment; filename=entry.xml',
             IN_PROGRESS='false',
         )
 
         # Call the sword view on this request to perform the upload
         adapter = getMultiAdapter(
-                (self.portal.workspace, uploadrequest), Interface, 'sword')
+                (self.folder.workspace, uploadrequest), Interface, 'sword')
         xml = adapter()
 
         # We should receive an error that confirms that an attempt was
@@ -730,9 +754,9 @@ class TestSwordService(PloneTestCase.PloneTestCase):
 
     def testPublishOnPostToSEIRI(self):
         self._setupRhaptos()
-        self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
         filename = 'entry.xml'
-        module = self._createModule(self.portal.workspace, filename)
+        module = self._createModule(self.folder.workspace, filename)
 
         # try publish on Post with In-Progress set to false
         uploadrequest = self.createUploadRequest(
@@ -756,10 +780,10 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self._setupRhaptos()
         # without the manager role we can't publish
         self.setRoles(('Manager',))
-        self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
         # try publish on PUT with In-Progress set to false
         filename = 'entry.xml'
-        module = self._createModule(self.portal.workspace, filename)
+        module = self._createModule(self.folder.workspace, filename)
 
         uploadrequest = self.createUploadRequest(
             'entry.xml',
@@ -778,9 +802,9 @@ class TestSwordService(PloneTestCase.PloneTestCase):
             "http://purl.org/oerpub/error/PublishUnauthorized" in xml, xml)
 
     def testPUTOnStub(self):
-        self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
-        self.testUploadAndPublish(self.portal.workspace)
-        pubmod = self.portal.workspace.objectValues()[0]
+        self.setRoles(('Manager',))
+        self.testUploadAndPublish()
+        pubmod = self.folder.workspace.objectValues()[0]
         
         file = open(os.path.join(
             DIRNAME, 'data', 'unittest', 'checkout_and_update.txt'), 'r')
@@ -791,7 +815,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         uploadrequest = self.createUploadRequest(
             None,
             content=content,
-            context=self.portal.workspace,
+            context=self.folder.workspace,
             CONTENT_TYPE='multipart/related; boundary="===============1338623209=="',
             IN_PROGRESS='true',
             REQUEST_METHOD='PUT'
@@ -809,7 +833,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         editiri = getEditIRI(dr)
 
         editorid = str(editiri).split('/')[-2]
-        editor = self.portal.workspace.restrictedTraverse(editorid)
+        editor = self.folder.workspace.restrictedTraverse(editorid)
 
         # make sure the message was cleared after checkout
         self.assertEqual(editor.message, '')
@@ -857,10 +881,10 @@ class TestSwordService(PloneTestCase.PloneTestCase):
 
     def testSwordServiceRetrieveContent(self):
         self._setupRhaptos()
-        self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
         uploadrequest = self.createUploadRequest(
             'multipart.txt',
-            context=self.portal.workspace,
+            context=self.folder.workspace,
             CONTENT_TYPE='multipart/related; boundary="===============1338623209=="',
             CONTENT_DISPOSITION='attachment; filename=multipart.txt'
         )
@@ -868,7 +892,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         # Call the sword view on this request to perform the upload
         self.setRoles(('Manager',))
         adapter = getMultiAdapter(
-                (self.portal.workspace, uploadrequest), Interface, 'sword')
+                (self.folder.workspace, uploadrequest), Interface, 'sword')
         xml = adapter()
         self.assertTrue("<sword:error" not in xml, xml)
         self.assertTrue("<entry" in xml, "Not a valid deposit receipt")
@@ -881,11 +905,11 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         getresponse = HTTPResponse(stdout=StringIO())
         getrequest = clone_request(self.app.REQUEST, getresponse, env)
         
-        ids = self.portal.objectIds()
+        ids = self.folder.objectIds()
         self.assertTrue('workspace' in ids, 'No workspace found!')
 
         # We should have at least one module now, this will fail if we don't
-        module = self.portal.workspace.objectValues()[0]
+        module = self.folder.workspace.objectValues()[0]
 
         adapter = getMultiAdapter((module, getrequest), ISWORDEMIRI)
         retrieved_content = adapter()
@@ -911,17 +935,17 @@ class TestSwordService(PloneTestCase.PloneTestCase):
     def testSwordServiceStatement(self):
         self._setupRhaptos()
         self.setRoles(('Manager',))
-        self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
 
         uploadrequest = self.createUploadRequest(
             'multipart.txt',
-            context=self.portal.workspace,
+            context=self.folder.workspace,
             CONTENT_TYPE='multipart/related; boundary="===============1338623209=="',
             CONTENT_DISPOSITION='attachment; filename=multipart.txt'
         )
 
         adapter = getMultiAdapter(
-                (self.portal.workspace, uploadrequest), Interface, 'sword')
+                (self.folder.workspace, uploadrequest), Interface, 'sword')
         xml = adapter()
         assert "<sword:error" not in xml, xml
 
@@ -949,8 +973,8 @@ class TestSwordService(PloneTestCase.PloneTestCase):
 
     def testDeriveModule(self):
         self.setPermissions(['Manage WebDAV Locks'], role='Member')
-        self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
-        self.testUploadAndPublish(self.portal.workspace)
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        self._createAndPublishModule(self.folder.workspace)
         filename = 'derive_module.xml'
         file = open(os.path.join(DIRNAME, 'data', 'unittest', filename), 'r')
         dom = parse(file)
@@ -962,6 +986,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
             None, self.folder.workspace, content = dom.toxml(),
             IN_PROGRESS='true'
             )
+        self.setRoles(('Manager',))
         adapter = getMultiAdapter(
                 (self.folder.workspace, uploadrequest), Interface, 'sword')
         xml = adapter()
@@ -1049,9 +1074,9 @@ class TestSwordService(PloneTestCase.PloneTestCase):
 
     def test_handlePost(self):
         self._setupRhaptos()
-        self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
         filename = 'entry.xml'
-        module = self._createModule(self.portal.workspace, filename)
+        module = self._createModule(self.folder.workspace, filename)
 
         # POST the same entry to make sure nothing is lost
         uploadrequest = self.createUploadRequest(
@@ -1071,7 +1096,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         dom = parse(file)
         file.close()
 
-        module = self.portal.workspace.objectValues()[0]
+        module = self.folder.workspace.objectValues()[0]
         self.assertEqual(module.message, 'Created module')
         mid = dom.getElementsByTagName('id')
         for element in mid:
@@ -1101,8 +1126,8 @@ class TestSwordService(PloneTestCase.PloneTestCase):
     
     def test_POSTMultipartOnSEIRI(self):
         self._setupRhaptos()
-        self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
-        module = self._createModule(self.portal.workspace, 'entry.xml')
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        module = self._createModule(self.folder.workspace, 'entry.xml')
 
         # try publish on Post with In-Progress set to false
         uploadrequest = self.createUploadRequest(
@@ -1555,15 +1580,15 @@ class TestSwordService(PloneTestCase.PloneTestCase):
 
     def test_one_featured_link(self):
         self._setupRhaptos()
-        self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
         uploadrequest = self.createUploadRequest(
             'one_featured_link.txt',
-            context=self.portal.workspace,
+            context=self.folder.workspace,
             CONTENT_TYPE='multipart/related; boundary="===============1338623209=="'
         )
         # Call the sword view on this request to perform the upload
         adapter = getMultiAdapter(
-                (self.portal.workspace, uploadrequest), Interface, 'sword')
+                (self.folder.workspace, uploadrequest), Interface, 'sword')
         xml = adapter()
         drdom = parseString(xml)
         module = self.folder.workspace.objectValues()[0]
@@ -1584,21 +1609,21 @@ class TestSwordService(PloneTestCase.PloneTestCase):
             'Link target incorrect')
         self.assertEqual(
             link.source,
-            'http://nohost/plone/workspace/%s' %module.id,
+            'http://nohost/plone/Members/test_user_1_/workspace/%s' %module.id,
             'Link source incorrect')
 
 
     def test_multiple_featured_links(self):
         self._setupRhaptos()
-        self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
         uploadrequest = self.createUploadRequest(
             'multiple_links_one_category.txt',
-            context=self.portal.workspace,
+            context=self.folder.workspace,
             CONTENT_TYPE='multipart/related; boundary="===============1338623209=="'
         )
         # Call the sword view on this request to perform the upload
         adapter = getMultiAdapter(
-                (self.portal.workspace, uploadrequest), Interface, 'sword')
+                (self.folder.workspace, uploadrequest), Interface, 'sword')
         xml = adapter()
         drdom = parseString(xml)
         module = self.folder.workspace.objectValues()[0]
@@ -1609,17 +1634,17 @@ class TestSwordService(PloneTestCase.PloneTestCase):
             [{'title': 'Test feature link',
               'category': 'example',
               'target': 'http://localhost:8080/featured_module',
-              'source': 'http://nohost/plone/workspace/%s',
+              'source': 'http://nohost/plone/Members/test_user_1_/workspace/%s',
              },
              {'title': 'Featured link 02',
               'category': 'example',
               'target': 'http://localhost:8080/featured_module_02',
-              'source': 'http://nohost/plone/workspace/%s',
+              'source': 'http://nohost/plone/Members/test_user_1_/workspace/%s',
              },
              {'title': 'Featured link 03',
               'category': 'example',
               'target': 'http://localhost:8080/featured_module_03',
-              'source': 'http://nohost/plone/workspace/%s',
+              'source': 'http://nohost/plone/Members/test_user_1_/workspace/%s',
              },
             ]
         
@@ -1646,15 +1671,15 @@ class TestSwordService(PloneTestCase.PloneTestCase):
 
     def test_multiple_featured_links_different_categories(self):
         self._setupRhaptos()
-        self.portal.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
         uploadrequest = self.createUploadRequest(
             'multiple_links_different_categories.txt',
-            context=self.portal.workspace,
+            context=self.folder.workspace,
             CONTENT_TYPE='multipart/related; boundary="===============1338623209=="'
         )
         # Call the sword view on this request to perform the upload
         adapter = getMultiAdapter(
-                (self.portal.workspace, uploadrequest), Interface, 'sword')
+                (self.folder.workspace, uploadrequest), Interface, 'sword')
         xml = adapter()
         drdom = parseString(xml)
         module = self.folder.workspace.objectValues()[0]
@@ -1665,47 +1690,47 @@ class TestSwordService(PloneTestCase.PloneTestCase):
             [{'title': 'Supplemental featured link 01',
               'category': 'supplemental',
               'target': 'http://localhost:8080/featured_module_supplemental_01',
-              'source': 'http://nohost/plone/workspace/%s',
+              'source': 'http://nohost/plone/Members/test_user_1_/workspace/%s',
              },
              {'title': 'Supplemental featured link 02',
               'category': 'supplemental',
               'target': 'http://localhost:8080/featured_module_supplemental_02',
-              'source': 'http://nohost/plone/workspace/%s',
+              'source': 'http://nohost/plone/Members/test_user_1_/workspace/%s',
              },
              {'title': 'Supplemental featured link 03',
               'category': 'supplemental',
               'target': 'http://localhost:8080/featured_module_supplemental_03',
-              'source': 'http://nohost/plone/workspace/%s',
+              'source': 'http://nohost/plone/Members/test_user_1_/workspace/%s',
              },
              {'title': 'Test feature link',
               'category': 'example',
               'target': 'http://localhost:8080/featured_module',
-              'source': 'http://nohost/plone/workspace/%s',
+              'source': 'http://nohost/plone/Members/test_user_1_/workspace/%s',
              },
              {'title': 'Featured link 02',
               'category': 'example',
               'target': 'http://localhost:8080/featured_module_02',
-              'source': 'http://nohost/plone/workspace/%s',
+              'source': 'http://nohost/plone/Members/test_user_1_/workspace/%s',
              },
              {'title': 'Featured link 03',
               'category': 'example',
               'target': 'http://localhost:8080/featured_module_03',
-              'source': 'http://nohost/plone/workspace/%s',
+              'source': 'http://nohost/plone/Members/test_user_1_/workspace/%s',
              },
              {'title': 'Prerequisite featured link 01',
               'category': 'prerequisite',
               'target': 'http://localhost:8080/featured_module_prereq_01',
-              'source': 'http://nohost/plone/workspace/%s',
+              'source': 'http://nohost/plone/Members/test_user_1_/workspace/%s',
              },
              {'title': 'Prerequisite featured link 02',
               'category': 'prerequisite',
               'target': 'http://localhost:8080/featured_module_prereq_02',
-              'source': 'http://nohost/plone/workspace/%s',
+              'source': 'http://nohost/plone/Members/test_user_1_/workspace/%s',
              },
              {'title': 'Prerequisite featured link 03',
               'category': 'prerequisite',
               'target': 'http://localhost:8080/featured_module_prereq_03',
-              'source': 'http://nohost/plone/workspace/%s',
+              'source': 'http://nohost/plone/Members/test_user_1_/workspace/%s',
              },
             ]
         
@@ -1768,7 +1793,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
 
         # get a new module
-        module = self.testUploadAndPublish(self.folder.workspace)
+        module = self._createAndPublishModule(self.folder.workspace)
 
         # create the lens
         lens_id = u'lens001'
@@ -1843,7 +1868,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
 
         # get a new module
-        module = self.testUploadAndPublish(self.folder.workspace)
+        module = self._createAndPublishModule(self.folder.workspace)
 
         # create the lens
         lens_id = u'lens001'
@@ -1874,10 +1899,10 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         self.setRoles(('Member','Manager'))
         self.setPermissions(['Manage WebDAV Locks'], role='Member')
         self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
-        self.portal.content = StubRhaptosRepository(self.folder.workspace)
+        self.folder.content = StubRhaptosRepository(self.folder.workspace)
 
         # get a new module
-        module = self.testUploadAndPublish(self.folder.workspace)
+        module = self._createAndPublishModule(self.folder.workspace)
 
         # create the lens
         lens_id = u'lens001'
@@ -1899,17 +1924,14 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         # add the module to the lens
         adapter = getMultiAdapter(
                 (lens, uploadrequest), Interface, 'atompub')
-
         xml = adapter()
         assert "<sword:error" not in xml, xml
-
-        module.checkout()
-        self._publishModule(self.folder.workspace, module)
 
 
     def _createModule(self, context, filename):
         """ Utility method to setup the environment and create a module.
         """
+        self.setRoles(('Manager',))
         uploadrequest = self.createUploadRequest(
             filename, 
             context,
@@ -1932,6 +1954,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
     def _publishModule(self, context, module):
         # Sign the license, set the title, set maintainer, author, copyright
         # holder, description of changes.
+        self.setRoles(('Manager',))
         module.license = 'http://creativecommons.org/licenses/by/3.0/'
         module.title = 'The Tigger Movie'
         module.maintainers = ['test_user_1_']
