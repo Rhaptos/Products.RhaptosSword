@@ -4,6 +4,7 @@
        xmlns:dcterms="http://purl.org/dc/terms/"
        xmlns:md="http://cnx.rice.edu/mdml"
        xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:oerdc="http://cnx.org/aboutus/technology/schemas/oerdc"
        tal:define="pending_collaborations view/pending_collaborations;
@@ -16,11 +17,10 @@
     <title tal:content="context/title">My Deposit</title>
     <id tal:content="context/getId">1234</id>
     <updated tal:content="context/revised">2008-08-18T14:27:08Z</updated>
-    <summary type="text" tal:condition="context/abstract" tal:content="context/abstract">
+    <summary type="text" tal:condition="context/abstract" tal:content="structure context/abstract">
         The summary
-    </summary>
-    <generator uri="rhaptos.swordservice.plone" version="1.0"/>
-
+        </summary>
+    <span tal:replace="structure context/@@generator-tag">cnx.org</span>
     <!-- The metadata begins -->
     <dcterms:identifier xsi:type="dcterms:URI" tal:content="context/absolute_url">
         http://cnx.org/content/m10000/1.1/
@@ -65,7 +65,7 @@
         Rights holder full name  
     </dcterms:rightsHolder>
     <oerdc:translator oerdc:id="translator id" oerdc:email="translator email"
-            tal:repeat="translator context/translators|python:()"
+            tal:repeat="translator python:context.roles.get('translators', [])"
             tal:content="python:view.fullname(translator)"
             tal:attributes="oerdc:id translator;
                             oerdc:email python:view.email(translator);
@@ -73,7 +73,7 @@
         Translator full name  
     </oerdc:translator>
     <oerdc:editor oerdc:id="editor id" oerdc:email="editor email"
-            tal:repeat="editor context/editors|python:()"
+            tal:repeat="editor python:context.roles.get('editors', [])"
             tal:content="python:view.fullname(editor)"
             tal:attributes="oerdc:id editor;
                             oerdc:email python:view.email(editor);
@@ -104,28 +104,15 @@
         http://cnx.org/content/m16296/1.8/
     </dcterms:source>
 
-    <dcterms:abstract tal:content="context/abstract">
+    <dcterms:abstract tal:content="structure context/abstract">
         The abstract
     </dcterms:abstract>
 
     <dcterms:language xsi:type="ISO639-1" tal:content="context/language">en</dcterms:language> 
 
     <dcterms:license xsi:type="dcterms:URI" tal:content="context/license">http://creativecommons.org/licenses/by/3.0/</dcterms:license>
-
-    <sword:treatment>
-        <tal:actions replace="treatment/actions" />
-        <tal:preview_link replace="structure treatment/preview_link" />
-        <tal:description_of_changes tal:condition="treatment/description_of_changes|nothing">
-        The current description of the changes you have made for this version of the module: <tal:block tal:replace="structure treatment/description_of_changes"/>
-        </tal:description_of_changes>
-
-        <tal:publication_requirements condition="treatment/publication_requirements">
-        Publication requirements:
-        <tal:requirements repeat="requirement treatment/publication_requirements">
-            <tal:requirement replace="structure string:${repeat/requirement/number}. ${requirement}" />
-        </tal:requirements>
-        </tal:publication_requirements>
-    </sword:treatment>
+    
+    <metal:treatment use-macro="context/sword/statement.atom/statement/macros/treatment">Treatment</metal:treatment>
 
     <tal:not_published condition="not:is_published">
     <!-- For all UNPUBLISHED modules -->

@@ -5,7 +5,9 @@
     <id>__MODULE_ID__</id>
     <updated>2011/09/11 18:24:32.449 GMT+2</updated>
     
-    <generator uri="rhaptos.swordservice.plone" version="1.0"/>
+    
+    <generator uri="rhaptos.swordservice.plone" version="1.1"/>
+
 
     <!-- The metadata begins -->
     <dcterms:identifier xsi:type="dcterms:URI">http://nohost/plone/workspace/__MODULE_ID__</dcterms:identifier> 
@@ -32,16 +34,18 @@
     <dcterms:language xsi:type="ISO639-1">en</dcterms:language> 
 
     <dcterms:license xsi:type="dcterms:URI"/>
-
+    
+    
     <sword:treatment>
-        Module '(Untitled)' was imported via the SWORD API.
+        Module '(Untitled)' was imported.
         You can <a href="http://nohost/plone/workspace/__MODULE_ID__/module_view">preview your module here</a> to see what it will look like once it is published.
         
         The current description of the changes you have made for this version of the module: Created module
         
 
         
-        Publication requirements:
+        Before publishing:
+
         
             1. Author (, account:test_user_1_), will need to <a href="http://nohost/plone/workspace/__MODULE_ID__/module_publish">sign the license here.</a>
         
@@ -52,6 +56,7 @@ page</a>.
         
         
     </sword:treatment>
+    
 
     
     <!-- For all UNPUBLISHED modules -->

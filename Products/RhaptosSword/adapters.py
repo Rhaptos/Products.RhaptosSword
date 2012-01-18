@@ -1,3 +1,4 @@
+from HTMLParser import HTMLParser
 from copy import copy
 from xml.dom.minidom import parse
 from zipfile import BadZipfile
@@ -22,6 +23,8 @@ from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from Products.CNXMLTransforms.helpers import CNXImportError, doTransform, makeContent
 from Products.CNXMLDocument.XMLService import XMLParserError
 from Products.CNXMLDocument.XMLService import validate
+from Products.RhaptosCollection.interfaces import ICollection
+from Products.RhaptosModuleEditor.interfaces import IModule
 
 from rhaptos.atompub.plone.exceptions import PreconditionFailed
 from rhaptos.atompub.plone.browser.atompub import ATOMPUB_CONTENT_TYPES
@@ -40,20 +43,9 @@ from Products.RhaptosSword.exceptions import OverwriteNotPermitted
 from Products.RhaptosSword.exceptions import TransformFailed
 from Products.RhaptosSword.exceptions import DepositFailed
 
-from utils import splitMultipartRequest, checkUploadSize
+from Products.RhaptosSword.utils import splitMultipartRequest, checkUploadSize
+from Products.RhaptosSword.utils import getSiteEncoding, SWORDTreatmentMixin
 
-def getSiteEncoding(context):
-    """ if we have on return it,
-        if not, figure out what it is, store it and return it.
-    """
-    encoding = 'utf-8'
-    properties = getToolByName(context, 'portal_properties')
-    site_properties = getattr(properties, 'site_properties', None)
-    if site_properties:
-        encoding = site_properties.getProperty('default_charset')
-    return encoding
-
-    
 class ValidationError(Exception):
     """ Basic validation error
     """
@@ -79,6 +71,8 @@ METADATA_MAPPING =\
          'analyticsCode': 'GoogleAnalyticsTrackingCode',
         }
 
+ATTRIBUTES_TO_FIX = ['title', 'message', 'keywords']
+
 METADATA_DEFAULTS = \
         {'title': '(Untitled)',
          'abstract': '',
@@ -86,13 +80,6 @@ METADATA_DEFAULTS = \
          'keywords': [],
          'subject': [],
          'GoogleAnalyticsTrackingCode': '',
-        }
-
-DESCRIPTION_OF_TREATMENT =\
-        {'derive': "Checkout and derive a new copy.",
-         'checkout': "Checkout to user's workspace.",
-         'create': "Created a module.",
-         'save': "Changes saved."
         }
 
 ROLE_MAPPING = {'creator': 'Author',
@@ -144,22 +131,23 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         # see if the request has a atompub payload that specifies,
         # module id in "source" or "mdml:derived_from" in ATOM entry.
         def _deriveOrCheckout(dom):
-            # Check if this is a request to derive or checkout a module
+            # Check if this is a request to derive or checkout an item
+            # 'item' could be a module or a collection at this point.
             elements = dom.getElementsByTagNameNS(
                 "http://purl.org/dc/terms/", 'isVersionOf')
             if len(elements) > 0:
-                module_id = \
+                item_id = \
                     elements[0].firstChild.toxml().encode(self.encoding)
-                obj = self.checkoutModule(module_id)
+                obj = self.checkoutItem(item_id)
                 self.action = 'checkout'
                 return obj
             elements = dom.getElementsByTagNameNS(
                 "http://purl.org/dc/terms/", 'source')
             if len(elements) > 0:
                 # now we can fork / derive the module
-                module_id = \
+                item_id = \
                     elements[0].firstChild.toxml().encode(self.encoding)
-                obj = self.deriveModule(module_id)
+                obj = self.deriveItem(item_id)
                 self.action = 'derive'
                 return obj
 
@@ -196,24 +184,24 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         return obj
 
 
-    def deriveModule(self, url):
+    def deriveItem(self, url):
         """ We checkout the object, fork it, remove the temp one and 
             return the forked copy.
         """
-        module_id = url.split('/')[-1]
-        # Fetch module and area
-        version = 'latest'
+        item_id = url.split('/')[-1]
+        # Fetch item and area
+        version = 'latest' #TODO: honour the version in the xml payload
         content_tool = getToolByName(self.context, 'content')
-        module = content_tool.getRhaptosObject(module_id, version)
+        item = content_tool.getRhaptosObject(item_id, version)
         area = self.context
         # We create a copy that we want to clean up later, let's track the id
         to_delete_id = area.generateUniqueId()
-        area.invokeFactory(id=to_delete_id, type_name=module.portal_type)
+        area.invokeFactory(id=to_delete_id, type_name=item.portal_type)
         obj = area._getOb(to_delete_id)
 
-        # module must be checked out to area before a fork is possible
+        # item must be checked out to area before a fork is possible
         obj.setState('published')
-        obj.checkout(module.objectId)
+        obj.checkout(item.objectId)
 
         # Do the fork
         forked_obj = obj.forkContent(license='', return_context=True)
@@ -235,46 +223,46 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         return forked_obj
 
 
-    def canCheckout(self, module):
+    def canCheckout(self, item):
         #return False
         pms = getToolByName(self.context, 'portal_membership')
         member = pms.getAuthenticatedMember()
 
-        li = list(module.authors) \
-            + list(module.maintainers) \
-            + list(module.licensors) \
-            + list(module.roles.get('translators', []))
+        li = list(item.authors) \
+            + list(item.maintainers) \
+            + list(item.licensors) \
+            + list(item.roles.get('translators', []))
 
         return member.getId() in li
 
 
-    def checkoutModule(self, url):
+    def checkoutItem(self, url):
         context = aq_inner(self.context)
-        module_id = url.split('/')[-1]
+        item_id = url.split('/')[-1]
 
-        # Fetch module
+        # Fetch item
         content_tool = getToolByName(self.context, 'content')
-        module = content_tool.getRhaptosObject(module_id, 'latest')
+        item = content_tool.getRhaptosObject(item_id, 'latest')
 
-        if not self.canCheckout(module):
+        if not self.canCheckout(item):
             raise CheckoutUnauthorized(
-                "You do not have permission to checkout %s" % module_id,
-                "You are not a maintainer of the requested module or "
+                "You do not have permission to checkout %s" % item_id,
+                "You are not a maintainer of the requested item or "
                 "you do not have sufficient permissions for this workspace")
 
-        if module_id not in context.objectIds():
-            context.invokeFactory(id=module_id, type_name=module.portal_type)
-            obj = context._getOb(module_id)
+        if item_id not in context.objectIds():
+            context.invokeFactory(id=item_id, type_name=item.portal_type)
+            obj = context._getOb(item_id)
             obj.setState('published')
-            obj.checkout(module.objectId)
+            obj.checkout(item.objectId)
             return obj
         else:
-            obj = context._getOb(module_id)
+            obj = context._getOb(item_id)
             if obj.state == 'published':
                 # Check out on top of published copy
-                obj.checkout(module.objectId)
+                obj.checkout(item.objectId)
                 return obj
-            elif obj.state == "checkedout" and obj.version == module.version:
+            elif obj.state == "checkedout" and obj.version == item.version:
                 # Already checked out, use as is
                 return obj
             else:
@@ -320,7 +308,11 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                     metadata[cnx_name] = current_value
         if metadata:
             self.validate_metadata(metadata)
-            obj.update_metadata(**metadata)
+            metadata = self.fixEntities(metadata, ATTRIBUTES_TO_FIX)
+            if ICollection.providedBy(obj):
+                obj.collection_metadata(**metadata)
+            elif IModule.providedBy(obj):
+                obj.update_metadata(**metadata)
         self.updateRoles(obj, dom)
         obj.reindexObject(idxs=metadata.keys())
 
@@ -330,7 +322,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             SWORD V2 Spec for Publishing Modules in Connexions
             Section: Metadata
         """
-        self.update_semantics = 'update'
+        self.update_semantics = 'merge'
         metadata = {}
         metadata.update(self.getMetadata(dom, METADATA_MAPPING))
         for oerdc_name, cnx_name in METADATA_MAPPING.items():
@@ -348,7 +340,11 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                     metadata[cnx_name] = new_values
         if metadata:
             self.validate_metadata(metadata)
-            obj.update_metadata(**metadata)
+            metadata = self.fixEntities(metadata, ATTRIBUTES_TO_FIX)
+            if ICollection.providedBy(obj):
+                obj.collection_metadata(**metadata)
+            elif IModule.providedBy(obj):
+                obj.update_metadata(**metadata)
         self.updateRoles(obj, dom)
         obj.reindexObject(idxs=metadata.keys())
 
@@ -373,7 +369,11 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         metadata.update(self.getMetadata(dom, METADATA_MAPPING))
         if metadata:
             self.validate_metadata(metadata)
-            obj.update_metadata(**metadata)
+            metadata = self.fixEntities(metadata, ATTRIBUTES_TO_FIX)
+            if ICollection.providedBy(obj):
+                obj.collection_metadata(**metadata)
+            elif IModule.providedBy(obj):
+                obj.update_metadata(**metadata)
         # we set GoogleAnalyticsTrackingCode explicitly, since the script
         # 'update_metadata' ignores empty strings.
         obj.GoogleAnalyticsTrackingCode = metadata.get('GoogleAnalyticsTrackingCode')
@@ -458,6 +458,12 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             obj.updateProperties(props)
             # Make sure the metadata gets into the cnxml
             obj.editMetadata()
+        elif meta.has_key('featured_links'):
+            # first we clean out all the old links
+            obj.setLinks([])
+            # now we add the ones specified in the cnxml
+            for link in meta.get('featured_links'):
+                obj.doAddLink(link)
         if merge:
             if text:
                 # Replace index.cnxml
@@ -547,6 +553,22 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                 if value and not metadata.has_key(cnxname):
                     metadata[cnxname] = value
         return metadata
+    
+
+    def fixEntities(self, metadata, names):
+        # fix the escaped entities or we end up with things like:
+        # '&amp;' in the title
+        htmlparser = HTMLParser()
+        for name in names:
+            value = metadata.get(name)
+            if isinstance(value, list):
+                l = []
+                for v in value:
+                    l.append(htmlparser.unescape(v))
+                metadata[name] = l
+            elif value:
+                metadata[name] = htmlparser.unescape(value)
+        return metadata
 
 
     def getRolesFromDOM(self, dom):
@@ -568,6 +590,7 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         for cnx_role in ROLE_MAPPING.values():
             role_name = cnx_role.lower() + 's'
             ids = getattr(module, role_name, [])
+            ids = [temp_id.encode(self.encoding) for temp_id in ids]
             roles = moduleRoles.get(cnx_role, [])
             roles.extend(ids)
             moduleRoles[cnx_role] = roles
@@ -619,14 +642,14 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
             else:
                 updateRoles.update(domRoles)
 
-        if self.update_semantics == 'merge':
+        elif self.update_semantics == 'merge':
             updateRoles.update(moduleRoles)
             for role, userids in domRoles.items():
                 userids = set(userids)
                 userids.union(updateRoles.get(role, []))
                 updateRoles[role] = list(userids)
 
-        if self.update_semantics == 'replace':
+        elif self.update_semantics == 'replace':
             currentUsers = set()
             for userids in moduleRoles.values():
                 currentUsers.update(userids)
@@ -702,13 +725,16 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
                 obj.removeCollaborator(c)
 
     
-class RhaptosEditMedia(EditMedia):
+class RhaptosEditMedia(EditMedia, SWORDTreatmentMixin):
+
+    depositreceipt = ViewPageTemplateFile('browser/depositreceipt.pt')
 
     def __init__(self, context, request):
         """ we override init in order to add DELETE as a legitemate
             call in RhaptosSword land.
         """
         EditMedia.__init__(self, context, request)
+        SWORDTreatmentMixin.__init__(self, context, request)
         self.callmap.update({'DELETE': self.DELETE,})
 
     def GET(self):
@@ -745,6 +771,10 @@ class RhaptosEditMedia(EditMedia):
         adapter.updateContent(self.context, body, content_type, cksum,
             merge == 'http://purl.org/oerpub/semantics/Merge')
         self.context.logAction(adapter.action)
+
+        view = self.__of__(self.context)
+        pt = self.depositreceipt.__of__(view)
+        return pt()
 
     def addFile(self, context, filename, f):
         # These files may never be uploaded, because we cannot process
@@ -853,3 +883,7 @@ class RhaptosEditMedia(EditMedia):
         self.context.manage_delObjects(ids)
         self.context.createTemplate()
         return self.request.response.setStatus(200)
+
+    def treatment(self):
+        """ Delegate to mixin class"""
+        return self.get_treatment(self.context)

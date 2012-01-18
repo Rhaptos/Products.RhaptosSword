@@ -11,7 +11,9 @@
     <id>http://nohost/plone/workspace/multipart</id>
     <updated>2011/08/25 15:21:12.561 GMT+2</updated>
     <summary type="text">The summary</summary>
-    <generator uri="rhaptos.swordservice.plone" version="1.0"/>
+
+    <generator uri="rhaptos.swordservice.plone" version="1.1"/>
+
 
     <!-- The metadata begins -->
     <dcterms:identifier xsi:type="dcterms:URI">http://nohost/plone/workspace/multipart</dcterms:identifier> 

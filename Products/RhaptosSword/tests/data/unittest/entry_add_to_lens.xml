@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<entry xmlns="http://www.w3.org/2005/Atom"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:dcterms="http://purl.org/dc/terms/"
+       xmlns:rhaptos="https://trac.rhaptos.org/trac/rhaptos/wiki/LensAPI"> 
+
+    <id>m10000</id> 
+    <rhaptos:comment>Used as supplemental materials for developmental math courses.</rhaptos:comment> <!-- These don't allow any html right now -->
+    <rhaptos:comment>Some arb extra comment.</rhaptos:comment> <!-- These don't allow any html right now -->
+    <rhaptos:tag>math</rhaptos:tag>
+    <rhaptos:tag>community-college-textbook</rhaptos:tag>
+
+    <rhaptos:inclusive>True</rhaptos:inclusive> <!-- Only applicable to collections, indicates that the lens should show up on included modules. -->
+    <rhaptos:versionStart>1.4</rhaptos:versionStart> <!-- start version, leave empty for beginning -->
+    <rhaptos:versionStop></rhaptos:versionStop> <!-- stop version, leave empty for all to latest <-->
+</entry>

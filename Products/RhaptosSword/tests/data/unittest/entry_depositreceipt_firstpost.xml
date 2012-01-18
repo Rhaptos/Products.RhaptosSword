@@ -1,10 +1,10 @@
 <?xml version="1.0" ?><entry xmlns="http://www.w3.org/2005/Atom" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:md="http://cnx.rice.edu/mdml" xmlns:oerdc="http://cnx.org/aboutus/technology/schemas/oerdc" xmlns:sword="http://purl.org/net/sword/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
     <!-- SWORD deposit receipt -->
-    <title>My Title</title>
+    <title>Box Plots Statistics for Majors</title>
     <id>__MODULE_ID__</id>
-    <updated>2011/08/25 19:10:40.197 GMT+2</updated>
-    
+    <updated>2011/09/11 19:33:25.811 GMT+2</updated>
+    <summary type="text">All you wanted to know about Box Plots and more.</summary>
     
     <generator uri="rhaptos.swordservice.plone" version="1.1"/>
 
@@ -13,23 +13,36 @@
     <dcterms:identifier xsi:type="dcterms:URI">http://nohost/plone/Members/test_user_1_/workspace/__MODULE_ID__</dcterms:identifier> 
     <dcterms:identifier xsi:type="oerdc:Version">**new**</dcterms:identifier> 
     <dcterms:identifier xsi:type="oerdc:ContentId">__MODULE_ID__</dcterms:identifier> 
-    <dcterms:title>My Title</dcterms:title>
-    <dcterms:created>2011/09/27 10:59:52.364 GMT+2</dcterms:created> 
-    <dcterms:modified>2011/09/27 10:59:52.432 GMT+2</dcterms:modified> 
+    <dcterms:title>Box Plots Statistics for Majors</dcterms:title>
+    <dcterms:created>2011/09/27 10:52:57.786 GMT+2</dcterms:created> 
+    <dcterms:modified>2011/09/27 10:52:58.026 GMT+2</dcterms:modified> 
     <dcterms:creator oerdc:email="" oerdc:id="test_user_1_" oerdc:pending="False"/>
     <oerdc:maintainer oerdc:email="" oerdc:id="test_user_1_" oerdc:pending="False"/>
     <dcterms:rightsHolder oerdc:email="" oerdc:id="test_user_1_" oerdc:pending="False"/>
+    <oerdc:translator oerdc:email="" oerdc:id="test_user_1_" oerdc:pending="False"/>
+    <oerdc:editor oerdc:email="" oerdc:id="test_user_1_" oerdc:pending="False"/>
     
     <!-- CNX-Supported but not in MDML -->
     <oerdc:descriptionOfChanges>
-        Frobnicate the Bar
+        Created module
     </oerdc:descriptionOfChanges> 
 
+    <oerdc:oer-subject>Mathematics and Statistics</oerdc:oer-subject>
+    <oerdc:oer-subject>Arts</oerdc:oer-subject>
+    <oerdc:oer-subject>Humanities</oerdc:oer-subject>
+    <oerdc:oer-subject>Business</oerdc:oer-subject>
 
+    <dcterms:subject xsi:type="oerdc:Subject">Mathematics and Statistics</dcterms:subject>
+    <dcterms:subject xsi:type="oerdc:Subject">Arts</dcterms:subject>
+    <dcterms:subject xsi:type="oerdc:Subject">Humanities</dcterms:subject>
+    <dcterms:subject xsi:type="oerdc:Subject">Business</dcterms:subject>
     
+    <dcterms:subject>box</dcterms:subject>
+    <dcterms:subject>median</dcterms:subject>
+    <dcterms:subject>quartiles</dcterms:subject>
 
 
-    <dcterms:abstract/>
+    <dcterms:abstract>All you wanted to know about Box Plots and more.</dcterms:abstract>
 
     <dcterms:language xsi:type="ISO639-1">en</dcterms:language> 
 
@@ -37,10 +50,10 @@
     
     
     <sword:treatment>
-        Module 'My Title' was imported.
+        Module 'Box Plots Statistics for Majors' was imported.
         You can <a href="http://nohost/plone/Members/test_user_1_/workspace/__MODULE_ID__/module_view">preview your module here</a> to see what it will look like once it is published.
         
-        The current description of the changes you have made for this version of the module: Frobnicate the Bar
+        The current description of the changes you have made for this version of the module: Created module
         
 
         
@@ -96,6 +109,6 @@ NOTE: Due to an increase of spam on our site:
 
     
 
-    
+    <oerdc:analyticsCode>UA-4688042-1</oerdc:analyticsCode>
 
 </entry>
