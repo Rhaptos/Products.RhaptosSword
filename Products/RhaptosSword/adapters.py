@@ -501,9 +501,11 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         errors = []
         links = meta.get('featured_links')
         for link in links:
-            if int(link.get('strength')) > 3:
+            strength = link.get('strength')
+            validvalues = ['1', '2', '3']
+            if strength not in validvalues:
                 errors.append(
-                   "The maximum strength for a link is 3." 
+                   "Valid values for strength is 1,2 or 3." 
                    " The link (%s) is incorrect." %link
                 )
         return errors
