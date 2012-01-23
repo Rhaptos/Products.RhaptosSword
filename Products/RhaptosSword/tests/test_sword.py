@@ -117,6 +117,20 @@ class StubDataObject(object):
         except AttributeError:
             raise KeyError, k
 
+class StubModule(StubDataObject):
+    def __init__(self, **kwargs):
+        super(StubModule, self).__init__(**kwargs)
+        self.id = kwargs.get('id')
+        self.versionStart = StubDataObject(version=kwargs.get('versionstart'))
+        self.versionStop = StubDataObject(version=kwargs.get('versionstop'))
+
+    def getHistory(self, moduleid):
+        return [self.versionStart, self.versionStop]
+    
+    def getId(self):
+        return self.id
+
+
 def makeStubFromVersionData(id, data):
     return StubDataObject(ident=1,
         name='Published Module %s' % id,
@@ -1820,7 +1834,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
 
         # assert that the module was added to the lens
         modules = lens.listFolderContents(spec='SelectedContent')
-        self.assertEqual(len(modules), 1, 'More than one module linked.')
+        self.assertEqual(len(modules), 1, 'Module linking failed.')
 
 
     def testAddMultipleModulesToLens(self):
@@ -1939,7 +1953,31 @@ class TestSwordService(PloneTestCase.PloneTestCase):
                 ['tester', ],
                 ['tester', ],
                ]
-        module = makeStubFromVersionData('testmodule', data)
+        id = 'testmodule1'
+        data = {
+            'ident': 1,
+            'name' :'Published Module %s' % id,
+            'abstract'  : 'The Abstract',
+            'roles'  : {},
+            'authors'  : ['tester',],
+            'language'  : 'en',
+            'version'  : '1.3',
+            'created'  : DateTime(),
+            'revised'  : DateTime(),
+            'maintainers'  : ['tester', ],
+            'licensors'  : ['tester', ],
+            'submitter'  : 'tester',
+            'portal_type'  : 'Module',
+            'license'  : 'http://creativecommons.org/licenses/by/3.0/',
+            'keywords'  : ('Test', 'Module'),
+            'subject'  : ('Arts',),
+            'parent_id'  : None,
+            'parent_version'  : None,
+            'parentAuthors'  : [],
+            'versionstart' : startVersion,
+            'versionstop' : stopVersion,
+        }
+        module = StubModule(**data)
 
         view = LensAtomPubAdapter(module, self.portal.REQUEST)
         view.validateVersions(startVersion, stopVersion, module)

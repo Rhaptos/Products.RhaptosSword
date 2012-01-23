@@ -88,10 +88,10 @@ class LensAtomPubAdapter(PloneFolderAtomPubAdapter):
             versionStart = versionStart.encode(encoding) or '1'
         
         elements = entry.getElementsByTagName('rhaptos:versionStop')
-        versionStop = ''
+        versionStop = 'latest'
         if elements and elements[0].hasChildNodes():
             versionStop = elements[0].firstChild.toxml()
-            versionStop = versionStop.encode(encoding) or 'latest'
+            versionStop = versionStop.encode(encoding)
         self.validateVersions(versionStart, versionStop, module)  
 
         namespaceTags = []
@@ -122,9 +122,15 @@ class LensAtomPubAdapter(PloneFolderAtomPubAdapter):
         return entry
 
     def validateVersions(self, versionStart, versionStop, module):
-        start = stop = None
+        history = module.getHistory(module.id)
+        modulestart = history and float(history[0].version) or None
+        modulestop = history and float(history[-1].version) or None
+
         try:
             start = float(versionStart)
+            if start < modulestart:
+                raise ValueError(
+                    'Supplied verionStart is less than module versionStart.')
         except ValueError, e:
             raise ValueError(e)
         try:
@@ -135,11 +141,15 @@ class LensAtomPubAdapter(PloneFolderAtomPubAdapter):
             if versionStop != 'latest':
                 raise ValueError(e)
             # we default to the current module version
-            stop = float(module.version)
+            stop = modulestop
+        if stop > modulestop:
+            raise ValueError(
+                'Supplied verionStop is greater than module versionStop.')
             
         if stop < start:
             raise ValueError(
                 'verionStop cannot be less than versionStart.')
+
 
     def lensAdd(self, lensPath, contentId, versionStart,
                 versionStop='latest', namespaceTags=[], tags='',
