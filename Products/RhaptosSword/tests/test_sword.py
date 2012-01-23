@@ -1628,6 +1628,22 @@ class TestSwordService(PloneTestCase.PloneTestCase):
             'Link source incorrect')
 
 
+    def test_featured_link_incorrect_strength(self):
+        self._setupRhaptos()
+        self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 
+        uploadrequest = self.createUploadRequest(
+            'badstrength.txt',
+            context=self.folder.workspace,
+            CONTENT_TYPE='multipart/related; boundary="===============2344332082578161682=="'
+
+        )
+        # Call the sword view on this request to perform the upload
+        adapter = getMultiAdapter(
+                (self.folder.workspace, uploadrequest), Interface, 'sword')
+        xml = adapter()
+        drdom = parseString(xml)
+
+
     def test_multiple_featured_links(self):
         self._setupRhaptos()
         self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 

@@ -461,9 +461,13 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         elif meta.has_key('featured_links'):
             # first we clean out all the old links
             obj.setLinks([])
-            # now we add the ones specified in the cnxml
-            for link in meta.get('featured_links'):
-                obj.doAddLink(link)
+            errors = self.validateLinks(meta)
+            if errors:
+                raise ValidationError(
+                    'Invalid links. Errors: %s' '\n'.join(errors))
+            else:
+                for link in meta.get('featured_links'):
+                    obj.doAddLink(link)
         if merge:
             if text:
                 # Replace index.cnxml
@@ -491,6 +495,18 @@ class RhaptosWorkspaceSwordAdapter(PloneFolderSwordAdapter):
         # After updating the content, set status to modified, reindex
         if self.action not in ('create', 'derive', 'checkout'):
             self.action = 'save'
+
+    
+    def validateLinks(self, meta):
+        errors = []
+        links = meta.get('featured_links')
+        for link in links:
+            if int(link.get('strength')) > 3:
+                errors.append(
+                   "The maximum strength for a link is 3." 
+                   " The link (%s) is incorrect." %link
+                )
+        return errors
 
 
     def updateObject(self, obj, filename, request, response, content_type):
