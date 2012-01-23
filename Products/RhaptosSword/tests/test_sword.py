@@ -34,6 +34,7 @@ from rhaptos.swordservice.plone.interfaces import ISWORDEMIRI
 from rhaptos.swordservice.plone.interfaces import ISWORDListCollection
 from Products.RhaptosSword.browser.views import ServiceDocument
 from Products.RhaptosSword.adapters import ValidationError
+from Products.RhaptosSword.browser.atompub import LensAtomPubAdapter
 from Products.RhaptosRepository.interfaces.IVersionStorage import IVersionStorage
 from Products.RhaptosRepository.VersionFolder import incrementMinor
 from Products.RhaptosModuleStorage.ModuleVersionFolder import ModuleVersionStorage
@@ -1927,6 +1928,49 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         xml = adapter()
         assert "<sword:error" not in xml, xml
 
+
+    def test_validateVersions(self):
+        startVersion = '1.1'
+        stopVersion = '1.3'
+        data = [stopVersion,
+                DateTime(),
+                DateTime(),
+                'tester',
+                ['tester', ],
+                ['tester', ],
+               ]
+        module = makeStubFromVersionData('testmodule', data)
+
+        view = LensAtomPubAdapter(module, self.portal.REQUEST)
+        view.validateVersions(startVersion, stopVersion, module)
+
+        startVersion = '1.3'
+        stopVersion = '1.1'
+        self.assertRaises(
+            ValueError,
+            view.validateVersions,
+            startVersion, stopVersion, module
+        )
+
+        startVersion = '1.1'
+        stopVersion = 'latest'
+        view.validateVersions(startVersion, stopVersion, module)
+        
+        startVersion = 'a'
+        stopVersion = 'b'
+        self.assertRaises(
+            ValueError,
+            view.validateVersions,
+            startVersion, stopVersion, module
+        )
+
+        startVersion = 'a'
+        stopVersion = 'latest'
+        self.assertRaises(
+            ValueError,
+            view.validateVersions,
+            startVersion, stopVersion, module
+        )
 
     def testCheckoutToWrongWorkspace(self):
         self._setupRhaptos()

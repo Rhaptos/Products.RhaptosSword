@@ -92,6 +92,7 @@ class LensAtomPubAdapter(PloneFolderAtomPubAdapter):
         if elements and elements[0].hasChildNodes():
             versionStop = elements[0].firstChild.toxml()
             versionStop = versionStop.encode(encoding) or 'latest'
+        self.validateVersions(versionStart, versionStop, module)  
 
         namespaceTags = []
 
@@ -119,6 +120,26 @@ class LensAtomPubAdapter(PloneFolderAtomPubAdapter):
                              comment=comments,
                              inclusive=inclusive)            
         return entry
+
+    def validateVersions(self, versionStart, versionStop, module):
+        start = stop = None
+        try:
+            start = float(versionStart)
+        except ValueError, e:
+            raise ValueError(e)
+        try:
+            stop = float(versionStop)
+        except ValueError, e:
+            # if we cannot cast the version string as float it might be ok
+            # but only if versionStop was 'latest'
+            if versionStop != 'latest':
+                raise ValueError(e)
+            # we default to the current module version
+            stop = float(module.version)
+            
+        if stop < start:
+            raise ValueError(
+                'verionStop cannot be less than versionStart.')
 
     def lensAdd(self, lensPath, contentId, versionStart,
                 versionStop='latest', namespaceTags=[], tags='',
