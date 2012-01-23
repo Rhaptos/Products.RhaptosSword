@@ -1,3 +1,6 @@
+RhaptosSword-2.1
+  - oerpub m4 release (lenses mostly)
+
 RhaptosSword-2.0
   - Use rhaptos.swordservice.plone to provide the sword functionality
   - Support sword version 2.0
