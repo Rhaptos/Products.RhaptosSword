@@ -2038,6 +2038,14 @@ class TestSwordService(PloneTestCase.PloneTestCase):
             startVersion, stopVersion, module
         )
 
+        startVersion = ''
+        stopVersion = '1.3'
+        view.validateVersions(startVersion, stopVersion, module)
+        
+        startVersion = '1.1'
+        stopVersion = ''
+        view.validateVersions(startVersion, stopVersion, module)
+
     def testCheckoutToWrongWorkspace(self):
         self._setupRhaptos()
         self.folder.manage_addProduct['CMFPlone'].addPloneFolder('workspace') 

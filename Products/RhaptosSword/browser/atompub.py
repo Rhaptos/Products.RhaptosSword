@@ -128,7 +128,11 @@ class LensAtomPubAdapter(PloneFolderAtomPubAdapter):
         versions = ', '.join(versions)
         modulestart = history and float(history[-1].version) or None
         modulestop = history and float(history[0].version) or None
-        if versionStop == 'latest':
+        if not versionStart:
+            versionStart = modulestart
+        if not versionStop:
+            versionStop = modulestop
+        elif versionStop == 'latest':
             versionStop = modulestop
 
         try:
@@ -136,10 +140,10 @@ class LensAtomPubAdapter(PloneFolderAtomPubAdapter):
             versionStop = float(versionStop)
             modulestart = float(modulestart) 
             modulestop = float(modulestop)
-        except ValueError:
+        except ValueError, e:
             raise ValueError(
-                'Version value %s cannot be expressed'
-                ' as a float.' %versionStop
+                'Version value cannot be expressed'
+                ' as a float. Error: %s' %e.args[0]
             )
 
         if versionStart < modulestart:
