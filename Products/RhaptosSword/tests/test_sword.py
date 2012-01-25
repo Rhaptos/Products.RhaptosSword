@@ -125,7 +125,7 @@ class StubModule(StubDataObject):
         self.versionStop = StubDataObject(version=kwargs.get('versionstop'))
 
     def getHistory(self, moduleid):
-        return [self.versionStart, self.versionStop]
+        return [self.versionStop, self.versionStart, ]
     
     def getId(self):
         return self.id
@@ -2020,6 +2020,18 @@ class TestSwordService(PloneTestCase.PloneTestCase):
 
         startVersion = 'a'
         stopVersion = 'latest'
+        self.assertRaises(
+            ValueError,
+            view.validateVersions,
+            startVersion, stopVersion, module
+        )
+
+        startVersion = '1.1'
+        stopVersion = '1.3'
+        view.validateVersions(startVersion, stopVersion, module)
+
+        startVersion = '3'
+        stopVersion = ''
         self.assertRaises(
             ValueError,
             view.validateVersions,

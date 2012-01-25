@@ -123,33 +123,43 @@ class LensAtomPubAdapter(PloneFolderAtomPubAdapter):
 
     def validateVersions(self, versionStart, versionStop, module):
         history = module.getHistory(module.id)
-        modulestart = history and float(history[0].version) or None
-        modulestop = history and float(history[-1].version) or None
+        versions = [h.version for h in history]
+        versions.reverse()
+        versions = ', '.join(versions)
+        modulestart = history and float(history[-1].version) or None
+        modulestop = history and float(history[0].version) or None
+        if versionStop == 'latest':
+            versionStop = modulestop
 
         try:
-            start = float(versionStart)
-            if start < modulestart:
-                raise ValueError(
-                    'Supplied verionStart is less than module versionStart.')
-        except ValueError, e:
-            raise ValueError(e)
-        try:
-            stop = float(versionStop)
-        except ValueError, e:
-            # if we cannot cast the version string as float it might be ok
-            # but only if versionStop was 'latest'
-            if versionStop != 'latest':
-                raise ValueError(e)
-            # we default to the current module version
-            stop = modulestop
-        if stop > modulestop:
+            versionStart = float(versionStart)
+            versionStop = float(versionStop)
+            modulestart = float(modulestart) 
+            modulestop = float(modulestop)
+        except ValueError:
             raise ValueError(
-                'Supplied verionStop is greater than module versionStop.')
-            
-        if stop < start:
-            raise ValueError(
-                'verionStop cannot be less than versionStart.')
+                'Version value %s cannot be expressed'
+                ' as a float.' %versionStop
+            )
 
+        if versionStart < modulestart:
+            raise ValueError(
+                'Supplied verionStart %s is less than module %s versionStart'
+                ' of %s (valid versions: %s).' %(
+                    versionStart, module.id, modulestart, versions)
+            )
+        if versionStop > modulestop:
+            raise ValueError(
+                'Supplied verionStop %s is greater than module'
+                ' %s versionStop of %s (valid versions: %s).' %(
+                    versionStop, module.id, modulestop, versions)
+            )
+        if versionStop < versionStart:
+            raise ValueError(
+                'VersionStop %s cannot be less than versionStart %s'
+                ' for module %s (valid versions: %s).' %(
+                    versionStop, versionStart, module.id, versions)
+            )
 
     def lensAdd(self, lensPath, contentId, versionStart,
                 versionStop='latest', namespaceTags=[], tags='',
