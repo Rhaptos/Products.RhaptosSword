@@ -92,7 +92,7 @@ class LensAtomPubAdapter(PloneFolderAtomPubAdapter):
         if elements and elements[0].hasChildNodes():
             versionStop = elements[0].firstChild.toxml()
             versionStop = versionStop.encode(encoding)
-        versionStart, versionStop = self.validateVersions(
+        versionStart, versionStop = self.getVersions(
             versionStart, versionStop, module)
 
         namespaceTags = []
@@ -122,7 +122,7 @@ class LensAtomPubAdapter(PloneFolderAtomPubAdapter):
                              inclusive=inclusive)            
         return entry
 
-    def validateVersions(self, versionStart, versionStop, module):
+    def getVersions(self, versionStart, versionStop, module):
         history = module.getHistory(module.id)
         versions = [h.version for h in history]
         versions.reverse()

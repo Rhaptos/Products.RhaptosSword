@@ -1959,7 +1959,7 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         assert "<sword:error" not in xml, xml
 
 
-    def test_validateVersions(self):
+    def test_getVersions(self):
         startVersion = '1.1'
         stopVersion = '1.3'
         data = [stopVersion,
@@ -1996,25 +1996,25 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         module = StubModule(**data)
 
         view = LensAtomPubAdapter(module, self.portal.REQUEST)
-        view.validateVersions(startVersion, stopVersion, module)
+        view.getVersions(startVersion, stopVersion, module)
 
         startVersion = '1.3'
         stopVersion = '1.1'
         self.assertRaises(
             ValueError,
-            view.validateVersions,
+            view.getVersions,
             startVersion, stopVersion, module
         )
 
         startVersion = '1.1'
         stopVersion = 'latest'
-        view.validateVersions(startVersion, stopVersion, module)
+        view.getVersions(startVersion, stopVersion, module)
         
         startVersion = 'a'
         stopVersion = 'b'
         self.assertRaises(
             ValueError,
-            view.validateVersions,
+            view.getVersions,
             startVersion, stopVersion, module
         )
 
@@ -2022,29 +2022,29 @@ class TestSwordService(PloneTestCase.PloneTestCase):
         stopVersion = 'latest'
         self.assertRaises(
             ValueError,
-            view.validateVersions,
+            view.getVersions,
             startVersion, stopVersion, module
         )
 
         startVersion = '1.1'
         stopVersion = '1.3'
-        view.validateVersions(startVersion, stopVersion, module)
+        view.getVersions(startVersion, stopVersion, module)
 
         startVersion = '3'
         stopVersion = ''
         self.assertRaises(
             ValueError,
-            view.validateVersions,
+            view.getVersions,
             startVersion, stopVersion, module
         )
 
         startVersion = ''
         stopVersion = '1.3'
-        view.validateVersions(startVersion, stopVersion, module)
+        view.getVersions(startVersion, stopVersion, module)
         
         startVersion = '1.1'
         stopVersion = ''
-        view.validateVersions(startVersion, stopVersion, module)
+        view.getVersions(startVersion, stopVersion, module)
 
     def testCheckoutToWrongWorkspace(self):
         self._setupRhaptos()
