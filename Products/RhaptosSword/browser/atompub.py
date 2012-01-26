@@ -149,8 +149,8 @@ class LensAtomPubAdapter(PloneFolderAtomPubAdapter):
 
         if versionStart < modulestart:
             raise ValueError(
-                'Supplied verionStart %s is less than module %s versionStart'
-                ' of %s (valid versions: %s).' %(
+                'Supplied verionStart %s is less than module'
+                ' %s versionStart of %s (valid versions: %s).' %(
                     versionStart, module.id, modulestart, versions)
             )
         if versionStop > modulestop:
@@ -161,9 +161,9 @@ class LensAtomPubAdapter(PloneFolderAtomPubAdapter):
             )
         if versionStop < versionStart:
             raise ValueError(
-                'VersionStop %s cannot be less than versionStart %s'
-                ' for module %s (valid versions: %s).' %(
-                    versionStop, versionStart, module.id, versions)
+                'Supplied versionStop %s is less than module'
+                '%s versionStart of %s (valid versions: %s).' %(
+                    versionStop, module.id, versionStart, versions)
             )
         return str(versionStart), str(versionStop)
 
