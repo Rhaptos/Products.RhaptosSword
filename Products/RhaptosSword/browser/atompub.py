@@ -92,7 +92,8 @@ class LensAtomPubAdapter(PloneFolderAtomPubAdapter):
         if elements and elements[0].hasChildNodes():
             versionStop = elements[0].firstChild.toxml()
             versionStop = versionStop.encode(encoding)
-        self.validateVersions(versionStart, versionStop, module)  
+        versionStart, versionStop = self.validateVersions(
+            versionStart, versionStop, module)
 
         namespaceTags = []
 
@@ -164,6 +165,7 @@ class LensAtomPubAdapter(PloneFolderAtomPubAdapter):
                 ' for module %s (valid versions: %s).' %(
                     versionStop, versionStart, module.id, versions)
             )
+        return str(versionStart), str(versionStop)
 
     def lensAdd(self, lensPath, contentId, versionStart,
                 versionStop='latest', namespaceTags=[], tags='',
