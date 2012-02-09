@@ -20,7 +20,6 @@
                 <sword:acceptPackaging>http://purl.org/net/sword/package/SimpleZip</sword:acceptPackaging>
                 <sword:mediation>false</sword:mediation>
                 <sword:treatment>Upload a word processing document, LaTeX document, or Connexions XML to create a module.</sword:treatment>
-                <sword:collectionPolicy tal:condition="collection/members|nothing">The following Connexions members can create and edit modules in this workgroup: <tal:members tal:replace="collection/members"/></sword:collectionPolicy>
                 <dcterms:abstract tal:content="collection/description"> </dcterms:abstract>
             </collection>
             
