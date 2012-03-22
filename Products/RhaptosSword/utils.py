@@ -161,7 +161,7 @@ class SWORDTreatmentMixin(object):
         
         treatment['description_of_changes'] = context.message
 
-        if context.state == 'published':
+        if context.state == 'published' or context.state == 'public':
             # No requirements if we are already published
             treatment['publication_requirements'] = []
         else:

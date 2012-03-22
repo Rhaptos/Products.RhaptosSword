@@ -51,6 +51,11 @@
         interface="Products.RhaptosSword.interfaces.IRhaptosSwordCollection"
         /> 
 
+    <five:implements                                                              
+        class="Products.RhaptosModuleStorage.ModuleView.ModuleView"
+        interface="Products.RhaptosSword.interfaces.IRhaptosSwordCollection"
+        /> 
+
     <!-- Mark collaboration requests -->
     <five:implements
         class="Products.RhaptosCollaborationTool.CollaborationFolder.CollabRequest"
