@@ -291,7 +291,7 @@ class SWORDTreatmentMixin(object):
 
         if not haspermission:
             requirements.append(unicode(
-                PERMISSION_WARNING % (context.absolute_url(),)*2, encoding))
+                PERMISSION_WARNING % ((context.absolute_url(),)*2), encoding))
 
         return requirements
 
