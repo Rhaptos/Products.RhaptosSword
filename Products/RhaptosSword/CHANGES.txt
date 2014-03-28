@@ -1,3 +1,6 @@
+RhaptosSword-2.3.1
+  - Rename Connexions to OSCNX
+
 RhaptosSword-2.3
   - enable published content GET
   - bugfix PERMISSIONS warning in deposit receipt
