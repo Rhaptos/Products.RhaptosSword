@@ -1,7 +1,7 @@
 <tal:container 
     xmlns:tal="http://xml.zope.org/namespaces/tal"
     tal:define="isCNX context/isCNX|nothing;
-                portalTitle python:isCNX and 'Connexions' or 'Rhaptos';
+                portalTitle python:isCNX and 'OpenStax CNX' or 'Rhaptos';
                 serviceDescription python:'Upload a MS Word document to a %s module.' % portalTitle;
                 providerDescritpion python:'%s is a web-based collaborative publishing system for educational material.' % portalTitle;
                 isAnon context/portal_membership/isAnonymousUser;"
@@ -16,10 +16,10 @@
  <sword:noOp>true</sword:noOp>
  <sword:maxUploadSize>60000</sword:maxUploadSize>
  <workspace>
-   <atom:title>Connexions</atom:title>
+   <atom:title>OpenStax CNX</atom:title>
    <tal:collection tal:condition="isAnon">
      <collection href="http://cnx.org/sword" tal:attributes="href string:${here/absolute_url}/sword">
-       <atom:title>Connexions Module Generation</atom:title>
+       <atom:title>OpenStax CNX Module Generation</atom:title>
        <accept>application/zip</accept>
        <sword:mediation>false</sword:mediation>
        <sword:treatment tal:content="serviceDescription"/>
