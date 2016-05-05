@@ -4,9 +4,10 @@
        xmlns:dcterms="http://purl.org/dc/terms/"
        xmlns:md="http://cnx.rice.edu/mdml"
        xmlns:tal="http://xml.zope.org/namespaces/tal"
-      xmlns:metal="http://xml.zope.org/namespaces/metal"
+       xmlns:metal="http://xml.zope.org/namespaces/metal"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:oerdc="http://cnx.org/aboutus/technology/schemas/oerdc"
+       xmlns:m="http://www.w3.org/1998/Math/MathML"
        tal:define="pending_collaborations view/pending_collaborations;
                    treatment view/treatment;
                    is_published python:context.state == 'published';
