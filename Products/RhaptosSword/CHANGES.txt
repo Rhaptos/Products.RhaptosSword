@@ -1,3 +1,6 @@
+RhaptosSword-2.3.2
+  - adding mathml namespace to template (fixes errors with Rhaptos/content-copy-tool)
+
 RhaptosSword-2.3.1
   - Rename Connexions to OSCNX
 
